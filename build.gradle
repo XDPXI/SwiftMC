@@ -1,0 +1,50 @@
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '9.2.2'
+}
+
+group = 'dev.xdpxi'
+version = '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'net.minestom:minestom:2025.10.31-1.21.10'
+    implementation 'org.apache.logging.log4j:log4j-core:2.25.2'
+    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.25.2'
+    implementation 'org.yaml:snakeyaml:2.5'
+    implementation 'com.formdev:flatlaf:3.6.2'
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
+}
+
+tasks {
+    jar {
+        manifest {
+            attributes["Main-Class"] = "dev.xdpxi.swiftmc.Main"
+        }
+    }
+
+    build {
+        dependsOn(shadowJar)
+    }
+
+    shadowJar {
+        mergeServiceFiles()
+        archiveClassifier.set("")
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
