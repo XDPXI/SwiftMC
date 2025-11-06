@@ -4,12 +4,16 @@ import dev.xdpxi.swiftmc.Main;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.generator.GenerationUnit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TerrainGenerator implements net.minestom.server.instance.generator.Generator {
     private static final int BASE_HEIGHT = 64;
     private static final int WATER_LEVEL = 60;
     private static final double[] NOISE_FREQUENCIES = {0.02, 0.05, 0.1};
     private static final double[] NOISE_AMPLITUDES = {20, 10, 5};
-    private static final double TREE_PROBABILITY = 0.1; // 3% chance per block
+    private static final double TREE_PROBABILITY = 0.1;
+    private static final int MIN_TREE_DISTANCE = 3; // min trunk-to-trunk distance
     private final FastNoise noise = new FastNoise(Main.config.seed);
 
     @Override
@@ -20,6 +24,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         int endY = unit.absoluteEnd().blockY();
 
         int[][] heightMap = new int[16][16];
+        List<TreePos> trees = new ArrayList<>();
 
         // Generate height map
         for (int x = 0; x < 16; x++) {
@@ -35,7 +40,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
             }
         }
 
-        // Fill blocks & place trees
+        // Fill terrain columns and record trees
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 int worldX = baseX + x;
@@ -48,11 +53,52 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                     if (block != null) unit.modifier().setBlock(worldX, y, worldZ, block);
                 }
 
-                // Tree generation
-                if (height > WATER_LEVEL && noise.get(worldX, worldZ) * 0.5 + 0.5 < TREE_PROBABILITY) {
-                    placeTree(unit, worldX, height, worldZ, startY, endY);
+                // Record trees if far enough from other trees
+                if (height > WATER_LEVEL && Math.random() < TREE_PROBABILITY) {
+                    boolean tooClose = false;
+                    for (TreePos tree : trees) {
+                        int dx = tree.x - worldX;
+                        int dz = tree.z - worldZ;
+                        if (Math.sqrt(dx * dx + dz * dz) < MIN_TREE_DISTANCE) {
+                            tooClose = true;
+                            break;
+                        }
+                    }
+                    if (!tooClose) trees.add(new TreePos(worldX, height, worldZ));
                 }
             }
+        }
+
+        // Generate trees
+        for (TreePos tree : trees) {
+            placeTree(unit, tree.x, tree.y, tree.z, startY, endY);
+        }
+    }
+
+    private void placeTree(GenerationUnit unit, int worldX, int worldY, int worldZ, int minY, int maxY) {
+        int trunkHeight = 4 + (int) (Math.random() * 3); // 4-6 blocks
+        int leafRadius = 2;
+        int leafCenter = worldY + trunkHeight - 1;
+
+        // Leaves
+        for (int dx = -leafRadius; dx <= leafRadius; dx++) {
+            for (int dz = -leafRadius; dz <= leafRadius; dz++) {
+                for (int dy = -leafRadius; dy <= leafRadius; dy++) {
+                    double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                    int leafX = worldX + dx;
+                    int leafY = leafCenter + dy;
+                    int leafZ = worldZ + dz;
+
+                    if (dist <= leafRadius && leafY >= minY && leafY < maxY) {
+                        unit.modifier().setBlock(leafX, leafY, leafZ, Block.OAK_LEAVES);
+                    }
+                }
+            }
+        }
+
+        // Trunk
+        for (int y = worldY; y < worldY + trunkHeight && y < maxY; y++) {
+            unit.modifier().setBlock(worldX, y, worldZ, Block.OAK_LOG);
         }
     }
 
@@ -60,7 +106,6 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         if (y < height - 3) return Block.STONE;
         if (y < height - 1) return Block.DIRT;
 
-        // Check for sand near water
         if (y == height - 1) {
             boolean nearWater = false;
             for (int dx = -1; dx <= 1 && !nearWater; dx++) {
@@ -81,25 +126,6 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         return null;
     }
 
-    private void placeTree(GenerationUnit unit, int worldX, int worldY, int worldZ, int minY, int maxY) {
-        int trunkHeight = 4 + (int) (Math.random() * 3); // 4-6 blocks
-        // Trunk
-        for (int y = worldY; y < worldY + trunkHeight && y < maxY; y++) {
-            unit.modifier().setBlock(worldX, y, worldZ, Block.OAK_LOG);
-        }
-
-        // Leaves
-        int leafRadius = 2;
-        int leafCenter = worldY + trunkHeight - 1;
-        for (int dx = -leafRadius; dx <= leafRadius; dx++) {
-            for (int dz = -leafRadius; dz <= leafRadius; dz++) {
-                for (int dy = -leafRadius; dy <= leafRadius; dy++) {
-                    double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-                    if (dist <= leafRadius && leafCenter + dy < maxY && leafCenter + dy >= minY) {
-                        unit.modifier().setBlock(worldX + dx, leafCenter + dy, worldZ + dz, Block.OAK_LEAVES);
-                    }
-                }
-            }
-        }
+    private record TreePos(int x, int y, int z) {
     }
 }
