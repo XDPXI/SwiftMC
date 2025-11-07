@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerData {
+    public final List<ItemSerialization> inventory = new ArrayList<>();
     public double x, y, z;
     public float yaw, pitch;
     public GameMode gameMode;
-    public final List<ItemSerialization> inventory = new ArrayList<>();
 
     public PlayerData() {
     }
