@@ -16,6 +16,7 @@ public class Config {
     public int seed;
     public int port = 25565;
     public int maxPlayers = 500;
+    public boolean debugEnabled = false;
 
     public static Config loadOrCreate() throws Exception {
         LoaderOptions loaderOptions = new LoaderOptions();
@@ -35,6 +36,9 @@ public class Config {
 
                 Object maxPlayersObj = map.get("maxPlayers");
                 if (maxPlayersObj != null) config.maxPlayers = ((Number) maxPlayersObj).intValue();
+
+                Object debugEnabledObj = map.get("debugEnabled");
+                if (debugEnabledObj != null) config.debugEnabled = (Boolean) debugEnabledObj;
             }
         } else {
             config = new Config();
@@ -44,6 +48,7 @@ public class Config {
             data.put("seed", config.seed);
             data.put("port", config.port);
             data.put("maxPlayers", config.maxPlayers);
+            data.put("debugEnabled", config.debugEnabled);
 
             DumperOptions dumperOptions = new DumperOptions();
             dumperOptions.setPrettyFlow(true);
