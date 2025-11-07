@@ -94,6 +94,9 @@ public class Main {
             instanceContainer.saveChunksToStorage();
 
             MinecraftServer.stopCleanly();
+
+            Log.close();
+
             Log.info("Server stopped cleanly.");
         }));
 
