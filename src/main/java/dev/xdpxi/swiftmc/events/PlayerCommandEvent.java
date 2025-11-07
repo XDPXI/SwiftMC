@@ -1,5 +1,6 @@
 package dev.xdpxi.swiftmc.events;
 
+import dev.xdpxi.swiftmc.nether.NetherManager;
 import dev.xdpxi.swiftmc.utils.Log;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -30,6 +31,22 @@ public class PlayerCommandEvent {
                     player.setGameMode(GameMode.SPECTATOR);
                     player.sendMessage(Component.text("Gamemode set to Spectator", NamedTextColor.GREEN));
                     Log.info(player.getUsername() + " changed gamemode to SPECTATOR");
+                    event.setCancelled(true);
+                }
+                case "nether" -> {
+                    if (player.getInstance() == NetherManager.getOverworldInstance()) {
+                        player.setInstance(NetherManager.getNetherInstance(), player.getPosition()).thenRun(() -> {
+                            player.sendMessage(Component.text("Teleported to Nether!", NamedTextColor.RED));
+                        });
+                    }
+                    event.setCancelled(true);
+                }
+                case "overworld" -> {
+                    if (player.getInstance() == NetherManager.getNetherInstance()) {
+                        player.setInstance(NetherManager.getOverworldInstance(), player.getPosition()).thenRun(() -> {
+                            player.sendMessage(Component.text("Teleported to Overworld!", NamedTextColor.GREEN));
+                        });
+                    }
                     event.setCancelled(true);
                 }
             }

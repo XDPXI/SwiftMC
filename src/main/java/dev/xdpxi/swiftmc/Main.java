@@ -1,6 +1,7 @@
 package dev.xdpxi.swiftmc;
 
 import dev.xdpxi.swiftmc.events.*;
+import dev.xdpxi.swiftmc.nether.NetherManager;
 import dev.xdpxi.swiftmc.player.PlayerDataManager;
 import dev.xdpxi.swiftmc.utils.Config;
 import dev.xdpxi.swiftmc.utils.Log;
@@ -61,6 +62,14 @@ public class Main {
         instanceContainer.setGenerator(new TerrainGenerator());
         Log.info("Custom terrain generator applied.");
 
+        // Initialize Nether
+        try {
+            NetherManager.init(instanceContainer);
+            Log.info("Nether dimension initialized.");
+        } catch (Exception e) {
+            Log.error("Failed to initialize Nether: " + e.getMessage());
+        }
+
         // Events
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         Log.debug("GlobalEventHandler obtained.");
@@ -120,6 +129,10 @@ public class Main {
             });
 
             instanceContainer.saveChunksToStorage();
+            if (NetherManager.getNetherInstance() != null) {
+                NetherManager.getNetherInstance().saveChunksToStorage();
+                Log.info("Nether world saved.");
+            }
 
             MinecraftServer.stopCleanly();
 
