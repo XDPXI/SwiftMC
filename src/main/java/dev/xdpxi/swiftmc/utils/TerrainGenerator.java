@@ -12,7 +12,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
     private static final int WATER_LEVEL = 60;
     private static final double[] NOISE_FREQUENCIES = {0.02, 0.05, 0.1};
     private static final double[] NOISE_AMPLITUDES = {20, 10, 5};
-    private static final double TREE_PROBABILITY = 0.1;
+    private static final double TREE_PROBABILITY = 0.001;
     private static final int MIN_TREE_DISTANCE = 3; // min trunk-to-trunk distance
     private final FastNoise noise = new FastNoise(Main.config.seed);
 
@@ -80,6 +80,13 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         int leafRadius = 2;
         int leafCenter = worldY + trunkHeight - 1;
 
+        int startX = unit.absoluteStart().blockX();
+        int endX = unit.absoluteEnd().blockX();
+        int startY = unit.absoluteStart().blockY();
+        int endY = unit.absoluteEnd().blockY();
+        int startZ = unit.absoluteStart().blockZ();
+        int endZ = unit.absoluteEnd().blockZ();
+
         // Leaves
         for (int dx = -leafRadius; dx <= leafRadius; dx++) {
             for (int dz = -leafRadius; dz <= leafRadius; dz++) {
@@ -89,7 +96,10 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                     int leafY = leafCenter + dy;
                     int leafZ = worldZ + dz;
 
-                    if (dist <= leafRadius && leafY >= minY && leafY < maxY) {
+                    // Clip to chunk
+                    if (dist <= leafRadius && leafY >= startY && leafY < endY
+                            && leafX >= startX && leafX < endX
+                            && leafZ >= startZ && leafZ < endZ) {
                         unit.modifier().setBlock(leafX, leafY, leafZ, Block.OAK_LEAVES);
                     }
                 }
@@ -97,8 +107,10 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         }
 
         // Trunk
-        for (int y = worldY; y < worldY + trunkHeight && y < maxY; y++) {
-            unit.modifier().setBlock(worldX, y, worldZ, Block.OAK_LOG);
+        for (int y = worldY; y < worldY + trunkHeight; y++) {
+            if (y >= startY && y < endY && worldX >= startX && worldX < endX && worldZ >= startZ && worldZ < endZ) {
+                unit.modifier().setBlock(worldX, y, worldZ, Block.OAK_LOG);
+            }
         }
     }
 
