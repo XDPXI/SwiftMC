@@ -3,6 +3,8 @@ package dev.xdpxi.swiftmc;
 import dev.xdpxi.swiftmc.utils.Config;
 import dev.xdpxi.swiftmc.utils.ServerLogger;
 import dev.xdpxi.swiftmc.utils.TerrainGenerator;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -10,9 +12,13 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.GameMode;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerBlockBreakEvent;
+import net.minestom.server.event.player.PlayerSpawnEvent;
+import net.minestom.server.event.player.PlayerUseItemEvent;
+import net.minestom.server.event.item.PickupItemEvent;
 import net.minestom.server.event.server.ServerListPingEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
@@ -53,6 +59,16 @@ public class Main {
             player.setRespawnPoint(new Pos(0, 64, 0));
         });
 
+        globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
+            final Player player = event.getPlayer();
+
+            // Set game mode to survival so inventory works properly
+            player.setGameMode(GameMode.SURVIVAL);
+
+            // Enable item pickup
+            player.setCanPickupItem(true);
+        });
+
         globalEventHandler.addListener(PlayerBlockBreakEvent.class, event -> {
             Block block = event.getBlock();
             Player player = event.getPlayer();
@@ -76,6 +92,22 @@ public class Main {
                 itemEntity.setInstance(player.getInstance(), Pos.fromPoint(blockPos));
                 itemEntity.setVelocity(velocity);
                 itemEntity.setPickupDelay(Duration.ofMillis(500));
+            }
+        });
+
+        globalEventHandler.addListener(PickupItemEvent.class, event -> {
+            Player player = (Player) event.getLivingEntity();
+            ItemEntity itemEntity = event.getItemEntity();
+
+            // Add the item to player's inventory
+            boolean added = player.getInventory().addItemStack(itemEntity.getItemStack());
+
+            if (added) {
+                // Play pickup sound
+                player.playSound(Sound.sound(Key.key("entity.item.pickup"), Sound.Source.PLAYER, 0.2f, 1.0f));
+            } else {
+                // Inventory full, cancel the pickup
+                event.setCancelled(true);
             }
         });
 
