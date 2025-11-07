@@ -51,9 +51,9 @@ public class Main {
         Log.debug("InstanceContainer created.");
 
         // Polar world loader
-        Path worldFolder = Path.of("world");
+        Path worldFolder = Path.of("worlds");
         Files.createDirectories(worldFolder);
-        Path polarFile = worldFolder.resolve("world.polar");
+        Path polarFile = worldFolder.resolve("overworld.polar");
         instanceContainer.setChunkLoader(new PolarLoader(polarFile));
         Log.info("Polar world loader set for instance.");
 
