@@ -3,7 +3,6 @@ package dev.xdpxi.swiftmc;
 import dev.xdpxi.swiftmc.events.*;
 import dev.xdpxi.swiftmc.utils.Config;
 import dev.xdpxi.swiftmc.utils.Log;
-import dev.xdpxi.swiftmc.utils.ServerLogger;
 import dev.xdpxi.swiftmc.utils.TerrainGenerator;
 import io.github.togar2.pvp.MinestomPvP;
 import io.github.togar2.pvp.feature.CombatFeatureSet;
@@ -30,10 +29,6 @@ public class Main {
             Log.error("Failed to load configuration: " + e.getMessage());
             throw e;
         }
-
-        // Setup logging
-        ServerLogger.setup(args);
-        Log.debug("ServerLogger initialized.");
 
         // Init server
         MinecraftServer minecraftServer = MinecraftServer.init();
