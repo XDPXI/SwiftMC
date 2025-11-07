@@ -6,8 +6,8 @@ import net.minestom.server.item.Material;
 import java.util.Objects;
 
 public class ItemSerialization {
-    public int materialId;
-    public int amount;
+    public final int materialId;
+    public final int amount;
 
     public ItemSerialization(ItemStack stack) {
         this.materialId = stack.material().id();

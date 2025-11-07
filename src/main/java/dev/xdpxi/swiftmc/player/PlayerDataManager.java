@@ -28,7 +28,7 @@ public class PlayerDataManager {
         try {
             PlayerData data = new PlayerData(player);
             UUID uuid = player.getUuid();
-            Path file = PLAYER_FOLDER.resolve(uuid.toString() + ".json");
+            Path file = PLAYER_FOLDER.resolve(uuid + ".json");
             Files.writeString(file, GSON.toJson(data));
         } catch (IOException e) {
             e.printStackTrace();
@@ -38,7 +38,7 @@ public class PlayerDataManager {
     public static void loadPlayer(Player player) {
         try {
             UUID uuid = player.getUuid();
-            Path file = PLAYER_FOLDER.resolve(uuid.toString() + ".json");
+            Path file = PLAYER_FOLDER.resolve(uuid + ".json");
             if (!Files.exists(file)) return;
 
             String json = Files.readString(file);

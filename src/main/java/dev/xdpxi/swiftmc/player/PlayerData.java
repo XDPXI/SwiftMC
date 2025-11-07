@@ -13,7 +13,7 @@ public class PlayerData {
     public double x, y, z;
     public float yaw, pitch;
     public GameMode gameMode;
-    public List<ItemSerialization> inventory = new ArrayList<>();
+    public final List<ItemSerialization> inventory = new ArrayList<>();
 
     public PlayerData() {
     }
