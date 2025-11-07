@@ -31,6 +31,7 @@ public class Main {
 
         // Events
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
+        
         AsyncPlayerConfigurationEvent.addListener(globalEventHandler, instanceContainer);
         PickupItemEvent.addListener(globalEventHandler, instanceContainer);
         PlayerBlockBreakEvent.addListener(globalEventHandler, instanceContainer);
