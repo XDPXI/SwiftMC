@@ -1,5 +1,6 @@
 package dev.xdpxi.swiftmc.events;
 
+import dev.xdpxi.swiftmc.utils.Log;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
@@ -15,6 +16,9 @@ public class PlayerSpawnEvent {
 
             // Enable item pickup
             player.setCanPickupItem(true);
+
+            // Log player join
+            Log.info(player.getName() + " joined the game");
         });
     }
 }
