@@ -40,6 +40,27 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
             }
         }
 
+        // Smooth height map
+        int[][] smoothedHeightMap = new int[16][16];
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                int sum = 0;
+                int count = 0;
+                for (int dx = -1; dx <= 1; dx++) {
+                    for (int dz = -1; dz <= 1; dz++) {
+                        int nx = x + dx;
+                        int nz = z + dz;
+                        if (nx >= 0 && nx < 16 && nz >= 0 && nz < 16) {
+                            sum += heightMap[nx][nz];
+                            count++;
+                        }
+                    }
+                }
+                smoothedHeightMap[x][z] = sum / count;
+            }
+        }
+        heightMap = smoothedHeightMap;
+
         // Fill terrain columns and record trees
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
