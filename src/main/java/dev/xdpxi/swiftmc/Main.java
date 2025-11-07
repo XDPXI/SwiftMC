@@ -7,10 +7,13 @@ import dev.xdpxi.swiftmc.utils.TerrainGenerator;
 import io.github.togar2.pvp.MinestomPvP;
 import io.github.togar2.pvp.feature.CombatFeatureSet;
 import io.github.togar2.pvp.feature.CombatFeatures;
+import net.hollowcube.polar.PolarLoader;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
+
+import java.nio.file.Path;
 
 public class Main {
     public static Config config;
@@ -29,6 +32,9 @@ public class Main {
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         InstanceContainer instanceContainer = instanceManager.createInstanceContainer();
 
+        // Polar world loader
+        instanceContainer.setChunkLoader(new PolarLoader(Path.of("/world/world.polar")));
+
         // Terrain Generator
         instanceContainer.setGenerator(new TerrainGenerator());
 
@@ -46,6 +52,12 @@ public class Main {
 
         CombatFeatureSet modernVanilla = CombatFeatures.modernVanilla();
         MinecraftServer.getGlobalEventHandler().addChild(modernVanilla.createNode());
+
+        // Save chunks to storage after stopping the server
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            instanceContainer.saveChunksToStorage();
+            MinecraftServer.stopCleanly();
+        }));
 
         // Start server
         minecraftServer.start("0.0.0.0", config.port);

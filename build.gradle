@@ -18,6 +18,8 @@ dependencies {
     implementation 'org.yaml:snakeyaml:2.5'
     implementation 'com.formdev:flatlaf:3.6.2'
     implementation 'com.github.TogAr2:MinestomPvP:56a831b41c'
+    implementation 'dev.hollowcube:polar:1.15.0'
+    implementation 'it.unimi.dsi:fastutil:8.5.18'
 
     testImplementation platform('org.junit:junit-bom:6.0.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
