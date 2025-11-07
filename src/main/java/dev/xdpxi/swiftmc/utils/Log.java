@@ -87,7 +87,7 @@ public class Log {
             System.err.println(RED + "Failed to write throwable to log file: " + e.getMessage() + RESET);
         }
     }
-    
+
     public static void close() {
         if (fileWriter == null) return;
         try {
