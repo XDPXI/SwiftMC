@@ -42,7 +42,7 @@ public class Main {
             MinestomPvP.init();
             Log.info("MinestomPvP initialized successfully.");
         } catch (Exception e) {
-            Log.warn("MinestomPvP initialization failed: " + e.getMessage());
+            Log.error("MinestomPvP initialization failed: " + e.getMessage());
         }
 
         // Instances
@@ -74,10 +74,38 @@ public class Main {
         ServerListPingEvent.addListener(globalEventHandler);
         Log.info("Event listeners registered.");
 
-        // MineStom PVP Events
+        // Minestom PVP Events
         CombatFeatureSet featureSet = CombatFeatures.empty()
                 .version(CombatVersion.MODERN)
                 .remove(CombatFeatures.VANILLA_TRIDENT.featureType())
+                .add(CombatFeatures.VANILLA_FALL)
+                .add(CombatFeatures.VANILLA_ARMOR)
+                .add(CombatFeatures.VANILLA_BLOCK)
+                .add(CombatFeatures.VANILLA_ATTACK_COOLDOWN)
+                .add(CombatFeatures.VANILLA_CRITICAL)
+                .add(CombatFeatures.VANILLA_DEATH_MESSAGE)
+                .add(CombatFeatures.VANILLA_DAMAGE)
+                .add(CombatFeatures.VANILLA_ATTACK)
+                .add(CombatFeatures.VANILLA_EQUIPMENT)
+                .add(CombatFeatures.VANILLA_BOW)
+                .add(CombatFeatures.VANILLA_CROSSBOW)
+                .add(CombatFeatures.VANILLA_FISHING_ROD)
+                .add(CombatFeatures.VANILLA_TOTEM)
+                .add(CombatFeatures.VANILLA_EFFECT)
+                .add(CombatFeatures.VANILLA_ENCHANTMENT)
+                .add(CombatFeatures.VANILLA_EXHAUSTION)
+                .add(CombatFeatures.VANILLA_EXPLOSION)
+                .add(CombatFeatures.VANILLA_EXPLOSIVE)
+                .add(CombatFeatures.VANILLA_FOOD)
+                .add(CombatFeatures.VANILLA_SWEEPING)
+                .add(CombatFeatures.VANILLA_ITEM_COOLDOWN)
+                .add(CombatFeatures.VANILLA_ITEM_DAMAGE)
+                .add(CombatFeatures.VANILLA_KNOCKBACK)
+                .add(CombatFeatures.VANILLA_MISC_PROJECTILE)
+                .add(CombatFeatures.VANILLA_PLAYER_STATE)
+                .add(CombatFeatures.VANILLA_POTION)
+                .add(CombatFeatures.VANILLA_REGENERATION)
+                .add(CombatFeatures.VANILLA_PROJECTILE_ITEM)
                 .build();
         globalEventHandler.addChild(featureSet.createNode());
         Log.info("Combat features enabled.");
