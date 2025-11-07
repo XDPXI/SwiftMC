@@ -33,7 +33,7 @@ public class Main {
         InstanceContainer instanceContainer = instanceManager.createInstanceContainer();
 
         // Polar world loader
-        instanceContainer.setChunkLoader(new PolarLoader(Path.of("/world/world.polar")));
+        instanceContainer.setChunkLoader(new PolarLoader(Path.of("world.polar")));
 
         // Terrain Generator
         instanceContainer.setGenerator(new TerrainGenerator());
