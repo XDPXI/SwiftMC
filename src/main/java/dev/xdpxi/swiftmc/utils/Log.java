@@ -39,7 +39,7 @@ public class Log {
         }
     }
 
-    private static String formatMessage(String level, String color, String message, Object... args) {
+    private static String formatMessage(String color, String message, Object... args) {
         String timestamp = LocalDateTime.now().format(TIME_FORMAT);
         String thread = Thread.currentThread().getName();
         return String.format("%s[%s] [%s] %s%s%n", color, timestamp, thread, String.format(message, args), RESET);
@@ -60,23 +60,23 @@ public class Log {
     }
 
     public static void debug(String message, Object... args) {
-        if (config.debugEnabled) write(formatMessage("DEBUG", GRAY, message, args));
+        if (config.debugEnabled) write(formatMessage(GRAY, message, args));
     }
 
     public static void info(String message, Object... args) {
-        write(formatMessage("INFO", GREEN, message, args));
+        write(formatMessage(GREEN, message, args));
     }
 
     public static void warn(String message, Object... args) {
-        write(formatMessage("WARN", YELLOW, message, args));
+        write(formatMessage(YELLOW, message, args));
     }
 
     public static void error(String message, Object... args) {
-        write(formatMessage("ERROR", RED, message, args));
+        write(formatMessage(RED, message, args));
     }
 
     public static void error(Throwable throwable, String message, Object... args) {
-        write(formatMessage("ERROR", RED, message, args));
+        write(formatMessage(RED, message, args));
         throwable.printStackTrace(System.err);
         try {
             if (fileWriter != null) {

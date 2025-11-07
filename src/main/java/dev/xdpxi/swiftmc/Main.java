@@ -21,7 +21,7 @@ import java.nio.file.Path;
 public class Main {
     public static Config config;
 
-    static void main(String[] args) throws Exception {
+    static void main() throws Exception {
         Log.info("Starting server setup...");
 
         // Setup config
@@ -66,12 +66,12 @@ public class Main {
         Log.debug("GlobalEventHandler obtained.");
 
         AsyncPlayerConfigurationEvent.addListener(globalEventHandler, instanceContainer);
-        PickupItemEvent.addListener(globalEventHandler, instanceContainer);
-        PlayerBlockBreakEvent.addListener(globalEventHandler, instanceContainer);
-        PlayerCommandEvent.addListener(globalEventHandler, instanceContainer);
-        PlayerDisconnectEvent.addListener(globalEventHandler, instanceContainer);
-        PlayerSpawnEvent.addListener(globalEventHandler, instanceContainer);
-        ServerListPingEvent.addListener(globalEventHandler, instanceContainer);
+        PickupItemEvent.addListener(globalEventHandler);
+        PlayerBlockBreakEvent.addListener(globalEventHandler);
+        PlayerCommandEvent.addListener(globalEventHandler);
+        PlayerDisconnectEvent.addListener(globalEventHandler);
+        PlayerSpawnEvent.addListener(globalEventHandler);
+        ServerListPingEvent.addListener(globalEventHandler);
         Log.info("Event listeners registered.");
 
         // MineStom PVP Events

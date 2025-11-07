@@ -4,13 +4,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.GlobalEventHandler;
-import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.ping.Status;
 
 import static dev.xdpxi.swiftmc.Main.config;
 
 public class ServerListPingEvent {
-    public static void addListener(GlobalEventHandler globalEventHandler, InstanceContainer instanceContainer) {
+    public static void addListener(GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(net.minestom.server.event.server.ServerListPingEvent.class, event -> {
             int onlinePlayers = MinecraftServer.getConnectionManager().getOnlinePlayerCount();
 

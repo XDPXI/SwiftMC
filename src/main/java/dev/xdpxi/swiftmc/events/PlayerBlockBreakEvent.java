@@ -5,7 +5,6 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
-import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -14,7 +13,7 @@ import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class PlayerBlockBreakEvent {
-    public static void addListener(GlobalEventHandler globalEventHandler, InstanceContainer instanceContainer) {
+    public static void addListener(GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(net.minestom.server.event.player.PlayerBlockBreakEvent.class, event -> {
             Block block = event.getBlock();
             Player player = event.getPlayer();

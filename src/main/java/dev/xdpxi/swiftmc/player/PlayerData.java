@@ -31,7 +31,7 @@ public class PlayerData {
         PlayerInventory inv = player.getInventory();
         for (int i = 0; i < inv.getSize(); i++) {
             ItemStack stack = inv.getItemStack(i);
-            if (stack != null && !stack.isAir()) {
+            if (!stack.isAir()) {
                 inventory.add(new ItemSerialization(stack));
             } else {
                 inventory.add(null);

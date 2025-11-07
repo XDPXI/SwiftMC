@@ -71,11 +71,11 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
 
         // Generate trees
         for (TreePos tree : trees) {
-            placeTree(unit, tree.x, tree.y, tree.z, startY, endY);
+            placeTree(unit, tree.x, tree.y, tree.z);
         }
     }
 
-    private void placeTree(GenerationUnit unit, int worldX, int worldY, int worldZ, int minY, int maxY) {
+    private void placeTree(GenerationUnit unit, int worldX, int worldY, int worldZ) {
         int trunkHeight = 4 + (int) (Math.random() * 3); // 4-6 blocks
         int leafRadius = 2;
         int leafCenter = worldY + trunkHeight - 1;

@@ -6,10 +6,9 @@ import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.PlayerSkin;
 import net.minestom.server.event.GlobalEventHandler;
-import net.minestom.server.instance.InstanceContainer;
 
 public class PlayerSpawnEvent {
-    public static void addListener(GlobalEventHandler globalEventHandler, InstanceContainer instanceContainer) {
+    public static void addListener(GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(net.minestom.server.event.player.PlayerSpawnEvent.class, event -> {
             final Player player = event.getPlayer();
 

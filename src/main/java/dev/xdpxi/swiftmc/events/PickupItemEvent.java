@@ -5,10 +5,9 @@ import net.kyori.adventure.sound.Sound;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
-import net.minestom.server.instance.InstanceContainer;
 
 public class PickupItemEvent {
-    public static void addListener(GlobalEventHandler globalEventHandler, InstanceContainer instanceContainer) {
+    public static void addListener(GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(net.minestom.server.event.item.PickupItemEvent.class, event -> {
             Player player = (Player) event.getLivingEntity();
             ItemEntity itemEntity = event.getItemEntity();

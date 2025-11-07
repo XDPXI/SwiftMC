@@ -9,9 +9,6 @@ public class ItemSerialization {
     public int materialId;
     public int amount;
 
-    public ItemSerialization() {
-    }
-
     public ItemSerialization(ItemStack stack) {
         this.materialId = stack.material().id();
         this.amount = stack.amount();
