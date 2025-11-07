@@ -121,7 +121,7 @@ public class Main {
                             .maxPlayers(config.maxPlayers)
                             .build())
                     .playerInfo(onlinePlayers, config.maxPlayers)
-                    .versionInfo(new Status.VersionInfo("1.21.10", 773))
+                    .versionInfo(new Status.VersionInfo("SwiftMC 1.21.10", 773))
                     .build());
         });
 
