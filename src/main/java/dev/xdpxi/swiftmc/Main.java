@@ -2,6 +2,7 @@ package dev.xdpxi.swiftmc;
 
 import dev.xdpxi.swiftmc.events.*;
 import dev.xdpxi.swiftmc.utils.Config;
+import dev.xdpxi.swiftmc.utils.Log;
 import dev.xdpxi.swiftmc.utils.ServerLogger;
 import dev.xdpxi.swiftmc.utils.TerrainGenerator;
 import io.github.togar2.pvp.MinestomPvP;
@@ -19,49 +20,78 @@ public class Main {
     public static Config config;
 
     static void main(String[] args) throws Exception {
+        Log.info("Starting server setup...");
+
         // Setup config
-        config = Config.loadOrCreate();
+        try {
+            config = Config.loadOrCreate();
+            Log.info("Configuration loaded successfully.");
+        } catch (Exception e) {
+            Log.error("Failed to load configuration: " + e.getMessage());
+            throw e;
+        }
 
         // Setup logging
         ServerLogger.setup(args);
+        Log.debug("ServerLogger initialized.");
 
         // Init server
         MinecraftServer minecraftServer = MinecraftServer.init();
+        Log.info("MinecraftServer initialized.");
 
         // Init Minestom PVP
-        MinestomPvP.init();
+        try {
+            MinestomPvP.init();
+            Log.info("MinestomPvP initialized successfully.");
+        } catch (Exception e) {
+            Log.warn("MinestomPvP initialization failed: " + e.getMessage());
+        }
 
         // Instances
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         InstanceContainer instanceContainer = instanceManager.createInstanceContainer();
+        Log.debug("InstanceContainer created.");
 
         // Polar world loader
         instanceContainer.setChunkLoader(new PolarLoader(Path.of("world.polar")));
+        Log.info("Polar world loader set for instance.");
 
         // Terrain Generator
         instanceContainer.setGenerator(new TerrainGenerator());
+        Log.info("Custom terrain generator applied.");
 
         // Events
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
-        
+        Log.debug("GlobalEventHandler obtained.");
+
         AsyncPlayerConfigurationEvent.addListener(globalEventHandler, instanceContainer);
         PickupItemEvent.addListener(globalEventHandler, instanceContainer);
         PlayerBlockBreakEvent.addListener(globalEventHandler, instanceContainer);
         PlayerDisconnectEvent.addListener(globalEventHandler, instanceContainer);
         PlayerSpawnEvent.addListener(globalEventHandler, instanceContainer);
         ServerListPingEvent.addListener(globalEventHandler, instanceContainer);
+        Log.info("Event listeners registered.");
 
         // MineStom PVP Events
         CombatFeatureSet modernVanilla = CombatFeatures.modernVanilla();
         globalEventHandler.addChild(modernVanilla.createNode());
+        Log.info("Combat features enabled.");
 
         // Save chunks to storage after stopping the server
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Log.info("Shutdown initiated. Saving chunks...");
             instanceContainer.saveChunksToStorage();
             MinecraftServer.stopCleanly();
+            Log.info("Server stopped cleanly.");
         }));
 
         // Start server
-        minecraftServer.start("0.0.0.0", config.port);
+        try {
+            minecraftServer.start("0.0.0.0", config.port);
+            Log.info("Server started on port " + config.port);
+        } catch (Exception e) {
+            Log.error("Failed to start server: " + e.getMessage());
+            throw e;
+        }
     }
 }
