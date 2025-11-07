@@ -3,6 +3,7 @@ package dev.xdpxi.swiftmc.events;
 import dev.xdpxi.swiftmc.utils.Log;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.PlayerSkin;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.instance.InstanceContainer;
 
@@ -16,6 +17,9 @@ public class PlayerSpawnEvent {
 
             // Enable item pickup
             player.setCanPickupItem(true);
+
+            // Set player skin
+            player.setSkin(PlayerSkin.fromUsername(player.getUsername()));
 
             // Log player join
             Log.info(player.getUsername() + " joined the game");
