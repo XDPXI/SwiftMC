@@ -1,2 +1,2 @@
 # SwiftMC
-A fast lightweight server made with Minestorm.
+A fast lightweight server made with Minestom.
