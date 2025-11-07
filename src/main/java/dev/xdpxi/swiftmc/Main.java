@@ -119,12 +119,6 @@ public class Main {
                 Log.info(player.getUsername() + " data saved on shutdown.");
             });
 
-            instanceContainer.saveChunksToStorage();
-            if (NetherManager.getNetherInstance() != null) {
-                NetherManager.getNetherInstance().saveChunksToStorage();
-                Log.info("Nether world saved.");
-            }
-
             MinecraftServer.stopCleanly();
 
             Log.close();
