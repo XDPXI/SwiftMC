@@ -47,6 +47,7 @@ public class PlayerDataManager {
                 if (data.gameMode != null) {
                     player.setGameMode(data.gameMode);
                 }
+                data.applyInventory(player);
             });
         } catch (IOException e) {
             e.printStackTrace();
