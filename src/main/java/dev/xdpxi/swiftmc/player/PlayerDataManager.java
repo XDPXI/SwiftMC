@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 public class PlayerDataManager {
     private static final Path PLAYER_FOLDER = Paths.get("players");
@@ -26,7 +27,8 @@ public class PlayerDataManager {
     public static void savePlayer(Player player) {
         try {
             PlayerData data = new PlayerData(player);
-            Path file = PLAYER_FOLDER.resolve(player.getUsername() + ".json");
+            UUID uuid = player.getUuid();
+            Path file = PLAYER_FOLDER.resolve(uuid.toString() + ".json");
             Files.writeString(file, GSON.toJson(data));
         } catch (IOException e) {
             e.printStackTrace();
@@ -35,7 +37,8 @@ public class PlayerDataManager {
 
     public static void loadPlayer(Player player) {
         try {
-            Path file = PLAYER_FOLDER.resolve(player.getUsername() + ".json");
+            UUID uuid = player.getUuid();
+            Path file = PLAYER_FOLDER.resolve(uuid.toString() + ".json");
             if (!Files.exists(file)) return;
 
             String json = Files.readString(file);
