@@ -28,6 +28,9 @@ public class Main {
         // Init server
         MinecraftServer minecraftServer = MinecraftServer.init();
 
+        // Init Minestom PVP
+        MinestomPvP.init();
+
         // Instances
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         InstanceContainer instanceContainer = instanceManager.createInstanceContainer();
@@ -47,11 +50,9 @@ public class Main {
         PlayerSpawnEvent.addListener(globalEventHandler, instanceContainer);
         ServerListPingEvent.addListener(globalEventHandler, instanceContainer);
 
-        // Init MineStom PVP
-        MinestomPvP.init();
-
+        // MineStom PVP Events
         CombatFeatureSet modernVanilla = CombatFeatures.modernVanilla();
-        MinecraftServer.getGlobalEventHandler().addChild(modernVanilla.createNode());
+        globalEventHandler.addChild(modernVanilla.createNode());
 
         // Save chunks to storage after stopping the server
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
