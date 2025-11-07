@@ -62,6 +62,7 @@ public class Main {
         AsyncPlayerConfigurationEvent.addListener(globalEventHandler, instanceContainer);
         PickupItemEvent.addListener(globalEventHandler, instanceContainer);
         PlayerBlockBreakEvent.addListener(globalEventHandler, instanceContainer);
+        PlayerCommandEvent.addListener(globalEventHandler, instanceContainer);
         PlayerDisconnectEvent.addListener(globalEventHandler, instanceContainer);
         PlayerSpawnEvent.addListener(globalEventHandler, instanceContainer);
         ServerListPingEvent.addListener(globalEventHandler, instanceContainer);
