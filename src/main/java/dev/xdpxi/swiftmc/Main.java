@@ -41,7 +41,7 @@ public class Main {
         PlayerSpawnEvent.addListener(globalEventHandler, instanceContainer);
         ServerListPingEvent.addListener(globalEventHandler, instanceContainer);
 
-        // Init MineStormPVP
+        // Init MineStom PVP
         MinestomPvP.init();
 
         CombatFeatureSet modernVanilla = CombatFeatures.modernVanilla();
