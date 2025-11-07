@@ -1,5 +1,6 @@
 package dev.xdpxi.swiftmc.events;
 
+import dev.xdpxi.swiftmc.player.PlayerDataManager;
 import dev.xdpxi.swiftmc.utils.Log;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
@@ -12,7 +13,10 @@ public class PlayerSpawnEvent {
         globalEventHandler.addListener(net.minestom.server.event.player.PlayerSpawnEvent.class, event -> {
             final Player player = event.getPlayer();
 
-            // Set game mode to survival so inventory works properly
+            // Load player data
+            PlayerDataManager.loadPlayer(player);
+
+            // Set game mode to survival
             player.setGameMode(GameMode.SURVIVAL);
 
             // Enable item pickup

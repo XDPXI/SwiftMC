@@ -1,6 +1,7 @@
 package dev.xdpxi.swiftmc;
 
 import dev.xdpxi.swiftmc.events.*;
+import dev.xdpxi.swiftmc.player.PlayerDataManager;
 import dev.xdpxi.swiftmc.utils.Config;
 import dev.xdpxi.swiftmc.utils.Log;
 import dev.xdpxi.swiftmc.utils.TerrainGenerator;
@@ -14,6 +15,7 @@ import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Main {
@@ -49,7 +51,10 @@ public class Main {
         Log.debug("InstanceContainer created.");
 
         // Polar world loader
-        instanceContainer.setChunkLoader(new PolarLoader(Path.of("world.polar")));
+        Path worldFolder = Path.of("world");
+        Files.createDirectories(worldFolder);
+        Path polarFile = worldFolder.resolve("world.polar");
+        instanceContainer.setChunkLoader(new PolarLoader(polarFile));
         Log.info("Polar world loader set for instance.");
 
         // Terrain Generator
@@ -77,10 +82,17 @@ public class Main {
         globalEventHandler.addChild(featureSet.createNode());
         Log.info("Combat features enabled.");
 
-        // Save chunks to storage after stopping the server
+        // Save world when closing server
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            Log.info("Shutdown initiated. Saving chunks...");
+            Log.info("Shutdown initiated. Saving world...");
+
+            MinecraftServer.getConnectionManager().getOnlinePlayers().forEach(player -> {
+                PlayerDataManager.savePlayer(player);
+                Log.info(player.getUsername() + " data saved on shutdown.");
+            });
+
             instanceContainer.saveChunksToStorage();
+
             MinecraftServer.stopCleanly();
             Log.info("Server stopped cleanly.");
         }));
