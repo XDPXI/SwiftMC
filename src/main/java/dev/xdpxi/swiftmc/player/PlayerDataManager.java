@@ -25,7 +25,7 @@ public class PlayerDataManager {
 
     public static void savePlayer(Player player) {
         try {
-            PlayerData data = new PlayerData(player.getPosition(), player.getInventory());
+            PlayerData data = new PlayerData(player);
             Path file = PLAYER_FOLDER.resolve(player.getUsername() + ".json");
             Files.writeString(file, GSON.toJson(data));
         } catch (IOException e) {
@@ -41,9 +41,12 @@ public class PlayerDataManager {
             String json = Files.readString(file);
             PlayerData data = GSON.fromJson(json, PlayerData.class);
 
-            // Schedule teleport on next tick
+            // Schedule next tick
             player.scheduleNextTick(_ -> {
                 player.teleport(data.toPos());
+                if (data.gameMode != null) {
+                    player.setGameMode(data.gameMode);
+                }
             });
         } catch (IOException e) {
             e.printStackTrace();
