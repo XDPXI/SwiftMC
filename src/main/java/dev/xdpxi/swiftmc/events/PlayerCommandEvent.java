@@ -17,17 +17,17 @@ public class PlayerCommandEvent {
             if (command.equals("survival")) {
                 player.setGameMode(GameMode.SURVIVAL);
                 player.sendMessage(Component.text("Gamemode set to Survival", NamedTextColor.GREEN));
-                Log.info(player.getName() + " changed gamemode to SURVIVAL");
+                Log.info(player.getUsername() + " changed gamemode to SURVIVAL");
                 event.setCancelled(true);
             } else if (command.equals("creative")) {
                 player.setGameMode(GameMode.CREATIVE);
                 player.sendMessage(Component.text("Gamemode set to Creative", NamedTextColor.GREEN));
-                Log.info(player.getName() + " changed gamemode to CREATIVE");
+                Log.info(player.getUsername() + " changed gamemode to CREATIVE");
                 event.setCancelled(true);
             } else if (command.equals("spectator")) {
                 player.setGameMode(GameMode.SPECTATOR);
                 player.sendMessage(Component.text("Gamemode set to Spectator", NamedTextColor.GREEN));
-                Log.info(player.getName() + " changed gamemode to SPECTATOR");
+                Log.info(player.getUsername() + " changed gamemode to SPECTATOR");
                 event.setCancelled(true);
             }
         });
