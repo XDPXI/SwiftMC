@@ -11,7 +11,7 @@ public class PlayerDisconnectEvent {
             final Player player = event.getPlayer();
 
             // Log player leave
-            Log.info(player.getName() + " left the game");
+            Log.info(player.getUsername() + " left the game");
         });
     }
 }

@@ -18,7 +18,7 @@ public class PlayerSpawnEvent {
             player.setCanPickupItem(true);
 
             // Log player join
-            Log.info(player.getName() + " joined the game");
+            Log.info(player.getUsername() + " joined the game");
         });
     }
 }
