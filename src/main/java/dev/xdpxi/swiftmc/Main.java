@@ -7,6 +7,7 @@ import dev.xdpxi.swiftmc.utils.TerrainGenerator;
 import io.github.togar2.pvp.MinestomPvP;
 import io.github.togar2.pvp.feature.CombatFeatureSet;
 import io.github.togar2.pvp.feature.CombatFeatures;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.hollowcube.polar.PolarLoader;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.GlobalEventHandler;
@@ -69,8 +70,11 @@ public class Main {
         Log.info("Event listeners registered.");
 
         // MineStom PVP Events
-        CombatFeatureSet modernVanilla = CombatFeatures.modernVanilla();
-        globalEventHandler.addChild(modernVanilla.createNode());
+        CombatFeatureSet featureSet = CombatFeatures.empty()
+                .version(CombatVersion.MODERN)
+                .remove(CombatFeatures.VANILLA_TRIDENT.featureType())
+                .build();
+        globalEventHandler.addChild(featureSet.createNode());
         Log.info("Combat features enabled.");
 
         // Save chunks to storage after stopping the server
