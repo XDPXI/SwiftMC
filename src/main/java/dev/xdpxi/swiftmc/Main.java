@@ -1,5 +1,9 @@
 package dev.xdpxi.swiftmc;
 
+import dev.xdpxi.swiftmc.commands.Adventure;
+import dev.xdpxi.swiftmc.commands.Creative;
+import dev.xdpxi.swiftmc.commands.Spectator;
+import dev.xdpxi.swiftmc.commands.Survival;
 import dev.xdpxi.swiftmc.events.*;
 import dev.xdpxi.swiftmc.player.PlayerDataManager;
 import dev.xdpxi.swiftmc.utils.Config;
@@ -75,11 +79,16 @@ public class Main {
         EntityDamageEvent.addListener(globalEventHandler);
         PickupItemEvent.addListener(globalEventHandler);
         PlayerBlockBreakEvent.addListener(globalEventHandler);
-        PlayerCommandEvent.addListener(globalEventHandler);
         PlayerDisconnectEvent.addListener(globalEventHandler);
         PlayerSpawnEvent.addListener(globalEventHandler);
         ServerListPingEvent.addListener(globalEventHandler);
         Log.info("Event listeners registered.");
+
+        // Commands
+        MinecraftServer.getCommandManager().register(new Spectator());
+        MinecraftServer.getCommandManager().register(new Creative());
+        MinecraftServer.getCommandManager().register(new Survival());
+        MinecraftServer.getCommandManager().register(new Adventure());
 
         // Minestom PVP Events
         CombatFeatureSet featureSet = CombatFeatures.empty()
