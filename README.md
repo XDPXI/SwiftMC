@@ -37,7 +37,7 @@ A **fast**, **lightweight**, and **modern** Minecraft server built on [Minestom]
 
 ---
 
-## Usage
+## ⚙️ Usage
 
 ### Requirements
 
