@@ -45,7 +45,7 @@ public class Main {
         Path lockFile = Path.of(jarFile.getPath().replaceFirst("\\.jar$", ".lck"));
         if (Files.exists(lockFile)) {
             System.err.println("ERROR: Server is already running or did not shut down properly!");
-            System.err.println("If you're sure the server is not running, delete the 'server.lock' file and try again.");
+            System.err.println("ERROR: If you're sure the server is not running, delete the 'server.lock' file and try again.");
             System.exit(1);
             return;
         }
