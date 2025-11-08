@@ -9,11 +9,11 @@ import java.util.List;
 
 public class TerrainGenerator implements net.minestom.server.instance.generator.Generator {
     private static final int BASE_HEIGHT = 64;
-    private static final int WATER_LEVEL = 60;
+    private static final int WATER_LEVEL = 55; // Lowered from 60 to make lakes less common
     private static final double[] NOISE_FREQUENCIES = {0.02, 0.05, 0.1};
     private static final double[] NOISE_AMPLITUDES = {20, 10, 5};
     private static final double TREE_PROBABILITY = 0.001;
-    private static final int MIN_TREE_DISTANCE = 3; // min trunk-to-trunk distance
+    private static final int MIN_TREE_DISTANCE = 3;
     private final FastNoise noise = new FastNoise(Main.config.seed);
 
     @Override
@@ -23,12 +23,11 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         int startY = unit.absoluteStart().blockY();
         int endY = unit.absoluteEnd().blockY();
 
-        int[][] heightMap = new int[16][16];
-        List<TreePos> trees = new ArrayList<>();
+        // Generate height map with extended area for proper smoothing
+        int[][] heightMap = new int[18][18]; // Extended to 18x18 to include neighboring chunk data
 
-        // Generate height map
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
+        for (int x = -1; x < 17; x++) {
+            for (int z = -1; z < 17; z++) {
                 double height = BASE_HEIGHT;
                 int worldX = baseX + x;
                 int worldZ = baseZ + z;
@@ -36,11 +35,11 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                     height += noise.get(worldX * NOISE_FREQUENCIES[i], worldZ * NOISE_FREQUENCIES[i]) * NOISE_AMPLITUDES[i];
                 }
                 height = Math.max(startY, Math.min(endY - 1, height));
-                heightMap[x][z] = (int) height;
+                heightMap[x + 1][z + 1] = (int) height;
             }
         }
 
-        // Smooth height map
+        // Smooth height map (now includes border data)
         int[][] smoothedHeightMap = new int[16][16];
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
@@ -48,29 +47,29 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                 int count = 0;
                 for (int dx = -1; dx <= 1; dx++) {
                     for (int dz = -1; dz <= 1; dz++) {
-                        int nx = x + dx;
-                        int nz = z + dz;
-                        if (nx >= 0 && nx < 16 && nz >= 0 && nz < 16) {
-                            sum += heightMap[nx][nz];
-                            count++;
-                        }
+                        // Access from the 18x18 grid (offset by 1)
+                        int nx = x + dx + 1;
+                        int nz = z + dz + 1;
+                        sum += heightMap[nx][nz];
+                        count++;
                     }
                 }
                 smoothedHeightMap[x][z] = sum / count;
             }
         }
-        heightMap = smoothedHeightMap;
+
+        List<TreePos> trees = new ArrayList<>();
 
         // Fill terrain columns and record trees
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 int worldX = baseX + x;
                 int worldZ = baseZ + z;
-                int height = heightMap[x][z];
+                int height = smoothedHeightMap[x][z];
 
                 // Fill column
                 for (int y = startY; y < endY; y++) {
-                    Block block = getBlockAt(y, height, x, z, heightMap);
+                    Block block = getBlockAt(y, height, x, z, smoothedHeightMap);
                     if (block != null) unit.modifier().setBlock(worldX, y, worldZ, block);
                 }
 
