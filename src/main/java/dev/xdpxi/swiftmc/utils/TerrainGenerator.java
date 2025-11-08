@@ -9,11 +9,10 @@ import java.util.List;
 
 public class TerrainGenerator implements net.minestom.server.instance.generator.Generator {
     private static final int BASE_HEIGHT = 64;
-    private static final int WATER_LEVEL = 50;
+    private static final int WATER_LEVEL = 52;
     private static final double[] NOISE_FREQUENCIES = {0.02, 0.05, 0.1};
     private static final double[] NOISE_AMPLITUDES = {20, 10, 5};
     private static final double TREE_PROBABILITY = 0.001;
-    private static final int MIN_TREE_DISTANCE = 3;
     private final FastNoise noise = new FastNoise(Main.config.seed);
 
     @Override
