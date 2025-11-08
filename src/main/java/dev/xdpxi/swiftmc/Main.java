@@ -31,6 +31,25 @@ public class Main {
     private static PolarLoader polarLoader;
 
     static void main() throws Exception {
+        // Check for lock file
+        Path lockFile = Path.of("server.lock");
+        if (Files.exists(lockFile)) {
+            System.err.println("ERROR: Server is already running or did not shut down properly!");
+            System.err.println("If you're sure the server is not running, delete the 'server.lock' file and try again.");
+            System.exit(1);
+            return;
+        }
+
+        // Create lock file
+        try {
+            Files.writeString(lockFile, "Server started at: " + java.time.LocalDateTime.now());
+            Log.info("Lock file created.");
+        } catch (Exception e) {
+            System.err.println("ERROR: Failed to create lock file: " + e.getMessage());
+            System.exit(1);
+            return;
+        }
+
         Log.info("Starting server setup...");
 
         // Setup config
@@ -179,6 +198,14 @@ public class Main {
                 }
             } catch (Exception e) {
                 Log.error("Failed to save/compress world: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            try {
+                Files.deleteIfExists(lockFile);
+                Log.info("Lockfile deleted.");
+            } catch (Exception e) {
+                Log.error("Failed to delete lockfile: " + e.getMessage());
                 e.printStackTrace();
             }
 
