@@ -49,6 +49,7 @@ public class Config {
                 if (velocitySecretObj != null) config.velocitySecret = (String) velocitySecretObj;
             }
         } else {
+            Log.warn("Config not found! Generating with default values.");
             config = new Config();
             config.seed = new Random().nextInt();
 
@@ -69,7 +70,7 @@ public class Config {
                 yamlWriter.dump(data, writer);
             }
 
-            System.out.println("Created config.yml with random seed: " + config.seed);
+            Log.info("Created config with random seed: " + config.seed);
         }
 
         return config;
