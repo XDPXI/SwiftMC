@@ -23,6 +23,8 @@ import net.minestom.server.instance.LightingChunk;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class Main {
     public static Config config;
@@ -66,6 +68,21 @@ public class Main {
         Path worldFolder = Path.of("worlds");
         Files.createDirectories(worldFolder);
         Path polarFile = worldFolder.resolve("overworld.polar");
+        Path polarGzFile = worldFolder.resolve("overworld.polar.gz");
+
+        // Decompress world if .gz exists
+        if (Files.exists(polarGzFile) && !Files.exists(polarFile)) {
+            Log.info("Decompressing world from " + polarGzFile + "...");
+            try (GZIPInputStream gis = new GZIPInputStream(Files.newInputStream(polarGzFile))) {
+                Files.copy(gis, polarFile);
+                Files.deleteIfExists(polarGzFile);
+                Log.info("World decompressed successfully and .gz file deleted.");
+            } catch (Exception e) {
+                Log.error("Failed to decompress world: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
         polarLoader = new PolarLoader(polarFile);
         instanceContainer.setChunkLoader(polarLoader);
         Log.info("Polar world loader set for instance.");
@@ -148,8 +165,20 @@ public class Main {
                 polarLoader.saveInstance(instanceContainer);
                 polarLoader.saveChunks(instanceContainer.getChunks());
                 Log.info("World saved successfully.");
+
+                // Compress the world file
+                if (Files.exists(polarFile)) {
+                    Log.info("Compressing world to " + polarGzFile + "...");
+                    try (GZIPOutputStream gos = new GZIPOutputStream(Files.newOutputStream(polarGzFile))) {
+                        Files.copy(polarFile, gos);
+                    }
+
+                    // Delete the uncompressed file
+                    Files.deleteIfExists(polarFile);
+                    Log.info("World compressed and uncompressed file deleted.");
+                }
             } catch (Exception e) {
-                Log.error("Failed to save world: " + e.getMessage());
+                Log.error("Failed to save/compress world: " + e.getMessage());
                 e.printStackTrace();
             }
 
