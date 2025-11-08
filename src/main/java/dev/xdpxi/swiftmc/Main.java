@@ -21,6 +21,7 @@ import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.LightingChunk;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.GZIPInputStream;
@@ -31,8 +32,17 @@ public class Main {
     private static PolarLoader polarLoader;
 
     static void main() throws Exception {
+        // Get the path of the running JAR
+        File jarFile = new File(
+                Main.class
+                        .getProtectionDomain()
+                        .getCodeSource()
+                        .getLocation()
+                        .toURI()
+        );
+
         // Check for lock file
-        Path lockFile = Path.of("server.lock");
+        Path lockFile = Path.of(jarFile.getPath().replaceFirst("\\.jar$", ".lck"));
         if (Files.exists(lockFile)) {
             System.err.println("ERROR: Server is already running or did not shut down properly!");
             System.err.println("If you're sure the server is not running, delete the 'server.lock' file and try again.");
