@@ -9,7 +9,7 @@ import java.util.List;
 
 public class TerrainGenerator implements net.minestom.server.instance.generator.Generator {
     private static final int BASE_HEIGHT = 64;
-    private static final int WATER_LEVEL = 55; // Lowered from 60 to make lakes less common
+    private static final int WATER_LEVEL = 50;
     private static final double[] NOISE_FREQUENCIES = {0.02, 0.05, 0.1};
     private static final double[] NOISE_AMPLITUDES = {20, 10, 5};
     private static final double TREE_PROBABILITY = 0.001;
@@ -73,18 +73,9 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                     if (block != null) unit.modifier().setBlock(worldX, y, worldZ, block);
                 }
 
-                // Record trees if far enough from other trees
-                if (height > WATER_LEVEL && Math.random() < TREE_PROBABILITY) {
-                    boolean tooClose = false;
-                    for (TreePos tree : trees) {
-                        int dx = tree.x - worldX;
-                        int dz = tree.z - worldZ;
-                        if (Math.sqrt(dx * dx + dz * dz) < MIN_TREE_DISTANCE) {
-                            tooClose = true;
-                            break;
-                        }
-                    }
-                    if (!tooClose) trees.add(new TreePos(worldX, height, worldZ));
+                // Record trees - keep trunks 2 blocks away from chunk borders
+                if (height > WATER_LEVEL && Math.random() < TREE_PROBABILITY && x >= 2 && x <= 13 && z >= 2 && z <= 13) {
+                    trees.add(new TreePos(worldX, height, worldZ));
                 }
             }
         }
@@ -96,40 +87,42 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
     }
 
     private void placeTree(GenerationUnit unit, int worldX, int worldY, int worldZ) {
-        int trunkHeight = 4 + (int) (Math.random() * 3); // 4-6 blocks
-        int leafRadius = 2;
-        int leafCenter = worldY + trunkHeight - 1;
-
-        int startX = unit.absoluteStart().blockX();
-        int endX = unit.absoluteEnd().blockX();
-        int startY = unit.absoluteStart().blockY();
-        int endY = unit.absoluteEnd().blockY();
-        int startZ = unit.absoluteStart().blockZ();
-        int endZ = unit.absoluteEnd().blockZ();
+        int trunkHeight = 4;
+        int baseY = worldY + trunkHeight;
 
         // Leaves
-        for (int dx = -leafRadius; dx <= leafRadius; dx++) {
-            for (int dz = -leafRadius; dz <= leafRadius; dz++) {
-                for (int dy = -leafRadius; dy <= leafRadius; dy++) {
-                    double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-                    int leafX = worldX + dx;
-                    int leafY = leafCenter + dy;
-                    int leafZ = worldZ + dz;
-
-                    // Clip to chunk
-                    if (dist <= leafRadius && leafY >= startY && leafY < endY
-                            && leafX >= startX && leafX < endX
-                            && leafZ >= startZ && leafZ < endZ) {
-                        unit.modifier().setBlock(leafX, leafY, leafZ, Block.OAK_LEAVES);
-                    }
-                }
-            }
-        }
+        placeLeafLayer(unit, worldX, baseY - 2, worldZ, 2, true);
+        placeLeafLayer(unit, worldX, baseY - 1, worldZ, 2, true);
+        placeLeafLayer(unit, worldX, baseY, worldZ, 1, false);
+        placeLeafLayer(unit, worldX, baseY + 1, worldZ, 1, true);
 
         // Trunk
-        for (int y = worldY; y < worldY + trunkHeight; y++) {
-            if (y >= startY && y < endY && worldX >= startX && worldX < endX && worldZ >= startZ && worldZ < endZ) {
-                unit.modifier().setBlock(worldX, y, worldZ, Block.OAK_LOG);
+        for (int y = worldY; y <= worldY + trunkHeight; y++) {
+            unit.modifier().setBlock(worldX, y, worldZ, Block.OAK_LOG);
+        }
+
+        // Dirt
+        unit.modifier().setBlock(worldX, worldY - 1, worldZ, Block.DIRT);
+    }
+
+    private void placeLeafLayer(GenerationUnit unit, int centerX, int y, int centerZ, int radius, boolean removeCorners) {
+        // Place leaves in a square pattern with given radius
+        // radius=1 gives 3x3, radius=2 gives 5x5
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                // Skip corners if requested
+                if (removeCorners && Math.abs(dx) == radius && Math.abs(dz) == radius) {
+                    continue;
+                }
+
+                int leafX = centerX + dx;
+                int leafZ = centerZ + dz;
+
+                // Don't replace the trunk block
+                if (dx == 0 && dz == 0 && radius > 1) continue;
+
+                // Place leaf without chunk boundary restrictions
+                unit.modifier().setBlock(leafX, y, leafZ, Block.OAK_LEAVES);
             }
         }
     }
