@@ -26,6 +26,7 @@ import java.nio.file.Path;
 
 public class Main {
     public static Config config;
+    private static PolarLoader polarLoader;
 
     static void main() throws Exception {
         Log.info("Starting server setup...");
@@ -65,13 +66,17 @@ public class Main {
         Path worldFolder = Path.of("worlds");
         Files.createDirectories(worldFolder);
         Path polarFile = worldFolder.resolve("overworld.polar");
-        instanceContainer.setChunkLoader(new PolarLoader(polarFile));
+        polarLoader = new PolarLoader(polarFile);
+        instanceContainer.setChunkLoader(polarLoader);
         Log.info("Polar world loader set for instance.");
 
         // Terrain Generator
         instanceContainer.setGenerator(new TerrainGenerator());
-        instanceContainer.setChunkSupplier(LightingChunk::new);
         Log.info("Custom terrain generator applied.");
+
+        // Enable chunk lighting
+        instanceContainer.setChunkSupplier(LightingChunk::new);
+        Log.info("Chunk lighting enabled.");
 
         // Events
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
@@ -136,6 +141,17 @@ public class Main {
                 PlayerDataManager.savePlayer(player);
                 Log.info(player.getUsername() + " data saved on shutdown.");
             });
+
+            // Save the world
+            try {
+                Log.info("Saving world...");
+                polarLoader.saveInstance(instanceContainer);
+                polarLoader.saveChunks(instanceContainer.getChunks());
+                Log.info("World saved successfully.");
+            } catch (Exception e) {
+                Log.error("Failed to save world: " + e.getMessage());
+                e.printStackTrace();
+            }
 
             MinecraftServer.stopCleanly();
 
