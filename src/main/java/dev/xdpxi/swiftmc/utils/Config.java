@@ -17,6 +17,8 @@ public class Config {
     public int port = 25565;
     public int maxPlayers = 500;
     public boolean debugEnabled = false;
+    public boolean velocityEnabled = false;
+    public String velocitySecret = "ENTER-YOUR-SECRET-HERE";
 
     public static Config loadOrCreate() throws Exception {
         LoaderOptions loaderOptions = new LoaderOptions();
@@ -29,16 +31,22 @@ public class Config {
                 config = new Config();
 
                 Object seedObj = map.get("seed");
-                if (seedObj != null) config.seed = ((Number) seedObj).intValue();
+                if (seedObj != null) config.seed = (Integer) seedObj;
 
                 Object portObj = map.get("port");
-                if (portObj != null) config.port = ((Number) portObj).intValue();
+                if (portObj != null) config.port = (Integer) portObj;
 
                 Object maxPlayersObj = map.get("maxPlayers");
-                if (maxPlayersObj != null) config.maxPlayers = ((Number) maxPlayersObj).intValue();
+                if (maxPlayersObj != null) config.maxPlayers = (Integer) maxPlayersObj;
 
                 Object debugEnabledObj = map.get("debugEnabled");
                 if (debugEnabledObj != null) config.debugEnabled = (Boolean) debugEnabledObj;
+
+                Object velocityEnabledObj = map.get("velocityEnabled");
+                if (velocityEnabledObj != null) config.velocityEnabled = (Boolean) velocityEnabledObj;
+
+                Object velocitySecretObj = map.get("velocitySecret");
+                if (velocitySecretObj != null) config.velocitySecret = (String) velocitySecretObj;
             }
         } else {
             config = new Config();
@@ -49,6 +57,8 @@ public class Config {
             data.put("port", config.port);
             data.put("maxPlayers", config.maxPlayers);
             data.put("debugEnabled", config.debugEnabled);
+            data.put("velocityEnabled", config.velocityEnabled);
+            data.put("velocitySecret", config.velocitySecret);
 
             DumperOptions dumperOptions = new DumperOptions();
             dumperOptions.setPrettyFlow(true);

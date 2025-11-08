@@ -10,6 +10,7 @@ import io.github.togar2.pvp.feature.CombatFeatureSet;
 import io.github.togar2.pvp.feature.CombatFeatures;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.hollowcube.polar.PolarLoader;
+import net.minestom.server.Auth;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.instance.InstanceContainer;
@@ -34,7 +35,12 @@ public class Main {
         }
 
         // Init server
-        MinecraftServer minecraftServer = MinecraftServer.init();
+        MinecraftServer minecraftServer;
+        if (config.velocityEnabled) {
+            minecraftServer = MinecraftServer.init(new Auth.Velocity(config.velocitySecret));
+        } else {
+            minecraftServer = MinecraftServer.init();
+        }
         Log.info("MinecraftServer initialized.");
 
         // Init Minestom PVP
