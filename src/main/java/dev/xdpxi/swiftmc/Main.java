@@ -19,6 +19,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
+import net.minestom.server.instance.LightingChunk;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,6 +70,7 @@ public class Main {
 
         // Terrain Generator
         instanceContainer.setGenerator(new TerrainGenerator());
+        instanceContainer.setChunkSupplier(LightingChunk::new);
         Log.info("Custom terrain generator applied.");
 
         // Events
