@@ -72,6 +72,7 @@ public class Main {
         Log.debug("GlobalEventHandler obtained.");
 
         AsyncPlayerConfigurationEvent.addListener(globalEventHandler, instanceContainer);
+        EntityDamageEvent.addListener(globalEventHandler);
         PickupItemEvent.addListener(globalEventHandler);
         PlayerBlockBreakEvent.addListener(globalEventHandler);
         PlayerCommandEvent.addListener(globalEventHandler);
