@@ -1,19 +1,27 @@
 package dev.xdpxi.swiftmc;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import dev.xdpxi.swiftmc.api.plugin.PluginManager;
 import dev.xdpxi.swiftmc.utils.Log;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class GUI extends JFrame {
-    private final JTextArea logArea;
-    private final JButton startButton;
-    private final JButton stopButton;
-    private final JButton restartButton;
+    private JTextArea logArea;
+    private JButton startButton;
+    private JButton stopButton;
+    private JButton restartButton;
+    private JPanel pluginsPanel;
+    private final List<PluginRow> pluginRows = new ArrayList<>();
     private volatile boolean serverRunning = false;
     private Process serverProcess;
 
@@ -23,39 +31,18 @@ public class GUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Main panel
-        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        // Create tabbed pane
+        JTabbedPane tabbedPane = new JTabbedPane();
 
-        // Log area
-        logArea = new JTextArea();
-        logArea.setEditable(false);
-        logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        JScrollPane scrollPane = new JScrollPane(logArea);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        // Console Tab
+        JPanel consolePanel = createConsolePanel();
+        tabbedPane.addTab("Console", consolePanel);
 
-        // Bottom panel with buttons
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        startButton = new JButton("Start Server");
-        stopButton = new JButton("Stop Server");
-        restartButton = new JButton("Restart Server");
+        // Plugins Tab
+        JPanel pluginsTab = createPluginsPanel();
+        tabbedPane.addTab("Plugins", pluginsTab);
 
-        stopButton.setEnabled(false);
-        restartButton.setEnabled(false);
-
-        startButton.addActionListener(e -> startServer());
-        stopButton.addActionListener(e -> stopServer());
-        restartButton.addActionListener(e -> restartServer());
-
-        bottomPanel.add(startButton);
-        bottomPanel.add(stopButton);
-        bottomPanel.add(restartButton);
-
-        // Add components
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
-        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
-
-        add(mainPanel);
+        add(tabbedPane);
 
         // Redirect console to the text area
         redirectOutput();
@@ -87,8 +74,137 @@ public class GUI extends JFrame {
 
         SwingUtilities.invokeLater(() -> {
             GUI gui = new GUI();
+            Main.setGuiInstance(gui);
             gui.setVisible(true);
         });
+    }
+
+    private JPanel createConsolePanel() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Log area
+        logArea = new JTextArea();
+        logArea.setEditable(false);
+        logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        JScrollPane scrollPane = new JScrollPane(logArea);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+        // Bottom panel with buttons
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        startButton = new JButton("Start Server");
+        stopButton = new JButton("Stop Server");
+        restartButton = new JButton("Restart Server");
+
+        stopButton.setEnabled(false);
+        restartButton.setEnabled(false);
+
+        startButton.addActionListener(e -> startServer());
+        stopButton.addActionListener(e -> stopServer());
+        restartButton.addActionListener(e -> restartServer());
+
+        bottomPanel.add(startButton);
+        bottomPanel.add(stopButton);
+        bottomPanel.add(restartButton);
+
+        panel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(bottomPanel, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private JPanel createPluginsPanel() {
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Plugins list panel
+        pluginsPanel = new JPanel();
+        pluginsPanel.setLayout(new BoxLayout(pluginsPanel, BoxLayout.Y_AXIS));
+
+        JScrollPane scrollPane = new JScrollPane(pluginsPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        // Refresh button
+        JButton refreshButton = new JButton("Refresh Plugin List");
+        refreshButton.addActionListener(e -> refreshPluginsList());
+
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel.add(refreshButton);
+
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        // Initial load
+        refreshPluginsList();
+
+        return mainPanel;
+    }
+
+    private void refreshPluginsList() {
+        pluginsPanel.removeAll();
+        pluginRows.clear();
+
+        File pluginsFolder = new File("plugins");
+        if (!pluginsFolder.exists()) {
+            pluginsFolder.mkdirs();
+        }
+
+        File[] pluginFiles = pluginsFolder.listFiles((dir, name) -> name.endsWith(".jar"));
+
+        if (pluginFiles == null || pluginFiles.length == 0) {
+            JLabel noPluginsLabel = new JLabel("No plugins found in plugins folder");
+            noPluginsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            noPluginsLabel.setForeground(Color.GRAY);
+            pluginsPanel.add(Box.createVerticalStrut(20));
+            pluginsPanel.add(noPluginsLabel);
+        } else {
+            // Sort alphabetically
+            Arrays.sort(pluginFiles, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+
+            for (File file : pluginFiles) {
+                PluginRow row = new PluginRow(file);
+                pluginRows.add(row);
+                pluginsPanel.add(row.getPanel());
+                pluginsPanel.add(Box.createVerticalStrut(5));
+            }
+        }
+
+        pluginsPanel.revalidate();
+        pluginsPanel.repaint();
+    }
+
+    public void setPluginManager(PluginManager pluginManager) {
+    }
+
+    private static class PluginRow {
+        private final JPanel panel;
+
+        public PluginRow(File pluginFile) {
+
+            panel = new JPanel();
+            panel.setLayout(new BorderLayout(10, 0));
+            panel.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(Color.GRAY, 1),
+                    new EmptyBorder(10, 15, 10, 15)
+            ));
+            panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+
+            // Left side - plugin info
+            JPanel infoPanel = new JPanel(new GridLayout(2, 1, 0, 5));
+            infoPanel.setOpaque(false);
+
+            JLabel nameLabel = new JLabel(pluginFile.getName());
+            nameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
+
+            infoPanel.add(nameLabel);
+
+            panel.add(infoPanel, BorderLayout.CENTER);
+        }
+
+        public JPanel getPanel() {
+            return panel;
+        }
     }
 
     private void redirectOutput() {

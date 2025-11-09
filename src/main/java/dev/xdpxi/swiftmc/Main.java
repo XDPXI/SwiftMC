@@ -37,6 +37,7 @@ public class Main {
     private static Path polarFile;
     private static Path polarGzFile;
     private static PluginManager pluginManager;
+    private static GUI guiInstance;
 
     static void main(String[] args) {
         boolean fromGui = args.length > 0 && args[0].equals("--nogui");
@@ -68,7 +69,7 @@ public class Main {
         lockFile = Path.of(jarFile.getPath().replaceFirst("\\.jar$", ".lck"));
         if (Files.exists(lockFile)) {
             System.err.println("ERROR: Server is already running or did not shut down properly!");
-            System.err.println("ERROR: If you're sure the server is not running, delete the 'server.lock' file and try again.");
+            System.err.println("ERROR: If you're sure the server is not running, delete the lock file and try again.");
             System.exit(1);
             return;
         }
@@ -207,6 +208,11 @@ public class Main {
         pluginManager.loadPlugins();
         pluginManager.enablePlugins();
 
+        // Notify GUI if it exists
+        if (guiInstance != null) {
+            guiInstance.setPluginManager(pluginManager);
+        }
+
         // Save world when closing server
         Runtime.getRuntime().addShutdownHook(new Thread(Main::shutdown));
 
@@ -286,5 +292,26 @@ public class Main {
         Log.close();
 
         Log.info("Server stopped cleanly.");
+    }
+
+    /**
+     * Gets the plugin manager instance.
+     */
+    public static PluginManager getPluginManager() {
+        return pluginManager;
+    }
+
+    /**
+     * Gets the main instance container.
+     */
+    public static InstanceContainer getInstanceContainer() {
+        return instanceContainer;
+    }
+
+    /**
+     * Sets the GUI instance (called by GUI when it's created)
+     */
+    public static void setGuiInstance(GUI gui) {
+        guiInstance = gui;
     }
 }
