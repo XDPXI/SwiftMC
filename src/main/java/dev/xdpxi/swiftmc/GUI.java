@@ -12,17 +12,16 @@ import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.jar.JarFile;
 
 public class GUI extends JFrame {
+    private final List<PluginRow> pluginRows = new ArrayList<>();
     private JTextArea logArea;
     private JButton startButton;
     private JButton stopButton;
     private JButton restartButton;
     private JPanel pluginsPanel;
-    private final List<PluginRow> pluginRows = new ArrayList<>();
     private volatile boolean serverRunning = false;
     private Process serverProcess;
 
@@ -190,34 +189,6 @@ public class GUI extends JFrame {
     public void setPluginManager(PluginManager pluginManager) {
     }
 
-    private static class PluginRow {
-        private final JPanel panel;
-
-        public PluginRow(File pluginFile) {
-            panel = new JPanel(new BorderLayout());
-            panel.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(Color.GRAY, 1),
-                    new EmptyBorder(5, 20, 5, 20)
-            ));
-            panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-
-            // Info panel
-            JPanel infoPanel = new JPanel(new BorderLayout());
-            infoPanel.setOpaque(false);
-
-            JLabel nameLabel = new JLabel(pluginFile.getName());
-            nameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
-
-            infoPanel.add(nameLabel, BorderLayout.CENTER);
-
-            panel.add(infoPanel, BorderLayout.CENTER);
-        }
-
-        public JPanel getPanel() {
-            return panel;
-        }
-    }
-
     private void redirectOutput() {
         OutputStream out = new OutputStream() {
             @Override
@@ -328,5 +299,33 @@ public class GUI extends JFrame {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    private static class PluginRow {
+        private final JPanel panel;
+
+        public PluginRow(File pluginFile) {
+            panel = new JPanel(new BorderLayout());
+            panel.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(Color.GRAY, 1),
+                    new EmptyBorder(5, 20, 5, 20)
+            ));
+            panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+
+            // Info panel
+            JPanel infoPanel = new JPanel(new BorderLayout());
+            infoPanel.setOpaque(false);
+
+            JLabel nameLabel = new JLabel(pluginFile.getName());
+            nameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
+
+            infoPanel.add(nameLabel, BorderLayout.CENTER);
+
+            panel.add(infoPanel, BorderLayout.CENTER);
+        }
+
+        public JPanel getPanel() {
+            return panel;
+        }
     }
 }
