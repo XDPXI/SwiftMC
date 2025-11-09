@@ -21,6 +21,7 @@ import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.LightingChunk;
 
+import java.awt.*;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,8 +31,28 @@ import java.util.zip.GZIPOutputStream;
 public class Main {
     public static Config config;
     private static PolarLoader polarLoader;
+    private static Path lockFile;
+    private static InstanceContainer instanceContainer;
+    private static Path polarFile;
+    private static Path polarGzFile;
 
-    static void main() throws Exception {
+    static void main(String[] args) {
+        boolean fromGui = args.length > 0 && args[0].equals("--nogui");
+
+        if (!fromGui && System.console() == null && !GraphicsEnvironment.isHeadless()) {
+            GUI.launch();
+        } else {
+            try {
+                server();
+            } catch (Exception e) {
+                System.err.println("Failed to start server: " + e.getMessage());
+                e.printStackTrace();
+                System.exit(1);
+            }
+        }
+    }
+
+    static void server() throws Exception {
         // Get the path of the running JAR
         File jarFile = new File(
                 Main.class
@@ -42,7 +63,7 @@ public class Main {
         );
 
         // Check for lock file
-        Path lockFile = Path.of(jarFile.getPath().replaceFirst("\\.jar$", ".lck"));
+        lockFile = Path.of(jarFile.getPath().replaceFirst("\\.jar$", ".lck"));
         if (Files.exists(lockFile)) {
             System.err.println("ERROR: Server is already running or did not shut down properly!");
             System.err.println("ERROR: If you're sure the server is not running, delete the 'server.lock' file and try again.");
@@ -90,14 +111,14 @@ public class Main {
 
         // Instances
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
-        InstanceContainer instanceContainer = instanceManager.createInstanceContainer();
+        instanceContainer = instanceManager.createInstanceContainer();
         Log.debug("InstanceContainer created.");
 
         // Polar world loader
         Path worldFolder = Path.of("worlds");
         Files.createDirectories(worldFolder);
-        Path polarFile = worldFolder.resolve("overworld.polar");
-        Path polarGzFile = worldFolder.resolve("overworld.polar.gz");
+        polarFile = worldFolder.resolve("overworld.polar");
+        polarGzFile = worldFolder.resolve("overworld.polar.gz");
 
         // Decompress world if .gz exists
         if (Files.exists(polarGzFile) && !Files.exists(polarFile)) {
@@ -180,59 +201,78 @@ public class Main {
         Log.info("Combat features enabled.");
 
         // Save world when closing server
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            Log.info("Shutdown initiated. Saving world...");
-
-            MinecraftServer.getConnectionManager().getOnlinePlayers().forEach(player -> {
-                PlayerDataManager.savePlayer(player);
-                Log.info(player.getUsername() + " data saved on shutdown.");
-            });
-
-            // Save the world
-            try {
-                Log.info("Saving world...");
-                polarLoader.saveInstance(instanceContainer);
-                polarLoader.saveChunks(instanceContainer.getChunks());
-                Log.info("World saved successfully.");
-
-                // Compress the world file
-                if (Files.exists(polarFile)) {
-                    Log.info("Compressing world to " + polarGzFile + "...");
-                    try (GZIPOutputStream gos = new GZIPOutputStream(Files.newOutputStream(polarGzFile))) {
-                        Files.copy(polarFile, gos);
-                    }
-
-                    // Delete the uncompressed file
-                    Files.deleteIfExists(polarFile);
-                    Log.info("World compressed and uncompressed file deleted.");
-                }
-            } catch (Exception e) {
-                Log.error("Failed to save/compress world: " + e.getMessage());
-                e.printStackTrace();
-            }
-
-            try {
-                Files.deleteIfExists(lockFile);
-                Log.info("Lockfile deleted.");
-            } catch (Exception e) {
-                Log.error("Failed to delete lockfile: " + e.getMessage());
-                e.printStackTrace();
-            }
-
-            MinecraftServer.stopCleanly();
-
-            Log.close();
-
-            Log.info("Server stopped cleanly.");
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(Main::shutdown));
 
         // Start server
         try {
             minecraftServer.start("0.0.0.0", config.port);
             Log.info("Server started on port " + config.port);
+
+            // Listen for stop command from GUI
+            new Thread(() -> {
+                try (var reader = new java.io.BufferedReader(new java.io.InputStreamReader(System.in))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if (line.equalsIgnoreCase("stop")) {
+                            Log.info("Received stop command from GUI.");
+                            shutdown();
+                            System.exit(0);
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.error("Command listener failed: " + e.getMessage());
+                }
+            }, "GUI-Control-Listener").start();
+
         } catch (Exception e) {
             Log.error("Failed to start server: " + e.getMessage());
             throw e;
         }
+    }
+
+    public static void shutdown() {
+        Log.info("Shutdown initiated. Saving world...");
+
+        MinecraftServer.getConnectionManager().getOnlinePlayers().forEach(player -> {
+            PlayerDataManager.savePlayer(player);
+            Log.info(player.getUsername() + " data saved on shutdown.");
+        });
+
+        // Save the world
+        try {
+            Log.info("Saving world...");
+            polarLoader.saveInstance(instanceContainer);
+            polarLoader.saveChunks(instanceContainer.getChunks());
+            Log.info("World saved successfully.");
+
+            // Compress the world file
+            if (Files.exists(polarFile)) {
+                Log.info("Compressing world to " + polarGzFile + "...");
+                try (GZIPOutputStream gos = new GZIPOutputStream(Files.newOutputStream(polarGzFile))) {
+                    Files.copy(polarFile, gos);
+                }
+
+                // Delete the uncompressed file
+                Files.deleteIfExists(polarFile);
+                Log.info("World compressed and uncompressed file deleted.");
+            }
+        } catch (Exception e) {
+            Log.error("Failed to save/compress world: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        try {
+            Files.deleteIfExists(lockFile);
+            Log.info("Lockfile deleted.");
+        } catch (Exception e) {
+            Log.error("Failed to delete lockfile: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        MinecraftServer.stopCleanly();
+
+        Log.close();
+
+        Log.info("Server stopped cleanly.");
     }
 }
