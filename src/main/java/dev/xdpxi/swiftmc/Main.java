@@ -30,10 +30,10 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class Main {
-    public static Config config;
-    private static PolarLoader polarLoader;
     private static Path lockFile;
+    public static Config config;
     private static InstanceContainer instanceContainer;
+    private static PolarLoader polarLoader;
     private static Path polarFile;
     private static Path polarGzFile;
     private static PluginManager pluginManager;
