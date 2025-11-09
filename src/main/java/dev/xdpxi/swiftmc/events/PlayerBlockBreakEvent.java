@@ -43,21 +43,34 @@ public class PlayerBlockBreakEvent {
 
     private static Material getBlockDrop(Block block) {
         // Map blocks to their drops
-        return switch (block.name()) {
-            case "minecraft:grass_block", "minecraft:dirt" -> Material.DIRT;
-            case "minecraft:stone" -> Material.COBBLESTONE;
-            case "minecraft:sand" -> Material.SAND;
-            case "minecraft:water" -> null; // Water doesn't drop
-            case "minecraft:oak_log" -> Material.OAK_LOG;
-            case "minecraft:oak_leaves" -> ThreadLocalRandom.current().nextInt(20) == 0 ? Material.OAK_SAPLING : null;
-            default -> {
+        String name = block.name();
+        switch (name) {
+            case "minecraft:grass_block":
+            case "minecraft:dirt":
+                return Material.DIRT;
+            case "minecraft:stone":
+                return Material.COBBLESTONE;
+            case "minecraft:sand":
+                return Material.SAND;
+            case "minecraft:water":
+                return null;
+            case "minecraft:oak_log":
+                return Material.OAK_LOG;
+            case "minecraft:oak_leaves":
+                return (ThreadLocalRandom.current().nextInt(20) == 0
+                        ? Material.OAK_SAPLING
+                        : null);
+            default:
                 // Try to get the material directly from the block
                 try {
-                    yield Material.fromId(block.id());
+                    Material mat = block.registry().material();
+                    if (mat == Material.AIR) {
+                        return null;
+                    }
+                    return mat;
                 } catch (Exception e) {
-                    yield null;
+                    return null;
                 }
-            }
-        };
+        }
     }
 }
