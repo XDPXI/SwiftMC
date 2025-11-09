@@ -197,18 +197,18 @@ public class GUI extends JFrame {
             panel = new JPanel(new BorderLayout());
             panel.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(Color.GRAY, 1),
-                    new EmptyBorder(15, 20, 15, 20)
+                    new EmptyBorder(5, 20, 5, 20)
             ));
-            panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
+            panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
             // Info panel
-            JPanel infoPanel = new JPanel(new GridLayout(2, 1, 0, 5));
+            JPanel infoPanel = new JPanel(new BorderLayout());
             infoPanel.setOpaque(false);
 
             JLabel nameLabel = new JLabel(pluginFile.getName());
             nameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
 
-            infoPanel.add(nameLabel);
+            infoPanel.add(nameLabel, BorderLayout.CENTER);
 
             panel.add(infoPanel, BorderLayout.CENTER);
         }
