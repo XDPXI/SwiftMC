@@ -2,6 +2,7 @@ package dev.xdpxi.swiftmc;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import dev.xdpxi.swiftmc.utils.Log;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -101,7 +102,7 @@ public class GUI extends JFrame {
             }
 
             @Override
-            public void write(byte[] b, int off, int len) {
+            public void write(byte @NotNull [] b, int off, int len) {
                 SwingUtilities.invokeLater(() -> {
                     logArea.append(new String(b, off, len));
                     logArea.setCaretPosition(logArea.getDocument().getLength());
