@@ -14,6 +14,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.jar.JarFile;
 
 public class GUI extends JFrame {
     private JTextArea logArea;
@@ -152,21 +153,33 @@ public class GUI extends JFrame {
 
         File[] pluginFiles = pluginsFolder.listFiles((dir, name) -> name.endsWith(".jar"));
 
-        if (pluginFiles == null || pluginFiles.length == 0) {
-            JLabel noPluginsLabel = new JLabel("No plugins found in plugins folder");
+        List<File> validPlugins = new ArrayList<>();
+        if (pluginFiles != null) {
+            for (File file : pluginFiles) {
+                try (JarFile jar = new JarFile(file)) {
+                    if (jar.getJarEntry("plugin.yml") != null) {
+                        validPlugins.add(file);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error reading plugin jar " + file.getName() + ": " + e.getMessage());
+                }
+            }
+        }
+
+        if (validPlugins.isEmpty()) {
+            JLabel noPluginsLabel = new JLabel("No valid plugins found in the plugins folder");
             noPluginsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             noPluginsLabel.setForeground(Color.GRAY);
             pluginsPanel.add(Box.createVerticalStrut(20));
             pluginsPanel.add(noPluginsLabel);
         } else {
             // Sort alphabetically
-            Arrays.sort(pluginFiles, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+            validPlugins.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
 
-            for (File file : pluginFiles) {
+            for (File file : validPlugins) {
                 PluginRow row = new PluginRow(file);
                 pluginRows.add(row);
                 pluginsPanel.add(row.getPanel());
-                pluginsPanel.add(Box.createVerticalStrut(5));
             }
         }
 
@@ -181,16 +194,14 @@ public class GUI extends JFrame {
         private final JPanel panel;
 
         public PluginRow(File pluginFile) {
-
-            panel = new JPanel();
-            panel.setLayout(new BorderLayout(10, 0));
+            panel = new JPanel(new BorderLayout());
             panel.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(Color.GRAY, 1),
-                    new EmptyBorder(10, 15, 10, 15)
+                    new EmptyBorder(15, 20, 15, 20)
             ));
-            panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+            panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
 
-            // Left side - plugin info
+            // Info panel
             JPanel infoPanel = new JPanel(new GridLayout(2, 1, 0, 5));
             infoPanel.setOpaque(false);
 
