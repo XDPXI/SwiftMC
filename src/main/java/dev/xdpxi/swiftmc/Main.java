@@ -1,5 +1,6 @@
 package dev.xdpxi.swiftmc;
 
+import dev.xdpxi.swiftmc.api.plugin.PluginManager;
 import dev.xdpxi.swiftmc.commands.Adventure;
 import dev.xdpxi.swiftmc.commands.Creative;
 import dev.xdpxi.swiftmc.commands.Spectator;
@@ -35,6 +36,7 @@ public class Main {
     private static InstanceContainer instanceContainer;
     private static Path polarFile;
     private static Path polarGzFile;
+    private static PluginManager pluginManager;
 
     static void main(String[] args) {
         boolean fromGui = args.length > 0 && args[0].equals("--nogui");
@@ -200,6 +202,11 @@ public class Main {
         globalEventHandler.addChild(featureSet.createNode());
         Log.info("Combat features enabled.");
 
+        // Initialize Plugin System
+        pluginManager = new PluginManager();
+        pluginManager.loadPlugins();
+        pluginManager.enablePlugins();
+
         // Save world when closing server
         Runtime.getRuntime().addShutdownHook(new Thread(Main::shutdown));
 
@@ -237,6 +244,11 @@ public class Main {
             PlayerDataManager.savePlayer(player);
             Log.info(player.getUsername() + " data saved on shutdown.");
         });
+
+        // Disable plugins
+        if (pluginManager != null) {
+            pluginManager.disablePlugins();
+        }
 
         // Save the world
         try {
