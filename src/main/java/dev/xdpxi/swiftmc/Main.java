@@ -6,6 +6,7 @@ import dev.xdpxi.swiftmc.commands.Creative;
 import dev.xdpxi.swiftmc.commands.Spectator;
 import dev.xdpxi.swiftmc.commands.Survival;
 import dev.xdpxi.swiftmc.events.*;
+import dev.xdpxi.swiftmc.api.mobs.MobSpawner;
 import dev.xdpxi.swiftmc.player.PlayerDataManager;
 import dev.xdpxi.swiftmc.utils.Config;
 import dev.xdpxi.swiftmc.utils.Log;
@@ -38,6 +39,7 @@ public class Main {
     private static Path polarGzFile;
     private static PluginManager pluginManager;
     private static GUI guiInstance;
+    private static MobSpawner mobSpawner;
 
     static void main(String[] args) {
         boolean fromGui = args.length > 0 && args[0].equals("--nogui");
@@ -154,6 +156,7 @@ public class Main {
 
         AsyncPlayerConfigurationEvent.addListener(globalEventHandler, instanceContainer);
         EntityDamageEvent.addListener(globalEventHandler);
+        EntityDeathEvent.addListener(globalEventHandler);
         ItemDropEvent.addListener(globalEventHandler);
         PickupItemEvent.addListener(globalEventHandler);
         PlayerBlockBreakEvent.addListener(globalEventHandler);
@@ -161,6 +164,11 @@ public class Main {
         PlayerSpawnEvent.addListener(globalEventHandler);
         ServerListPingEvent.addListener(globalEventHandler);
         Log.info("Event listeners registered.");
+
+        // Mob Spawner
+        mobSpawner = new MobSpawner(instanceContainer);
+        mobSpawner.start();
+        Log.info("Mob spawner initialized.");
 
         // Commands
         MinecraftServer.getCommandManager().register(new Spectator());
@@ -314,5 +322,12 @@ public class Main {
      */
     public static void setGuiInstance(GUI gui) {
         guiInstance = gui;
+    }
+
+    /**
+     * Gets the mob spawner instance.
+     */
+    public static MobSpawner getMobSpawner() {
+        return mobSpawner;
     }
 }
