@@ -17,12 +17,14 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public record MobSpawner(Instance instance) {
-    private static final int SPAWN_RADIUS_CHUNKS = 2; // spawn within 2 chunks around player
-    private static final int MAX_MOBS_PER_TYPE = 20;
-    private static final int SPAWN_ATTEMPTS_PER_TICK = 3;
+    private static final int SPAWN_RADIUS_CHUNKS = 4; // spawn within 4 chunks around player
+    private static final int MAX_MOBS_PER_TYPE = 30;
+    private static final int SPAWN_ATTEMPTS_PER_TICK = 5;
     private static final int SPAWN_INTERVAL_TICKS = 100; // every 5 seconds
-    private static final int GROUP_MIN = 3;
-    private static final int GROUP_MAX = 5;
+    private static final int GROUP_MIN = 2;
+    private static final int GROUP_MAX = 4;
+    private static final int MIN_SPAWN_DISTANCE = 24; // blocks away from player
+    private static final int MAX_SPAWN_DISTANCE = 64; // blocks away from player
     private static final List<EntityCreature> spawnedMobs = new ArrayList<>();
 
     public void start() {
@@ -34,8 +36,10 @@ public record MobSpawner(Instance instance) {
     }
 
     private void trySpawnMobs() {
+        // Clean up removed/inactive mobs
         spawnedMobs.removeIf(mob -> mob.isRemoved() || !mob.isActive());
 
+        // Count mobs by type
         long chickenCount = spawnedMobs.stream()
                 .filter(mob -> mob.getEntityType() == EntityType.CHICKEN).count();
         long cowCount = spawnedMobs.stream()
@@ -57,6 +61,7 @@ public record MobSpawner(Instance instance) {
             // Pick a random player to spawn near
             var players = instance.getPlayers();
             if (players.isEmpty()) continue;
+
             Player player = players.stream()
                     .skip(ThreadLocalRandom.current().nextInt(players.size()))
                     .findFirst()
@@ -66,6 +71,10 @@ public record MobSpawner(Instance instance) {
             // Find a random spawn location near the player
             Pos groupCenter = getRandomSpawnLocationNearPlayer(player);
             if (groupCenter == null) continue;
+
+            // Check distance from player
+            double distance = player.getPosition().distance(groupCenter);
+            if (distance < MIN_SPAWN_DISTANCE || distance > MAX_SPAWN_DISTANCE) continue;
 
             // Spawn a group of mobs around that point
             int groupSize = ThreadLocalRandom.current().nextInt(GROUP_MIN, GROUP_MAX + 1);
@@ -90,7 +99,8 @@ public record MobSpawner(Instance instance) {
     }
 
     private Pos getRandomSpawnLocationNearPlayer(Player player) {
-        assert player.getChunk() != null;
+        if (player.getChunk() == null) return null;
+
         int playerChunkX = player.getChunk().getChunkX();
         int playerChunkZ = player.getChunk().getChunkZ();
 
@@ -104,11 +114,12 @@ public record MobSpawner(Instance instance) {
         int z = chunkZ * 16 + ThreadLocalRandom.current().nextInt(16);
 
         // Search for ground level
-        for (int y = 100; y > 40; y--) {
+        for (int y = 120; y > 40; y--) {
             Block block = instance.getBlock(x, y, z);
             Block above = instance.getBlock(x, y + 1, z);
             Block above2 = instance.getBlock(x, y + 2, z);
-            if (!block.isAir() && above.isAir() && above2.isAir()) {
+
+            if (!block.isAir() && !block.compare(Block.WATER) && above.isAir() && above2.isAir()) {
                 return new Pos(x + 0.5, y + 1, z + 0.5);
             }
         }
@@ -118,25 +129,36 @@ public record MobSpawner(Instance instance) {
 
     private boolean isValidSpawnLocation(Pos pos) {
         Block below = instance.getBlock(pos.sub(0, 1, 0));
-        if (below.isAir() || below.compare(Block.WATER) || below.compare(Block.SAND)) {
+        if (below.isAir() || below.compare(Block.WATER)) {
             return false;
         }
+
         Block atPos = instance.getBlock(pos);
-        if (atPos.compare(Block.WATER)) return false;
-        return pos.y() >= 60;
+        Block above = instance.getBlock(pos.add(0, 1, 0));
+
+        if (!atPos.isAir() || !above.isAir()) return false;
+        if (atPos.compare(Block.WATER) || above.compare(Block.WATER)) return false;
+
+        return pos.y() >= 50;
     }
 
     private void spawnMob(EntityType type, Pos pos) {
         EntityCreature mob = new EntityCreature(type);
+
+        // Add AI
         mob.addAIGroup(
                 List.of(new RandomStrollGoal(mob, 20)),
                 List.of()
         );
-        mob.getAttribute(Attribute.MOVEMENT_SPEED)
-                .setBaseValue(0.1f);
-        mob.setInstance(instance, pos);
-        spawnedMobs.add(mob);
-        Log.debug("Spawned " + type.name() + " at " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
+
+        // Set movement speed
+        mob.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.15f);
+
+        // Spawn in instance
+        mob.setInstance(instance, pos).thenRun(() -> {
+            spawnedMobs.add(mob);
+            Log.debug("Spawned " + type.name() + " at " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
+        });
     }
 
     static List<EntityCreature> getSpawnedMobs() {
