@@ -13,19 +13,19 @@ public class ItemDropEvent {
         globalEventHandler.addListener(net.minestom.server.event.item.ItemDropEvent.class, event -> {
             Player player = event.getPlayer();
 
-            // Get player's position and looking direction
+            // Get player position and looking direction
             Pos playerPos = player.getPosition();
             Vec direction = playerPos.direction();
 
-            // Spawn position: in front of player at eye level
+            // Spawn position
             Vec spawnPos = playerPos.asVec()
                     .add(0, player.getEyeHeight(), 0)
                     .add(direction.mul(0.3));
 
-            // Throw velocity: in the direction player is looking
-            Vec velocity = direction.mul(3);
+            // Throw velocity
+            Vec velocity = direction.mul(4);
 
-            // Create and spawn the item entity
+            // Create and spawn
             ItemEntity itemEntity = new ItemEntity(event.getItemStack());
             itemEntity.setInstance(player.getInstance(), Pos.fromPoint(spawnPos));
             itemEntity.setVelocity(velocity);
