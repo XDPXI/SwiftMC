@@ -154,6 +154,7 @@ public class Main {
 
         AsyncPlayerConfigurationEvent.addListener(globalEventHandler, instanceContainer);
         EntityDamageEvent.addListener(globalEventHandler);
+        ItemDropEvent.addListener(globalEventHandler);
         PickupItemEvent.addListener(globalEventHandler);
         PlayerBlockBreakEvent.addListener(globalEventHandler);
         PlayerDisconnectEvent.addListener(globalEventHandler);
