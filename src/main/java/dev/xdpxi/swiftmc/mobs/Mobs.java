@@ -1,4 +1,4 @@
-package dev.xdpxi.swiftmc.api.mobs;
+package dev.xdpxi.swiftmc.mobs;
 
 import net.minestom.server.entity.EntityCreature;
 

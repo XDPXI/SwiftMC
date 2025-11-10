@@ -1,13 +1,13 @@
 package dev.xdpxi.swiftmc;
 
-import dev.xdpxi.swiftmc.api.plugin.PluginManager;
 import dev.xdpxi.swiftmc.commands.Adventure;
 import dev.xdpxi.swiftmc.commands.Creative;
 import dev.xdpxi.swiftmc.commands.Spectator;
 import dev.xdpxi.swiftmc.commands.Survival;
 import dev.xdpxi.swiftmc.events.*;
-import dev.xdpxi.swiftmc.api.mobs.MobSpawner;
+import dev.xdpxi.swiftmc.mobs.MobSpawner;
 import dev.xdpxi.swiftmc.player.PlayerDataManager;
+import dev.xdpxi.swiftmc.plugin.PluginManager;
 import dev.xdpxi.swiftmc.utils.Config;
 import dev.xdpxi.swiftmc.utils.Log;
 import dev.xdpxi.swiftmc.utils.TerrainGenerator;

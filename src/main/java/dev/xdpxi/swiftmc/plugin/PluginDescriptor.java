@@ -1,4 +1,4 @@
-package dev.xdpxi.swiftmc.api.plugin;
+package dev.xdpxi.swiftmc.plugin;
 
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;

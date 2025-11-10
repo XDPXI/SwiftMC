@@ -1,4 +1,4 @@
-package dev.xdpxi.swiftmc.api.plugin;
+package dev.xdpxi.swiftmc.plugin;
 
 import java.io.File;
 import java.net.URL;

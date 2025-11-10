@@ -1,6 +1,5 @@
 package dev.xdpxi.swiftmc.events;
 
-import dev.xdpxi.swiftmc.api.mobs.MobSpawner;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.EntityCreature;

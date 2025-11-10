@@ -1,4 +1,4 @@
-package dev.xdpxi.swiftmc.api.mobs;
+package dev.xdpxi.swiftmc.mobs;
 
 import dev.xdpxi.swiftmc.utils.Log;
 import net.minestom.server.MinecraftServer;

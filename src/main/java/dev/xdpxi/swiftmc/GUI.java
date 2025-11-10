@@ -1,7 +1,7 @@
 package dev.xdpxi.swiftmc;
 
 import com.formdev.flatlaf.FlatDarkLaf;
-import dev.xdpxi.swiftmc.api.plugin.PluginManager;
+import dev.xdpxi.swiftmc.plugin.PluginManager;
 import dev.xdpxi.swiftmc.utils.Log;
 import org.jetbrains.annotations.NotNull;
 
