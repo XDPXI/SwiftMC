@@ -30,6 +30,9 @@ java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(25))
     }
+
+    withJavadocJar()
+    withSourcesJar()
 }
 
 tasks {
@@ -47,8 +50,12 @@ tasks {
         mergeServiceFiles()
         archiveClassifier.set("")
     }
-}
 
-test {
-    useJUnitPlatform()
+    test {
+        useJUnitPlatform()
+    }
+
+    build {
+        dependsOn(javadocJar, sourcesJar)
+    }
 }
