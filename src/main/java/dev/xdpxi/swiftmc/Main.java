@@ -162,6 +162,7 @@ public class Main {
         PlayerBlockBreakEvent.addListener(globalEventHandler);
         PlayerDisconnectEvent.addListener(globalEventHandler);
         PlayerSpawnEvent.addListener(globalEventHandler);
+        PlayerUseItemEvent.addListener(globalEventHandler);
         ServerListPingEvent.addListener(globalEventHandler);
         Log.info("Event listeners registered.");
 
