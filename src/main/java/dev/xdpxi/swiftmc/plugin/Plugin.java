@@ -28,13 +28,13 @@ import java.util.*;
  * Provides a Bukkit-style API while using Minestom underneath.
  */
 public abstract class Plugin {
+    private final List<Command> registeredCommands = new ArrayList<>();
+    private final List<Task> scheduledTasks = new ArrayList<>();
     private PluginDescriptor descriptor;
     private File dataFolder;
     private PluginClassLoader classLoader;
     private boolean enabled = false;
     private EventNode<@NotNull Event> eventNode;
-    private final List<Command> registeredCommands = new ArrayList<>();
-    private final List<Task> scheduledTasks = new ArrayList<>();
     private Map<String, Object> config;
 
     /**

@@ -1,8 +1,6 @@
 package dev.xdpxi.swiftmc.events;
 
 import dev.xdpxi.swiftmc.utils.Log;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;

@@ -27,6 +27,10 @@ public record MobSpawner(Instance instance) {
     private static final int MAX_SPAWN_DISTANCE = 64; // blocks away from player
     private static final List<EntityCreature> spawnedMobs = new ArrayList<>();
 
+    static List<EntityCreature> getSpawnedMobs() {
+        return new ArrayList<>(spawnedMobs);
+    }
+
     public void start() {
         MinecraftServer.getSchedulerManager().submitTask(() -> {
             trySpawnMobs();
@@ -159,9 +163,5 @@ public record MobSpawner(Instance instance) {
             spawnedMobs.add(mob);
             Log.debug("Spawned " + type.name() + " at " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
         });
-    }
-
-    static List<EntityCreature> getSpawnedMobs() {
-        return new ArrayList<>(spawnedMobs);
     }
 }

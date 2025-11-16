@@ -31,8 +31,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class Main {
-    private static Path lockFile;
     public static Config config;
+    private static Path lockFile;
     private static InstanceContainer instanceContainer;
     private static PolarLoader polarLoader;
     private static Path polarFile;
