@@ -163,11 +163,11 @@ public class Main {
         ItemDropEvent.addListener(globalEventHandler);
         PickupItemEvent.addListener(globalEventHandler);
         PlayerBlockBreakEvent.addListener(globalEventHandler);
+        PlayerDeathEvent.addListener(globalEventHandler);
         PlayerDisconnectEvent.addListener(globalEventHandler);
         PlayerSpawnEvent.addListener(globalEventHandler);
         PlayerUseItemEvent.addListener(globalEventHandler);
         ServerListPingEvent.addListener(globalEventHandler);
-        PlayerDeathEvent.addListener(globalEventHandler); // New death handler
         Log.info("Event listeners registered.");
 
         // Mob Spawner
