@@ -40,6 +40,7 @@ public class Main {
     private static PluginManager pluginManager;
     private static GUI guiInstance;
     private static MobSpawner mobSpawner;
+    private static volatile boolean isShuttingDown = false;
 
     static void main(String[] args) {
         boolean fromGui = args.length > 0 && args[0].equals("--nogui");
@@ -50,7 +51,7 @@ public class Main {
             try {
                 server();
             } catch (Exception e) {
-                System.err.println("Failed to start server: " + e.getMessage());
+                Log.error("Failed to start server: " + e.getMessage());
                 e.printStackTrace();
                 System.exit(1);
             }
@@ -70,8 +71,8 @@ public class Main {
         // Check for lock file
         lockFile = Path.of(jarFile.getPath().replaceFirst("\\.jar$", ".lck"));
         if (Files.exists(lockFile)) {
-            System.err.println("ERROR: Server is already running or did not shut down properly!");
-            System.err.println("ERROR: If you're sure the server is not running, delete the lock file and try again.");
+            Log.error("Server is already running or did not shut down properly!");
+            Log.error("If you're sure the server is not running, delete the lock file: " + lockFile);
             System.exit(1);
             return;
         }
@@ -81,7 +82,7 @@ public class Main {
             Files.writeString(lockFile, "Server started at: " + java.time.LocalDateTime.now());
             Log.info("Lock file created.");
         } catch (Exception e) {
-            System.err.println("ERROR: Failed to create lock file: " + e.getMessage());
+            Log.error("Failed to create lock file: " + e.getMessage());
             System.exit(1);
             return;
         }
@@ -101,10 +102,11 @@ public class Main {
         MinecraftServer minecraftServer;
         if (config.velocityEnabled) {
             minecraftServer = MinecraftServer.init(new Auth.Velocity(config.velocitySecret));
+            Log.info("Server initialized with Velocity support.");
         } else {
             minecraftServer = MinecraftServer.init();
+            Log.info("Server initialized in offline mode.");
         }
-        Log.info("MinecraftServer initialized.");
 
         // Init Minestom PVP
         try {
@@ -112,6 +114,7 @@ public class Main {
             Log.info("MinestomPvP initialized successfully.");
         } catch (Exception e) {
             Log.error("MinestomPvP initialization failed: " + e.getMessage());
+            e.printStackTrace();
         }
 
         // Instances
@@ -164,6 +167,7 @@ public class Main {
         PlayerSpawnEvent.addListener(globalEventHandler);
         PlayerUseItemEvent.addListener(globalEventHandler);
         ServerListPingEvent.addListener(globalEventHandler);
+        PlayerDeathEvent.addListener(globalEventHandler); // New death handler
         Log.info("Event listeners registered.");
 
         // Mob Spawner
@@ -176,6 +180,7 @@ public class Main {
         MinecraftServer.getCommandManager().register(new Creative());
         MinecraftServer.getCommandManager().register(new Survival());
         MinecraftServer.getCommandManager().register(new Adventure());
+        Log.info("Commands registered.");
 
         // Minestom PVP Events
         CombatFeatureSet featureSet = CombatFeatures.empty()
@@ -224,12 +229,17 @@ public class Main {
         }
 
         // Save world when closing server
-        Runtime.getRuntime().addShutdownHook(new Thread(Main::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (!isShuttingDown) {
+                shutdown();
+            }
+        }));
 
         // Start server
         try {
             minecraftServer.start("0.0.0.0", config.port);
-            Log.info("Server started on port " + config.port);
+            Log.info("Server started on 0.0.0.0:" + config.port);
+            Log.info("Server is ready for players!");
 
             // Listen for stop command from GUI
             new Thread(() -> {
@@ -237,15 +247,17 @@ public class Main {
                     String line;
                     while ((line = reader.readLine()) != null) {
                         if (line.equalsIgnoreCase("stop")) {
-                            Log.info("Received stop command from GUI.");
+                            Log.info("Received stop command.");
                             shutdown();
                             System.exit(0);
                         }
                     }
                 } catch (Exception e) {
-                    Log.error("Command listener failed: " + e.getMessage());
+                    if (!isShuttingDown) {
+                        Log.error("Command listener failed: " + e.getMessage());
+                    }
                 }
-            }, "GUI-Control-Listener").start();
+            }, "Command-Listener").start();
 
         } catch (Exception e) {
             Log.error("Failed to start server: " + e.getMessage());
@@ -254,16 +266,30 @@ public class Main {
     }
 
     public static void shutdown() {
-        Log.info("Shutdown initiated. Saving world...");
+        if (isShuttingDown) {
+            return;
+        }
+        isShuttingDown = true;
 
+        Log.info("=== Server shutdown initiated ===");
+
+        // Save all player data
         MinecraftServer.getConnectionManager().getOnlinePlayers().forEach(player -> {
-            PlayerDataManager.savePlayer(player);
-            Log.info(player.getUsername() + " data saved on shutdown.");
+            try {
+                PlayerDataManager.savePlayer(player);
+                Log.info("Saved data for " + player.getUsername());
+            } catch (Exception e) {
+                Log.error("Failed to save data for " + player.getUsername() + ": " + e.getMessage());
+            }
         });
 
         // Disable plugins
         if (pluginManager != null) {
-            pluginManager.disablePlugins();
+            try {
+                pluginManager.disablePlugins();
+            } catch (Exception e) {
+                Log.error("Error disabling plugins: " + e.getMessage());
+            }
         }
 
         // Save the world
@@ -279,8 +305,6 @@ public class Main {
                 try (GZIPOutputStream gos = new GZIPOutputStream(Files.newOutputStream(polarGzFile))) {
                     Files.copy(polarFile, gos);
                 }
-
-                // Delete the uncompressed file
                 Files.deleteIfExists(polarFile);
                 Log.info("World compressed and uncompressed file deleted.");
             }
@@ -289,46 +313,38 @@ public class Main {
             e.printStackTrace();
         }
 
+        // Delete lock file
         try {
             Files.deleteIfExists(lockFile);
-            Log.info("Lockfile deleted.");
+            Log.info("Lock file deleted.");
         } catch (Exception e) {
-            Log.error("Failed to delete lockfile: " + e.getMessage());
-            e.printStackTrace();
+            Log.error("Failed to delete lock file: " + e.getMessage());
         }
 
+        // Stop server
         MinecraftServer.stopCleanly();
 
+        // Close log
         Log.close();
-
-        Log.info("Server stopped cleanly.");
     }
 
-    /**
-     * Gets the plugin manager instance.
-     */
     public static PluginManager getPluginManager() {
         return pluginManager;
     }
 
-    /**
-     * Gets the main instance container.
-     */
     public static InstanceContainer getInstanceContainer() {
         return instanceContainer;
     }
 
-    /**
-     * Sets the GUI instance (called by GUI when it's created)
-     */
     public static void setGuiInstance(GUI gui) {
         guiInstance = gui;
     }
 
-    /**
-     * Gets the mob spawner instance.
-     */
     public static MobSpawner getMobSpawner() {
         return mobSpawner;
+    }
+
+    public static boolean isShuttingDown() {
+        return isShuttingDown;
     }
 }
