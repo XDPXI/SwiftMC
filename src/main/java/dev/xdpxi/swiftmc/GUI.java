@@ -1,7 +1,6 @@
 package dev.xdpxi.swiftmc;
 
 import com.formdev.flatlaf.FlatDarkLaf;
-import dev.xdpxi.swiftmc.plugin.PluginManager;
 import dev.xdpxi.swiftmc.utils.Log;
 import org.jetbrains.annotations.NotNull;
 
@@ -74,7 +73,6 @@ public class GUI extends JFrame {
 
         SwingUtilities.invokeLater(() -> {
             GUI gui = new GUI();
-            Main.setGuiInstance(gui);
             gui.setVisible(true);
         });
     }
@@ -99,9 +97,9 @@ public class GUI extends JFrame {
         stopButton.setEnabled(false);
         restartButton.setEnabled(false);
 
-        startButton.addActionListener(e -> startServer());
-        stopButton.addActionListener(e -> stopServer());
-        restartButton.addActionListener(e -> restartServer());
+        startButton.addActionListener(_ -> startServer());
+        stopButton.addActionListener(_ -> stopServer());
+        restartButton.addActionListener(_ -> restartServer());
 
         bottomPanel.add(startButton);
         bottomPanel.add(stopButton);
@@ -127,7 +125,7 @@ public class GUI extends JFrame {
 
         // Refresh button
         JButton refreshButton = new JButton("Refresh Plugin List");
-        refreshButton.addActionListener(e -> refreshPluginsList());
+        refreshButton.addActionListener(_ -> refreshPluginsList());
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.add(refreshButton);
@@ -150,7 +148,7 @@ public class GUI extends JFrame {
             pluginsFolder.mkdirs();
         }
 
-        File[] pluginFiles = pluginsFolder.listFiles((dir, name) -> name.endsWith(".jar"));
+        File[] pluginFiles = pluginsFolder.listFiles((_, name) -> name.endsWith(".jar"));
 
         List<File> validPlugins = new ArrayList<>();
         if (pluginFiles != null) {
@@ -184,9 +182,6 @@ public class GUI extends JFrame {
 
         pluginsPanel.revalidate();
         pluginsPanel.repaint();
-    }
-
-    public void setPluginManager(PluginManager pluginManager) {
     }
 
     private void redirectOutput() {

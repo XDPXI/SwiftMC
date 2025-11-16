@@ -38,7 +38,6 @@ public class Main {
     private static Path polarFile;
     private static Path polarGzFile;
     private static PluginManager pluginManager;
-    private static GUI guiInstance;
     private static MobSpawner mobSpawner;
     private static volatile boolean isShuttingDown = false;
 
@@ -223,11 +222,6 @@ public class Main {
         pluginManager.loadPlugins();
         pluginManager.enablePlugins();
 
-        // Notify GUI if it exists
-        if (guiInstance != null) {
-            guiInstance.setPluginManager(pluginManager);
-        }
-
         // Save world when closing server
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (!isShuttingDown) {
@@ -334,10 +328,6 @@ public class Main {
 
     public static InstanceContainer getInstanceContainer() {
         return instanceContainer;
-    }
-
-    public static void setGuiInstance(GUI gui) {
-        guiInstance = gui;
     }
 
     public static MobSpawner getMobSpawner() {
