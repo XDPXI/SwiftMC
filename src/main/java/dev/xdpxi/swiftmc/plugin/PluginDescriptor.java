@@ -27,7 +27,7 @@ public record PluginDescriptor(String name, String version, String main, String 
     /**
      * Loads a plugin descriptor from plugin.yml
      */
-    public static PluginDescriptor load(InputStream stream) throws Exception {
+    public static PluginDescriptor load(InputStream stream) {
         LoaderOptions loaderOptions = new LoaderOptions();
         Yaml yaml = new Yaml(loaderOptions);
         Map<String, Object> data = yaml.load(stream);

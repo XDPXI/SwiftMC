@@ -3,7 +3,6 @@ package dev.xdpxi.swiftmc.events;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.EntityCreature;
-import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.item.ItemStack;
@@ -18,7 +17,6 @@ public class EntityDeathEvent {
             if (!(event.getEntity() instanceof EntityCreature creature)) return;
 
             Pos deathPos = creature.getPosition();
-            EntityType type = creature.getEntityType();
 
             // Drop items based on mob type
             switch (creature.getEntityType().name()) {
@@ -30,9 +28,7 @@ public class EntityDeathEvent {
                     dropItem(creature, Material.LEATHER, 0, 2, deathPos);
                     dropItem(creature, Material.BEEF, 1, 3, deathPos);
                 }
-                case "minecraft:pig" -> {
-                    dropItem(creature, Material.PORKCHOP, 1, 3, deathPos);
-                }
+                case "minecraft:pig" -> dropItem(creature, Material.PORKCHOP, 1, 3, deathPos);
             }
         });
     }
