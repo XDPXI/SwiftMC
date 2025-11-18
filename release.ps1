@@ -7,12 +7,14 @@ $LIB_DIR = "build/libs"
 # Build
 Write-Host "Running clean build via ./gradlew clean build …"
 & .\gradlew clean build
-if ($LASTEXITCODE -ne 0) {
+if ($LASTEXITCODE -ne 0)
+{
     Write-Error "Build failed. Aborting."
     exit $LASTEXITCODE
 }
 & .\gradlew build
-if ($LASTEXITCODE -ne 0) {
+if ($LASTEXITCODE -ne 0)
+{
     Write-Error "Build failed. Aborting."
     exit $LASTEXITCODE
 }
@@ -23,11 +25,13 @@ $files = @(
     "SwiftMC-$VERSION-javadoc.jar",
     "SwiftMC-$VERSION-sources.jar"
 )
-$hashResults = @{}
+$hashResults = @{ }
 
-foreach ($f in $files) {
+foreach ($f in $files)
+{
     $path = Join-Path $LIB_DIR $f
-    if (-not (Test-Path $path)) {
+    if (-not (Test-Path $path))
+    {
         Write-Error "File not found: $path"
         exit 1
     }
@@ -41,8 +45,8 @@ foreach ($f in $files) {
     # SHA256
     $sha256 = (Get-FileHash -Path $path -Algorithm SHA256).Hash
     $hashResults[$f] = [PSCustomObject]@{
-        MD5    = $md5
-        SHA1   = $sha1
+        MD5 = $md5
+        SHA1 = $sha1
         SHA256 = $sha256
     }
 }
@@ -53,22 +57,26 @@ Write-Host "Fetching commits from GitHub: $OLD → $NEW"
 $apiUrl = "https://api.github.com/repos/XDPXI/SwiftMC/compare/$OLD...$NEW"
 $headers = @{ "User-Agent" = "PowerShell" }
 
-try {
+try
+{
     $response = Invoke-RestMethod -Uri $apiUrl -Headers $headers -Method GET
-} catch {
+}
+catch
+{
     Write-Error "Failed to fetch commits from GitHub. $_"
     exit 1
 }
 
-if (-not $response.commits) {
+if (-not $response.commits)
+{
     Write-Error "No commits returned from GitHub API."
     exit 1
 }
 
 $commitLines = $response.commits | ForEach-Object {
     [PSCustomObject]@{
-        ShortHash = $_.sha.Substring(0,7)
-        Message   = $_.commit.message.Split("`n")[0]
+        ShortHash = $_.sha.Substring(0, 7)
+        Message = $_.commit.message.Split("`n")[0]
     }
 }
 
@@ -79,7 +87,8 @@ $sb = New-Object System.Text.StringBuilder
 
 $sb.AppendLine("## Commits") | Out-Null
 $sb.AppendLine() | Out-Null
-foreach ($c in $commitLines) {
+foreach ($c in $commitLines)
+{
     $line = ("- [``{1}``](https://github.com/XDPXI/SwiftMC/commit/{1}): {0}" -f $c.Message, $c.ShortHash)
     $sb.AppendLine($line) | Out-Null
 }
@@ -88,7 +97,8 @@ $sb.AppendLine() | Out-Null
 $sb.AppendLine("## Hashes") | Out-Null
 $sb.AppendLine() | Out-Null
 
-foreach ($f in $files) {
+foreach ($f in $files)
+{
     $sb.AppendLine("|        | $f |") | Out-Null
     $sb.AppendLine("| ------ | --------------------- |") | Out-Null
     $sb.AppendLine("| MD5    | {0} |" -f $hashResults[$f].MD5) | Out-Null
@@ -97,6 +107,6 @@ foreach ($f in $files) {
     $sb.AppendLine() | Out-Null
 }
 
-[System.IO.File]::WriteAllText($releaseMdPath, $sb.ToString())
+[System.IO.File]::WriteAllText($releaseMdPath,$sb.ToString())
 
 Write-Host "Release file generated. Done."
