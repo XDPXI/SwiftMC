@@ -1,5 +1,6 @@
 package dev.xdpxi.swiftmc.events;
 
+import dev.xdpxi.swiftmc.mobs.Mobs;
 import dev.xdpxi.swiftmc.utils.Log;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -20,7 +21,7 @@ public class PlayerUseItemEvent {
             Player player = event.getPlayer();
             Material material = event.getItemStack().material();
 
-            EntityType mobType = getEntityTypeFromSpawnEgg(material);
+            EntityType mobType = Mobs.getEntityTypeFromSpawnEgg(material);
             if (mobType == null) return;
 
             Pos spawnPos = getSpawnPosition(player);
@@ -95,53 +96,14 @@ public class PlayerUseItemEvent {
         return null;
     }
 
-    private static EntityType getEntityTypeFromSpawnEgg(Material material) {
-        return switch (material.name()) {
-            case "minecraft:chicken_spawn_egg" -> EntityType.CHICKEN;
-            case "minecraft:cow_spawn_egg" -> EntityType.COW;
-            case "minecraft:pig_spawn_egg" -> EntityType.PIG;
-            case "minecraft:sheep_spawn_egg" -> EntityType.SHEEP;
-            case "minecraft:zombie_spawn_egg" -> EntityType.ZOMBIE;
-            case "minecraft:skeleton_spawn_egg" -> EntityType.SKELETON;
-            case "minecraft:spider_spawn_egg" -> EntityType.SPIDER;
-            case "minecraft:creeper_spawn_egg" -> EntityType.CREEPER;
-            case "minecraft:wolf_spawn_egg" -> EntityType.WOLF;
-            case "minecraft:horse_spawn_egg" -> EntityType.HORSE;
-            case "minecraft:rabbit_spawn_egg" -> EntityType.RABBIT;
-            case "minecraft:bat_spawn_egg" -> EntityType.BAT;
-            case "minecraft:villager_spawn_egg" -> EntityType.VILLAGER;
-            case "minecraft:enderman_spawn_egg" -> EntityType.ENDERMAN;
-            case "minecraft:blaze_spawn_egg" -> EntityType.BLAZE;
-            case "minecraft:ghast_spawn_egg" -> EntityType.GHAST;
-            case "minecraft:slime_spawn_egg" -> EntityType.SLIME;
-            case "minecraft:magma_cube_spawn_egg" -> EntityType.MAGMA_CUBE;
-            case "minecraft:witch_spawn_egg" -> EntityType.WITCH;
-            case "minecraft:squid_spawn_egg" -> EntityType.SQUID;
-            case "minecraft:dolphin_spawn_egg" -> EntityType.DOLPHIN;
-            case "minecraft:bee_spawn_egg" -> EntityType.BEE;
-            case "minecraft:iron_golem_spawn_egg" -> EntityType.IRON_GOLEM;
-            case "minecraft:snow_golem_spawn_egg" -> EntityType.SNOW_GOLEM;
-            default -> null;
-        };
-    }
-
     private static void spawnMob(Player player, EntityType type, Pos pos) {
         EntityCreature mob = new EntityCreature(type);
 
-        if (isPassiveMob(type)) {
+        if (Mobs.isPassiveMob(type)) {
             mob.addAIGroup(List.of(new RandomStrollGoal(mob, 20)), List.of());
         }
-        mob.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.15f);
+        mob.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue((double) Mobs.getMobSpeed(type) / 100);
 
         mob.setInstance(player.getInstance(), pos);
-    }
-
-    private static boolean isPassiveMob(EntityType type) {
-        return type == EntityType.CHICKEN || type == EntityType.COW ||
-                type == EntityType.PIG || type == EntityType.SHEEP ||
-                type == EntityType.RABBIT || type == EntityType.HORSE ||
-                type == EntityType.WOLF || type == EntityType.BAT ||
-                type == EntityType.SQUID || type == EntityType.DOLPHIN ||
-                type == EntityType.BEE;
     }
 }

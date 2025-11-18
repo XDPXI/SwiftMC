@@ -156,7 +156,7 @@ public record MobSpawner(Instance instance) {
         );
 
         // Set movement speed
-        mob.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.15f);
+        mob.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue((double) Mobs.getMobSpeed(type) / 100);
 
         // Spawn in instance
         mob.setInstance(instance, pos).thenRun(() -> {
