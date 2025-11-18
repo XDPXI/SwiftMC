@@ -1,7 +1,7 @@
 # Variables
 $VERSION = "1.0.0-SNAPSHOT"
 $OLD = "7b8859ea7b7f72c58be15b4449ba63487c4e0b35"
-$NEW = "1a2293753fa04d617ab49437103fc54e9d6d59ee"
+$NEW = "e9604569341f70ff192c6f90534e191a2bb29b72"
 $LIB_DIR = "build/libs"
 
 # Build
@@ -80,7 +80,7 @@ $sb = New-Object System.Text.StringBuilder
 $sb.AppendLine("## Commits") | Out-Null
 $sb.AppendLine() | Out-Null
 foreach ($c in $commitLines) {
-    $line = ("- {0} [`{1}`](https://github.com/XDPXI/SwiftMC/commit/{1})" -f $c.Message, $c.ShortHash)
+    $line = ("- [``{1}``](https://github.com/XDPXI/SwiftMC/commit/{1}): {0}" -f $c.Message, $c.ShortHash)
     $sb.AppendLine($line) | Out-Null
 }
 
