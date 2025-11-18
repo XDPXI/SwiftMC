@@ -165,7 +165,7 @@ public class Main {
         PlayerDeathEvent.addListener(globalEventHandler);
         PlayerDisconnectEvent.addListener(globalEventHandler);
         PlayerSpawnEvent.addListener(globalEventHandler);
-        PlayerUseItemEvent.addListener(globalEventHandler);
+        PlayerUseItemOnBlockEvent.addListener(globalEventHandler);
         ServerListPingEvent.addListener(globalEventHandler);
         Log.info("Event listeners registered.");
 
