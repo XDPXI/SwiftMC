@@ -41,7 +41,9 @@ public class PlayerUseItemOnBlockEvent {
         if (Mobs.isPassiveMob(type)) {
             mob.addAIGroup(List.of(new RandomStrollGoal(mob, 20)), List.of());
         }
+
         mob.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue((double) Mobs.getMobSpeed(type) / 100);
+        mob.getAttribute(Attribute.MAX_HEALTH).setBaseValue(Mobs.getMobHealth(type));
 
         mob.setInstance(player.getInstance(), pos);
     }

@@ -155,8 +155,9 @@ public record MobSpawner(Instance instance) {
                 List.of()
         );
 
-        // Set movement speed
+        // Set attributes
         mob.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue((double) Mobs.getMobSpeed(type) / 100);
+        mob.getAttribute(Attribute.MAX_HEALTH).setBaseValue(Mobs.getMobHealth(type));
 
         // Spawn in instance
         mob.setInstance(instance, pos).thenRun(() -> {
