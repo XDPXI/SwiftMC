@@ -1,5 +1,6 @@
 package dev.xdpxi.swiftmc.mobs;
 
+import dev.xdpxi.swiftmc.Main;
 import dev.xdpxi.swiftmc.utils.Log;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
@@ -146,7 +147,7 @@ public record MobSpawner(Instance instance) {
         return pos.y() >= 50;
     }
 
-    private void spawnMob(EntityType type, Pos pos) {
+    public static void spawnMob(EntityType type, Pos pos) {
         EntityCreature mob = new EntityCreature(type);
 
         // Add AI
@@ -160,7 +161,7 @@ public record MobSpawner(Instance instance) {
         mob.getAttribute(Attribute.MAX_HEALTH).setBaseValue(Mobs.getMobHealth(type));
 
         // Spawn in instance
-        mob.setInstance(instance, pos).thenRun(() -> {
+        mob.setInstance(Main.getInstanceContainer(), pos).thenRun(() -> {
             spawnedMobs.add(mob);
             Log.debug("Spawned " + type.name() + " at " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
         });
