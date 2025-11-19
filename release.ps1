@@ -1,7 +1,7 @@
 # Variables
 $VERSION = "1.0.0-SNAPSHOT" # MATCH WITH VERSION IN BUILD.GRADLE!
-$OLD = "7b8859ea7b7f72c58be15b4449ba63487c4e0b35"
-$NEW = "e9604569341f70ff192c6f90534e191a2bb29b72"
+$OLD = "e9604569341f70ff192c6f90534e191a2bb29b72"
+$NEW = "e9d0246a0b91e5a9bec90aa771700f3cba73a579"
 $LIB_DIR = "build/libs"
 
 # Build
@@ -52,7 +52,7 @@ foreach ($f in $files)
 }
 
 # Get commit list
-Write-Host "Fetching commits from GitHub: $OLD → $NEW"
+Write-Host "Fetching commits from GitHub: $OLD -> $NEW"
 
 $apiUrl = "https://api.github.com/repos/XDPXI/SwiftMC/compare/$OLD...$NEW"
 $headers = @{ "User-Agent" = "PowerShell" }
@@ -89,7 +89,7 @@ $sb.AppendLine("## Commits") | Out-Null
 $sb.AppendLine() | Out-Null
 foreach ($c in $commitLines)
 {
-    $line = ("- [``{1}``](https://github.com/XDPXI/SwiftMC/commit/{1}): {0}" -f $c.Message, $c.ShortHash)
+    $line = ("- [``{1}``](https://github.com/XDPXI/SwiftMC/commit/{1}) {0}" -f $c.Message, $c.ShortHash)
     $sb.AppendLine($line) | Out-Null
 }
 
