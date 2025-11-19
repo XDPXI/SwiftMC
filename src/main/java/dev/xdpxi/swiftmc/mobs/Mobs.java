@@ -155,7 +155,7 @@ public class Mobs {
     }
 
     public static boolean isPassiveMob(EntityType type) {
-        return  type == EntityType.CHICKEN || type == EntityType.COW ||
+        return type == EntityType.CHICKEN || type == EntityType.COW ||
                 type == EntityType.PIG || type == EntityType.SHEEP ||
                 type == EntityType.RABBIT || type == EntityType.HORSE ||
                 type == EntityType.WOLF || type == EntityType.BAT ||
