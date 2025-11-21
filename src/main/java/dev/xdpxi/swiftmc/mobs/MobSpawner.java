@@ -32,6 +32,26 @@ public record MobSpawner(Instance instance) {
         return new ArrayList<>(spawnedMobs);
     }
 
+    public static void spawnMob(EntityType type, Pos pos) {
+        EntityCreature mob = new EntityCreature(type);
+
+        // Add AI
+        mob.addAIGroup(
+                List.of(new RandomStrollGoal(mob, 20)),
+                List.of()
+        );
+
+        // Set attributes
+        mob.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue((double) Mobs.getMobSpeed(type) / 100);
+        mob.getAttribute(Attribute.MAX_HEALTH).setBaseValue(Mobs.getMobHealth(type));
+
+        // Spawn in instance
+        mob.setInstance(Main.getInstanceContainer(), pos).thenRun(() -> {
+            spawnedMobs.add(mob);
+            Log.debug("Spawned " + type.name() + " at " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
+        });
+    }
+
     public void start() {
         MinecraftServer.getSchedulerManager().submitTask(() -> {
             trySpawnMobs();
@@ -145,25 +165,5 @@ public record MobSpawner(Instance instance) {
         if (atPos.compare(Block.WATER) || above.compare(Block.WATER)) return false;
 
         return pos.y() >= 50;
-    }
-
-    public static void spawnMob(EntityType type, Pos pos) {
-        EntityCreature mob = new EntityCreature(type);
-
-        // Add AI
-        mob.addAIGroup(
-                List.of(new RandomStrollGoal(mob, 20)),
-                List.of()
-        );
-
-        // Set attributes
-        mob.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue((double) Mobs.getMobSpeed(type) / 100);
-        mob.getAttribute(Attribute.MAX_HEALTH).setBaseValue(Mobs.getMobHealth(type));
-
-        // Spawn in instance
-        mob.setInstance(Main.getInstanceContainer(), pos).thenRun(() -> {
-            spawnedMobs.add(mob);
-            Log.debug("Spawned " + type.name() + " at " + pos.blockX() + ", " + pos.blockY() + ", " + pos.blockZ());
-        });
     }
 }

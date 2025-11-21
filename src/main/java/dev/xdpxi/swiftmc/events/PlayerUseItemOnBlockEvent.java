@@ -3,16 +3,11 @@ package dev.xdpxi.swiftmc.events;
 import dev.xdpxi.swiftmc.mobs.MobSpawner;
 import dev.xdpxi.swiftmc.mobs.Mobs;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.Player;
-import net.minestom.server.entity.ai.goal.RandomStrollGoal;
-import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.Material;
-
-import java.util.List;
 
 public class PlayerUseItemOnBlockEvent {
     public static void addListener(GlobalEventHandler globalEventHandler) {
