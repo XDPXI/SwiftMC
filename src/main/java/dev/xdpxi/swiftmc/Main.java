@@ -11,6 +11,7 @@ import dev.xdpxi.swiftmc.plugin.PluginManager;
 import dev.xdpxi.swiftmc.utils.Config;
 import dev.xdpxi.swiftmc.utils.Log;
 import dev.xdpxi.swiftmc.utils.TerrainGenerator;
+import io.github.togar2.fluids.MinestomFluids;
 import io.github.togar2.pvp.MinestomPvP;
 import io.github.togar2.pvp.feature.CombatFeatureSet;
 import io.github.togar2.pvp.feature.CombatFeatures;
@@ -116,6 +117,15 @@ public class Main {
             e.printStackTrace();
         }
 
+        // Init Minestom Fluids
+        try {
+            MinestomFluids.init();
+            Log.info("MinestomFluids initialized successfully.");
+        } catch (Exception e) {
+            Log.error("MinestomFluids initialization failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+
         // Instances
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         instanceContainer = instanceManager.createInstanceContainer();
@@ -216,6 +226,10 @@ public class Main {
                 .build();
         globalEventHandler.addChild(featureSet.createNode());
         Log.info("Combat features enabled.");
+
+        // Add MinestomFluids Events
+        globalEventHandler.addChild(MinestomFluids.events());
+        Log.info("Fluid events enabled.");
 
         // Initialize Plugin System
         pluginManager = new PluginManager();
