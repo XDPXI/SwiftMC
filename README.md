@@ -3,7 +3,7 @@
 
 <h1 align="center">SwiftMC</h1>
 
-<p align="center">A fast, lightweight, and modern Minecraft server built on [Minestom](https://github.com/Minestom/Minestom).</p>
+<p align="center">A fast, lightweight, and modern Minecraft server built on <a href="https://github.com/Minestom/Minestom" target="_blank">Minestom</a>.</p>
 
 ---
 
