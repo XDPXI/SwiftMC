@@ -101,9 +101,9 @@ foreach ($f in $files)
 {
     $sb.AppendLine("|        | $f |") | Out-Null
     $sb.AppendLine("| ------ | --------------------- |") | Out-Null
-    $sb.AppendLine("| MD5    | {0} |" -f $hashResults[$f].MD5) | Out-Null
-    $sb.AppendLine("| SHA1   | {0} |" -f $hashResults[$f].SHA1) | Out-Null
-    $sb.AppendLine("| SHA256 | {0} |" -f $hashResults[$f].SHA256) | Out-Null
+    $sb.AppendLine("| MD5    | `{0}` |" -f $hashResults[$f].MD5) | Out-Null
+    $sb.AppendLine("| SHA1   | `{0}` |" -f $hashResults[$f].SHA1) | Out-Null
+    $sb.AppendLine("| SHA256 | `{0}` |" -f $hashResults[$f].SHA256) | Out-Null
     $sb.AppendLine() | Out-Null
 }
 
