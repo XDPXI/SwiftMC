@@ -8,7 +8,7 @@ version = '1.0.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
-    flatDir { dir "libs"}
+    flatDir { dir "libs" }
     maven { url 'https://jitpack.io' }
 }
 

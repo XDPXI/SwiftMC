@@ -61,7 +61,7 @@ public class PlayerUseItemOnBlockEvent {
             EntityType mobType = Mobs.getEntityTypeFromSpawnEgg(material);
             if (mobType == null) return;
 
-            Block above = player.getInstance().getBlock(x, y , z);
+            Block above = player.getInstance().getBlock(x, y, z);
             Block above2 = player.getInstance().getBlock(x, y, z);
             if (above.isAir() && above2.isAir()) {
                 MobSpawner.spawnMob(mobType, new Pos(x + 0.5, y, z + 0.5));

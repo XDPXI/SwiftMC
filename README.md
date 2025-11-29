@@ -9,9 +9,12 @@
 
 ## 🧱 Features
 
-- ⚡ **Fast:** Powered by Minestom and optimized for performance, SwiftMC delivers exceptional tick rates, low latency, and smooth gameplay even under heavy player loads.
-- 🪶 **Lightweight:** Designed with modularity and efficiency in mind, SwiftMC runs with minimal resource usage so you can focus on building, not managing overhead.
-- 💡 **Modern:** Built using modern Java standards and clean architecture, SwiftMC supports the latest Minecraft versions with a robust and extensible API.
+- ⚡ **Fast:** Powered by Minestom and optimized for performance, SwiftMC delivers exceptional tick rates, low latency,
+  and smooth gameplay even under heavy player loads.
+- 🪶 **Lightweight:** Designed with modularity and efficiency in mind, SwiftMC runs with minimal resource usage so you
+  can focus on building, not managing overhead.
+- 💡 **Modern:** Built using modern Java standards and clean architecture, SwiftMC supports the latest Minecraft versions
+  with a robust and extensible API.
 
 ---
 
