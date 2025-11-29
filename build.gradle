@@ -9,7 +9,6 @@ version = '1.0.0-SNAPSHOT'
 repositories {
     mavenCentral()
     flatDir { dir "libs" }
-    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -18,7 +17,7 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.25.2'
     implementation 'org.yaml:snakeyaml:2.5'
     implementation 'com.formdev:flatlaf:3.6.2'
-    implementation 'com.github.TogAr2:MinestomPvP:56a831b41c'
+    implementation 'com.github.TogAr2:MinestomPvP'
     implementation 'dev.hollowcube:polar:1.15.0'
     implementation 'it.unimi.dsi:fastutil:8.5.18'
     implementation 'io.github.TogAr2:MinestomFluids'
