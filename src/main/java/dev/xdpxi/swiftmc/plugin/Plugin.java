@@ -2,6 +2,12 @@ package dev.xdpxi.swiftmc.plugin;
 
 import dev.xdpxi.swiftmc.Main;
 import dev.xdpxi.swiftmc.utils.Log;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.*;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.entity.Player;
@@ -16,18 +22,12 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.util.*;
-
 /**
  * Base class for all SwiftMC plugins.
  * Provides a Bukkit-style API while using Minestom underneath.
  */
 public abstract class Plugin {
+
     private final List<Command> registeredCommands = new ArrayList<>();
     private final List<Task> scheduledTasks = new ArrayList<>();
     private PluginDescriptor descriptor;
@@ -127,18 +127,25 @@ public abstract class Plugin {
      */
     public void saveResource(String resourcePath, boolean replace) {
         if (resourcePath == null || resourcePath.isEmpty()) {
-            throw new IllegalArgumentException("ResourcePath cannot be null or empty");
+            throw new IllegalArgumentException(
+                "ResourcePath cannot be null or empty"
+            );
         }
 
         resourcePath = resourcePath.replace('\\', '/');
         InputStream in = getResource(resourcePath);
         if (in == null) {
-            throw new IllegalArgumentException("The embedded resource '" + resourcePath + "' cannot be found");
+            throw new IllegalArgumentException(
+                "The embedded resource '" + resourcePath + "' cannot be found"
+            );
         }
 
         File outFile = new File(getDataFolder(), resourcePath);
         int lastIndex = resourcePath.lastIndexOf('/');
-        File outDir = new File(getDataFolder(), resourcePath.substring(0, Math.max(lastIndex, 0)));
+        File outDir = new File(
+            getDataFolder(),
+            resourcePath.substring(0, Math.max(lastIndex, 0))
+        );
 
         if (!outDir.exists()) {
             outDir.mkdirs();
@@ -246,7 +253,10 @@ public abstract class Plugin {
     /**
      * Registers an event listener.
      */
-    public <T extends Event> void registerEvent(Class<T> eventType, EventListener<@NotNull T> listener) {
+    public <T extends Event> void registerEvent(
+        Class<T> eventType,
+        EventListener<@NotNull T> listener
+    ) {
         if (eventNode == null) {
             eventNode = EventNode.all(getName() + "-events");
             MinecraftServer.getGlobalEventHandler().addChild(eventNode);
@@ -257,13 +267,17 @@ public abstract class Plugin {
     /**
      * Schedules a repeating task.
      */
-    public Task scheduleRepeatingTask(Runnable task, long delayTicks, long periodTicks) {
+    public Task scheduleRepeatingTask(
+        Runnable task,
+        long delayTicks,
+        long periodTicks
+    ) {
         Task scheduledTask = MinecraftServer.getSchedulerManager().scheduleTask(
-                () -> {
-                    task.run();
-                    return TaskSchedule.tick((int) periodTicks);
-                },
-                TaskSchedule.tick((int) delayTicks)
+            () -> {
+                task.run();
+                return TaskSchedule.tick((int) periodTicks);
+            },
+            TaskSchedule.tick((int) delayTicks)
         );
         scheduledTasks.add(scheduledTask);
         return scheduledTask;
@@ -274,11 +288,11 @@ public abstract class Plugin {
      */
     public Task scheduleDelayedTask(Runnable task, long delayTicks) {
         Task scheduledTask = MinecraftServer.getSchedulerManager().scheduleTask(
-                () -> {
-                    task.run();
-                    return TaskSchedule.stop();
-                },
-                TaskSchedule.tick((int) delayTicks)
+            () -> {
+                task.run();
+                return TaskSchedule.stop();
+            },
+            TaskSchedule.tick((int) delayTicks)
         );
         scheduledTasks.add(scheduledTask);
         return scheduledTask;
@@ -302,27 +316,33 @@ public abstract class Plugin {
      * Gets a player by name.
      */
     public Player getPlayer(String name) {
-        return MinecraftServer.getConnectionManager().getOnlinePlayers().stream()
-                .filter(p -> p.getUsername().equalsIgnoreCase(name))
-                .findFirst()
-                .orElse(null);
+        return MinecraftServer.getConnectionManager()
+            .getOnlinePlayers()
+            .stream()
+            .filter(p -> p.getUsername().equalsIgnoreCase(name))
+            .findFirst()
+            .orElse(null);
     }
 
     /**
      * Gets a player by UUID.
      */
     public Player getPlayer(UUID uuid) {
-        return MinecraftServer.getConnectionManager().getOnlinePlayers().stream()
-                .filter(p -> p.getUuid().equals(uuid))
-                .findFirst()
-                .orElse(null);
+        return MinecraftServer.getConnectionManager()
+            .getOnlinePlayers()
+            .stream()
+            .filter(p -> p.getUuid().equals(uuid))
+            .findFirst()
+            .orElse(null);
     }
 
     /**
      * Broadcasts a message to all players.
      */
     public void broadcastMessage(net.kyori.adventure.text.Component message) {
-        MinecraftServer.getConnectionManager().getOnlinePlayers().forEach(p -> p.sendMessage(message));
+        MinecraftServer.getConnectionManager()
+            .getOnlinePlayers()
+            .forEach(p -> p.sendMessage(message));
     }
 
     /**
@@ -362,7 +382,9 @@ public abstract class Plugin {
         scheduledTasks.clear();
 
         // Unregister commands
-        registeredCommands.forEach(cmd -> MinecraftServer.getCommandManager().unregister(cmd));
+        registeredCommands.forEach(cmd ->
+            MinecraftServer.getCommandManager().unregister(cmd)
+        );
         registeredCommands.clear();
 
         // Remove event node

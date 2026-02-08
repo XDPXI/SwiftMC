@@ -8,17 +8,24 @@ import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 
 public class Survival extends Command {
+
     public Survival() {
         super("survival");
-
         setDefaultExecutor((sender, context) -> {
             if (!(sender instanceof Player player)) {
-                sender.sendMessage(Component.text("Only players can use this command!", NamedTextColor.RED));
+                sender.sendMessage(
+                    Component.text(
+                        "Only players can use this command!",
+                        NamedTextColor.RED
+                    )
+                );
                 return;
             }
 
             player.setGameMode(GameMode.SURVIVAL);
-            player.sendMessage(Component.text("Gamemode set to Survival", NamedTextColor.GREEN));
+            player.sendMessage(
+                Component.text("Gamemode set to Survival", NamedTextColor.GREEN)
+            );
             Log.info(player.getUsername() + " changed gamemode to Survival");
         });
     }

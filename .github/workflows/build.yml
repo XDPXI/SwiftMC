@@ -21,8 +21,8 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: 25
-          distribution: 'temurin'
-          cache: 'gradle'
+          distribution: "temurin"
+          cache: "gradle"
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew

@@ -1,17 +1,17 @@
 package dev.xdpxi.swiftmc.utils;
 
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
 
 public class Config {
+
     private static final File CONFIG_FILE = new File("config.yml");
     public int seed;
     public int port = 25565;
@@ -37,16 +37,20 @@ public class Config {
                 if (portObj != null) config.port = (Integer) portObj;
 
                 Object maxPlayersObj = map.get("maxPlayers");
-                if (maxPlayersObj != null) config.maxPlayers = (Integer) maxPlayersObj;
+                if (maxPlayersObj != null) config.maxPlayers =
+                    (Integer) maxPlayersObj;
 
                 Object debugEnabledObj = map.get("debugEnabled");
-                if (debugEnabledObj != null) config.debugEnabled = (Boolean) debugEnabledObj;
+                if (debugEnabledObj != null) config.debugEnabled =
+                    (Boolean) debugEnabledObj;
 
                 Object velocityEnabledObj = map.get("velocityEnabled");
-                if (velocityEnabledObj != null) config.velocityEnabled = (Boolean) velocityEnabledObj;
+                if (velocityEnabledObj != null) config.velocityEnabled =
+                    (Boolean) velocityEnabledObj;
 
                 Object velocitySecretObj = map.get("velocitySecret");
-                if (velocitySecretObj != null) config.velocitySecret = (String) velocitySecretObj;
+                if (velocitySecretObj != null) config.velocitySecret =
+                    (String) velocitySecretObj;
             }
         } else {
             Log.warn("Config not found! Generating with default values.");

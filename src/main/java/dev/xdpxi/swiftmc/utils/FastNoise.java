@@ -1,6 +1,7 @@
 package dev.xdpxi.swiftmc.utils;
 
 public class FastNoise {
+
     private static final double[] FADE_LUT = new double[256];
 
     static {
@@ -51,9 +52,14 @@ public class FastNoise {
         int a = (perm[X] & 0xFF) + Y;
         int b = (perm[X + 1] & 0xFF) + Y;
 
-        return lerp(v,
-                lerp(u, grad(perm[a] & 0xFF, x, y), grad(perm[b] & 0xFF, x - 1, y)),
-                lerp(u, grad(perm[a + 1] & 0xFF, x, y - 1), grad(perm[b + 1] & 0xFF, x - 1, y - 1))
+        return lerp(
+            v,
+            lerp(u, grad(perm[a] & 0xFF, x, y), grad(perm[b] & 0xFF, x - 1, y)),
+            lerp(
+                u,
+                grad(perm[a + 1] & 0xFF, x, y - 1),
+                grad(perm[b + 1] & 0xFF, x - 1, y - 1)
+            )
         );
     }
 }

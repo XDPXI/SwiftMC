@@ -8,12 +8,17 @@ import java.net.URLClassLoader;
  * ClassLoader for loading plugin classes from JAR files.
  */
 public class PluginClassLoader extends URLClassLoader {
+
     private final PluginManager pluginManager;
     private final PluginDescriptor descriptor;
 
-    public PluginClassLoader(PluginManager pluginManager, PluginDescriptor descriptor,
-                             File file, ClassLoader parent) throws Exception {
-        super(new URL[]{file.toURI().toURL()}, parent);
+    public PluginClassLoader(
+        PluginManager pluginManager,
+        PluginDescriptor descriptor,
+        File file,
+        ClassLoader parent
+    ) throws Exception {
+        super(new URL[] { file.toURI().toURL() }, parent);
         this.pluginManager = pluginManager;
         this.descriptor = descriptor;
     }

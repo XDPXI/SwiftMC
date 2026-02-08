@@ -1,22 +1,21 @@
 package dev.xdpxi.swiftmc.player;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PlayerData {
+
     public final List<ItemSerialization> inventory = new ArrayList<>();
     public double x, y, z;
     public float yaw, pitch;
     public GameMode gameMode;
 
-    public PlayerData() {
-    }
+    public PlayerData() {}
 
     public PlayerData(Player player) {
         Pos pos = player.getPosition();

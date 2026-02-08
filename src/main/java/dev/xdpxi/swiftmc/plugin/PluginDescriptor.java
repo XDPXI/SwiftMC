@@ -1,20 +1,33 @@
 package dev.xdpxi.swiftmc.plugin;
 
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * Represents plugin metadata from plugin.yml
  */
-public record PluginDescriptor(String name, String version, String main, String description, String author,
-                               List<String> depend, List<String> softDepend) {
-    public PluginDescriptor(String name, String version, String main, String description,
-                            String author, List<String> depend, List<String> softDepend) {
+public record PluginDescriptor(
+    String name,
+    String version,
+    String main,
+    String description,
+    String author,
+    List<String> depend,
+    List<String> softDepend
+) {
+    public PluginDescriptor(
+        String name,
+        String version,
+        String main,
+        String description,
+        String author,
+        List<String> depend,
+        List<String> softDepend
+    ) {
         this.name = name;
         this.version = version;
         this.main = main;
@@ -45,9 +58,19 @@ public record PluginDescriptor(String name, String version, String main, String 
         List<String> softDepend = (List<String>) data.get("softdepend");
 
         if (name == null || version == null || main == null) {
-            throw new IllegalArgumentException("plugin.yml must contain name, version, and main fields");
+            throw new IllegalArgumentException(
+                "plugin.yml must contain name, version, and main fields"
+            );
         }
 
-        return new PluginDescriptor(name, version, main, description, author, depend, softDepend);
+        return new PluginDescriptor(
+            name,
+            version,
+            main,
+            description,
+            author,
+            depend,
+            softDepend
+        );
     }
 }
