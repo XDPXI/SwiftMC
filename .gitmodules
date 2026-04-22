@@ -1,0 +1,3 @@
+[submodule "libs/MinestomFluids"]
+	path = libs/MinestomFluids
+	url = https://github.com/Kanelucky/MinestomFluids-1.21.11.git
