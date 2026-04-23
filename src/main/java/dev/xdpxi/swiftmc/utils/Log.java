@@ -86,7 +86,7 @@ public class Log {
     }
 
     public static void debug(String message, Object... args) {
-        if (config.debugEnabled) write(formatMessage(GRAY, message, args));
+        if (config.debug) write(formatMessage(GRAY, message, args));
     }
 
     public static void info(String message, Object... args) {
