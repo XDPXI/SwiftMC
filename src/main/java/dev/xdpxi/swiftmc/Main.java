@@ -111,11 +111,14 @@ public class Main {
 
         // Init server
         MinecraftServer minecraftServer;
-        if (config.velocityEnabled) {
+        if (config.velocity) {
             minecraftServer = MinecraftServer.init(
                 new Auth.Velocity(config.velocitySecret)
             );
             Log.info("Server initialized with Velocity support.");
+        } else if (config.online) {
+            minecraftServer = MinecraftServer.init(new Auth.Online());
+            Log.info("Server initialized in online mode.");
         } else {
             minecraftServer = MinecraftServer.init();
             Log.info("Server initialized in offline mode.");
