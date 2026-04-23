@@ -16,8 +16,9 @@ public class Config {
     public int seed;
     public int port = 25565;
     public int maxPlayers = 500;
-    public boolean debugEnabled = false;
-    public boolean velocityEnabled = false;
+    public boolean online = true;
+    public boolean debug = false;
+    public boolean velocity = false;
     public String velocitySecret = "ENTER-YOUR-SECRET-HERE";
 
     public static Config loadOrCreate() throws Exception {
@@ -40,13 +41,17 @@ public class Config {
                 if (maxPlayersObj != null) config.maxPlayers =
                     (Integer) maxPlayersObj;
 
-                Object debugEnabledObj = map.get("debugEnabled");
-                if (debugEnabledObj != null) config.debugEnabled =
-                    (Boolean) debugEnabledObj;
+                Object onlineObj = map.get("online");
+                if (onlineObj != null) config.online =
+                        (Boolean) onlineObj;
 
-                Object velocityEnabledObj = map.get("velocityEnabled");
-                if (velocityEnabledObj != null) config.velocityEnabled =
-                    (Boolean) velocityEnabledObj;
+                Object debugObj = map.get("debug");
+                if (debugObj != null) config.debug =
+                    (Boolean) debugObj;
+
+                Object velocityObj = map.get("velocity");
+                if (velocityObj != null) config.velocity =
+                    (Boolean) velocityObj;
 
                 Object velocitySecretObj = map.get("velocitySecret");
                 if (velocitySecretObj != null) config.velocitySecret =
@@ -61,8 +66,9 @@ public class Config {
             data.put("seed", config.seed);
             data.put("port", config.port);
             data.put("maxPlayers", config.maxPlayers);
-            data.put("debugEnabled", config.debugEnabled);
-            data.put("velocityEnabled", config.velocityEnabled);
+            data.put("online", config.online);
+            data.put("debug", config.debug);
+            data.put("velocity", config.velocity);
             data.put("velocitySecret", config.velocitySecret);
 
             DumperOptions dumperOptions = new DumperOptions();
