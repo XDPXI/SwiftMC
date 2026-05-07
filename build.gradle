@@ -13,8 +13,8 @@ repositories {
 
 dependencies {
     implementation 'net.minestom:minestom:2026.02.09-1.21.11'
-    implementation 'org.apache.logging.log4j:log4j-core:2.25.4'
-    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.25.4'
+    implementation 'org.apache.logging.log4j:log4j-core:2.26.0'
+    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.26.0'
     implementation 'org.yaml:snakeyaml:2.6'
     implementation 'com.formdev:flatlaf:3.7.1'
     implementation 'io.github.togar2:MinestomPvP:2025.12.29-1.21.11'
