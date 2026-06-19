@@ -33,7 +33,7 @@ public class ServerListPingEvent {
                         )
                         .playerInfo(onlinePlayers, config.maxPlayers)
                         .versionInfo(
-                            new Status.VersionInfo("SwiftMC 1.21.10", 773)
+                            new Status.VersionInfo("SwiftMC 26.1.2", 775)
                         )
                         .build()
                 );
