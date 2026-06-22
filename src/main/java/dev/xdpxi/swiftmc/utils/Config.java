@@ -20,6 +20,7 @@ public class Config {
     public boolean debug = false;
     public boolean velocity = false;
     public String velocitySecret = "ENTER-YOUR-SECRET-HERE";
+    public boolean simpleVoiceChat = true;
 
     public static Config loadOrCreate() throws Exception {
         LoaderOptions loaderOptions = new LoaderOptions();
@@ -56,6 +57,10 @@ public class Config {
                 Object velocitySecretObj = map.get("velocitySecret");
                 if (velocitySecretObj != null) config.velocitySecret =
                     (String) velocitySecretObj;
+
+                Object simpleVoiceChatObj = map.get("simpleVoiceChat");
+                if (simpleVoiceChatObj != null) config.simpleVoiceChat =
+                    (Boolean) simpleVoiceChatObj;
             }
         } else {
             Log.warn("Config not found! Generating with default values.");
@@ -70,6 +75,7 @@ public class Config {
             data.put("debug", config.debug);
             data.put("velocity", config.velocity);
             data.put("velocitySecret", config.velocitySecret);
+            data.put("simpleVoiceChat", config.simpleVoiceChat);
 
             DumperOptions dumperOptions = new DumperOptions();
             dumperOptions.setPrettyFlow(true);

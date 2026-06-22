@@ -1,5 +1,6 @@
 package dev.xdpxi.swiftmc;
 
+import dev.lu15.voicechat.VoiceChat;
 import dev.xdpxi.swiftmc.commands.Adventure;
 import dev.xdpxi.swiftmc.commands.Creative;
 import dev.xdpxi.swiftmc.commands.Spectator;
@@ -140,6 +141,18 @@ public class Main {
         } catch (Exception e) {
             Log.error(
                 "MinestomFluids initialization failed: " + e.getMessage()
+            );
+            e.printStackTrace();
+        }
+
+        try {
+            if (config.simpleVoiceChat) {
+                VoiceChat voiceChat = VoiceChat.builder("0.0.0.0", config.port).enable();
+                Log.info("Simple Voice Chat initialized successfully.");
+            }
+        } catch (Exception e) {
+            Log.error(
+                    "Simple Voice Chat initialization failed: " + e.getMessage()
             );
             e.printStackTrace();
         }
