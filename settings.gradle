@@ -1,1 +1,15 @@
+includeBuild('libs/MinestomFluids') {
+    dependencySubstitution {
+        substitute(module('io.github.togar2:MinestomFluids'))
+                .using(project(':'))
+    }
+}
+
+includeBuild('libs/simple-voice-chat-minestom') {
+    dependencySubstitution {
+        substitute(module('dev.lu15:simple-voice-chat-minestom'))
+                .using(project(':'))
+    }
+}
+
 rootProject.name = 'SwiftMC'

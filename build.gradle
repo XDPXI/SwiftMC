@@ -8,7 +8,6 @@ version = '1.0.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
-    flatDir { dir "libs" }
 }
 
 dependencies {
@@ -20,7 +19,8 @@ dependencies {
     implementation 'io.github.togar2:MinestomPvP:2026.05.30-26.1.1'
     implementation 'dev.hollowcube:polar:1.16.0'
     implementation 'it.unimi.dsi:fastutil:8.5.18'
-    implementation 'io.github.TogAr2:MinestomFluids'
+
+    implementation 'io.github.togar2:MinestomFluids'
     implementation 'dev.lu15:simple-voice-chat-minestom:0.2.0-SNAPSHOT'
 
     testImplementation platform('org.junit:junit-bom:6.1.0')
