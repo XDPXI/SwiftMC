@@ -1,7 +1,5 @@
 package dev.xdpxi.swiftmc.events;
 
-import java.time.Duration;
-import java.util.concurrent.ThreadLocalRandom;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.ItemEntity;
@@ -11,42 +9,45 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 
+import java.time.Duration;
+import java.util.concurrent.ThreadLocalRandom;
+
 public class PlayerBlockBreakEvent {
 
     public static void addListener(GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(
-            net.minestom.server.event.player.PlayerBlockBreakEvent.class,
-            event -> {
-                Block block = event.getBlock();
-                Player player = event.getPlayer();
+                net.minestom.server.event.player.PlayerBlockBreakEvent.class,
+                event -> {
+                    Block block = event.getBlock();
+                    Player player = event.getPlayer();
 
-                // Get block drop
-                Material dropMaterial = getBlockDrop(block);
+                    // Get block drop
+                    Material dropMaterial = getBlockDrop(block);
 
-                if (dropMaterial != null) {
-                    // Create item stack
-                    ItemStack itemStack = ItemStack.of(dropMaterial, 1);
+                    if (dropMaterial != null) {
+                        // Create item stack
+                        ItemStack itemStack = ItemStack.of(dropMaterial, 1);
 
-                    // Spawn item entity
-                    Vec blockPos = event
-                        .getBlockPosition()
-                        .add(0.5, 0.5, 0.5)
-                        .asVec();
-                    Vec velocity = new Vec(
-                        (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.2,
-                        0.2,
-                        (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.2
-                    );
+                        // Spawn item entity
+                        Vec blockPos = event
+                                .getBlockPosition()
+                                .add(0.5, 0.5, 0.5)
+                                .asVec();
+                        Vec velocity = new Vec(
+                                (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.2,
+                                0.2,
+                                (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.2
+                        );
 
-                    ItemEntity itemEntity = new ItemEntity(itemStack);
-                    itemEntity.setInstance(
-                        player.getInstance(),
-                        Pos.fromPoint(blockPos)
-                    );
-                    itemEntity.setVelocity(velocity);
-                    itemEntity.setPickupDelay(Duration.ofMillis(500));
+                        ItemEntity itemEntity = new ItemEntity(itemStack);
+                        itemEntity.setInstance(
+                                player.getInstance(),
+                                Pos.fromPoint(blockPos)
+                        );
+                        itemEntity.setVelocity(velocity);
+                        itemEntity.setPickupDelay(Duration.ofMillis(500));
+                    }
                 }
-            }
         );
     }
 
@@ -67,9 +68,9 @@ public class PlayerBlockBreakEvent {
                 return Material.OAK_LOG;
             case "minecraft:oak_leaves":
                 return (
-                    ThreadLocalRandom.current().nextInt(20) == 0
-                        ? Material.OAK_SAPLING
-                        : null
+                        ThreadLocalRandom.current().nextInt(20) == 0
+                                ? Material.OAK_SAPLING
+                                : null
                 );
             default:
                 // Try to get the material directly from the block

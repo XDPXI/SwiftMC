@@ -53,13 +53,13 @@ public class FastNoise {
         int b = (perm[X + 1] & 0xFF) + Y;
 
         return lerp(
-            v,
-            lerp(u, grad(perm[a] & 0xFF, x, y), grad(perm[b] & 0xFF, x - 1, y)),
-            lerp(
-                u,
-                grad(perm[a + 1] & 0xFF, x, y - 1),
-                grad(perm[b + 1] & 0xFF, x - 1, y - 1)
-            )
+                v,
+                lerp(u, grad(perm[a] & 0xFF, x, y), grad(perm[b] & 0xFF, x - 1, y)),
+                lerp(
+                        u,
+                        grad(perm[a + 1] & 0xFF, x, y - 1),
+                        grad(perm[b + 1] & 0xFF, x - 1, y - 1)
+                )
         );
     }
 }

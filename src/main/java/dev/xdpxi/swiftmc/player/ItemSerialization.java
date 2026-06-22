@@ -1,8 +1,9 @@
 package dev.xdpxi.swiftmc.player;
 
-import java.util.Objects;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+
+import java.util.Objects;
 
 public class ItemSerialization {
 
@@ -16,8 +17,8 @@ public class ItemSerialization {
 
     public ItemStack toItemStack() {
         return ItemStack.of(
-            Objects.requireNonNull(Material.fromId(materialId)),
-            amount
+                Objects.requireNonNull(Material.fromId(materialId)),
+                amount
         );
     }
 }

@@ -1,25 +1,17 @@
 package dev.xdpxi.swiftmc.plugin;
 
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
 
 /**
  * Represents plugin metadata from plugin.yml
  */
 public record PluginDescriptor(
-    String name,
-    String version,
-    String main,
-    String description,
-    String author,
-    List<String> depend,
-    List<String> softDepend
-) {
-    public PluginDescriptor(
         String name,
         String version,
         String main,
@@ -27,6 +19,15 @@ public record PluginDescriptor(
         String author,
         List<String> depend,
         List<String> softDepend
+) {
+    public PluginDescriptor(
+            String name,
+            String version,
+            String main,
+            String description,
+            String author,
+            List<String> depend,
+            List<String> softDepend
     ) {
         this.name = name;
         this.version = version;
@@ -59,18 +60,18 @@ public record PluginDescriptor(
 
         if (name == null || version == null || main == null) {
             throw new IllegalArgumentException(
-                "plugin.yml must contain name, version, and main fields"
+                    "plugin.yml must contain name, version, and main fields"
             );
         }
 
         return new PluginDescriptor(
-            name,
-            version,
-            main,
-            description,
-            author,
-            depend,
-            softDepend
+                name,
+                version,
+                main,
+                description,
+                author,
+                depend,
+                softDepend
         );
     }
 }

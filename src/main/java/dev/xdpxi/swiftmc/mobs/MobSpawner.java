@@ -2,9 +2,6 @@ package dev.xdpxi.swiftmc.mobs;
 
 import dev.xdpxi.swiftmc.Main;
 import dev.xdpxi.swiftmc.utils.Log;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityCreature;
@@ -15,6 +12,10 @@ import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.timer.TaskSchedule;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public record MobSpawner(Instance instance) {
     private static final int SPAWN_RADIUS_CHUNKS = 4; // spawn within 4 chunks around player
@@ -39,28 +40,28 @@ public record MobSpawner(Instance instance) {
 
         // Set attributes
         mob
-            .getAttribute(Attribute.MOVEMENT_SPEED)
-            .setBaseValue((double) Mobs.getMobSpeed(type) / 100);
+                .getAttribute(Attribute.MOVEMENT_SPEED)
+                .setBaseValue((double) Mobs.getMobSpeed(type) / 100);
         mob
-            .getAttribute(Attribute.MAX_HEALTH)
-            .setBaseValue(Mobs.getMobHealth(type));
+                .getAttribute(Attribute.MAX_HEALTH)
+                .setBaseValue(Mobs.getMobHealth(type));
 
         // Spawn in instance
         mob
-            .setInstance(Main.getInstanceContainer(), pos)
-            .thenRun(() -> {
-                spawnedMobs.add(mob);
-                Log.debug(
-                    "Spawned " +
-                        type.name() +
-                        " at " +
-                        pos.blockX() +
-                        ", " +
-                        pos.blockY() +
-                        ", " +
-                        pos.blockZ()
-                );
-            });
+                .setInstance(Main.getInstanceContainer(), pos)
+                .thenRun(() -> {
+                    spawnedMobs.add(mob);
+                    Log.debug(
+                            "Spawned " +
+                                    type.name() +
+                                    " at " +
+                                    pos.blockX() +
+                                    ", " +
+                                    pos.blockY() +
+                                    ", " +
+                                    pos.blockZ()
+                    );
+                });
     }
 
     public void start() {
@@ -77,17 +78,17 @@ public record MobSpawner(Instance instance) {
 
         // Count mobs by type
         long chickenCount = spawnedMobs
-            .stream()
-            .filter(mob -> mob.getEntityType() == EntityType.CHICKEN)
-            .count();
+                .stream()
+                .filter(mob -> mob.getEntityType() == EntityType.CHICKEN)
+                .count();
         long cowCount = spawnedMobs
-            .stream()
-            .filter(mob -> mob.getEntityType() == EntityType.COW)
-            .count();
+                .stream()
+                .filter(mob -> mob.getEntityType() == EntityType.COW)
+                .count();
         long pigCount = spawnedMobs
-            .stream()
-            .filter(mob -> mob.getEntityType() == EntityType.PIG)
-            .count();
+                .stream()
+                .filter(mob -> mob.getEntityType() == EntityType.PIG)
+                .count();
 
         for (int i = 0; i < SPAWN_ATTEMPTS_PER_TICK; i++) {
             EntityType mobType = getRandomMobType();
@@ -105,10 +106,10 @@ public record MobSpawner(Instance instance) {
             if (players.isEmpty()) continue;
 
             Player player = players
-                .stream()
-                .skip(ThreadLocalRandom.current().nextInt(players.size()))
-                .findFirst()
-                .orElse(null);
+                    .stream()
+                    .skip(ThreadLocalRandom.current().nextInt(players.size()))
+                    .findFirst()
+                    .orElse(null);
             if (player == null) continue;
 
             // Find a random spawn location near the player
@@ -118,13 +119,13 @@ public record MobSpawner(Instance instance) {
             // Check distance from player
             double distance = player.getPosition().distance(groupCenter);
             if (
-                distance < MIN_SPAWN_DISTANCE || distance > MAX_SPAWN_DISTANCE
+                    distance < MIN_SPAWN_DISTANCE || distance > MAX_SPAWN_DISTANCE
             ) continue;
 
             // Spawn a group of mobs around that point
             int groupSize = ThreadLocalRandom.current().nextInt(
-                GROUP_MIN,
-                GROUP_MAX + 1
+                    GROUP_MIN,
+                    GROUP_MAX + 1
             );
             for (int g = 0; g < groupSize; g++) {
                 double offsetX = ThreadLocalRandom.current().nextDouble(-3, 3);
@@ -154,17 +155,17 @@ public record MobSpawner(Instance instance) {
 
         // Pick a random chunk within radius
         int chunkX =
-            playerChunkX +
-            ThreadLocalRandom.current().nextInt(
-                -SPAWN_RADIUS_CHUNKS,
-                SPAWN_RADIUS_CHUNKS + 1
-            );
+                playerChunkX +
+                        ThreadLocalRandom.current().nextInt(
+                                -SPAWN_RADIUS_CHUNKS,
+                                SPAWN_RADIUS_CHUNKS + 1
+                        );
         int chunkZ =
-            playerChunkZ +
-            ThreadLocalRandom.current().nextInt(
-                -SPAWN_RADIUS_CHUNKS,
-                SPAWN_RADIUS_CHUNKS + 1
-            );
+                playerChunkZ +
+                        ThreadLocalRandom.current().nextInt(
+                                -SPAWN_RADIUS_CHUNKS,
+                                SPAWN_RADIUS_CHUNKS + 1
+                        );
 
         if (!instance.isChunkLoaded(chunkX, chunkZ)) return null;
 
@@ -178,10 +179,10 @@ public record MobSpawner(Instance instance) {
             Block above2 = instance.getBlock(x, y + 2, z);
 
             if (
-                !block.isAir() &&
-                !block.compare(Block.WATER) &&
-                above.isAir() &&
-                above2.isAir()
+                    !block.isAir() &&
+                            !block.compare(Block.WATER) &&
+                            above.isAir() &&
+                            above2.isAir()
             ) {
                 return new Pos(x + 0.5, y + 1, z + 0.5);
             }
@@ -201,7 +202,7 @@ public record MobSpawner(Instance instance) {
 
         if (!atPos.isAir() || !above.isAir()) return false;
         if (
-            atPos.compare(Block.WATER) || above.compare(Block.WATER)
+                atPos.compare(Block.WATER) || above.compare(Block.WATER)
         ) return false;
 
         return pos.y() >= 50;

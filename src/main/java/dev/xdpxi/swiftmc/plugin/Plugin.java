@@ -2,12 +2,6 @@ package dev.xdpxi.swiftmc.plugin;
 
 import dev.xdpxi.swiftmc.Main;
 import dev.xdpxi.swiftmc.utils.Log;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.util.*;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.entity.Player;
@@ -21,6 +15,13 @@ import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.*;
 
 /**
  * Base class for all SwiftMC plugins.
@@ -128,7 +129,7 @@ public abstract class Plugin {
     public void saveResource(String resourcePath, boolean replace) {
         if (resourcePath == null || resourcePath.isEmpty()) {
             throw new IllegalArgumentException(
-                "ResourcePath cannot be null or empty"
+                    "ResourcePath cannot be null or empty"
             );
         }
 
@@ -136,15 +137,15 @@ public abstract class Plugin {
         InputStream in = getResource(resourcePath);
         if (in == null) {
             throw new IllegalArgumentException(
-                "The embedded resource '" + resourcePath + "' cannot be found"
+                    "The embedded resource '" + resourcePath + "' cannot be found"
             );
         }
 
         File outFile = new File(getDataFolder(), resourcePath);
         int lastIndex = resourcePath.lastIndexOf('/');
         File outDir = new File(
-            getDataFolder(),
-            resourcePath.substring(0, Math.max(lastIndex, 0))
+                getDataFolder(),
+                resourcePath.substring(0, Math.max(lastIndex, 0))
         );
 
         if (!outDir.exists()) {
@@ -254,8 +255,8 @@ public abstract class Plugin {
      * Registers an event listener.
      */
     public <T extends Event> void registerEvent(
-        Class<T> eventType,
-        EventListener<@NotNull T> listener
+            Class<T> eventType,
+            EventListener<@NotNull T> listener
     ) {
         if (eventNode == null) {
             eventNode = EventNode.all(getName() + "-events");
@@ -268,16 +269,16 @@ public abstract class Plugin {
      * Schedules a repeating task.
      */
     public Task scheduleRepeatingTask(
-        Runnable task,
-        long delayTicks,
-        long periodTicks
+            Runnable task,
+            long delayTicks,
+            long periodTicks
     ) {
         Task scheduledTask = MinecraftServer.getSchedulerManager().scheduleTask(
-            () -> {
-                task.run();
-                return TaskSchedule.tick((int) periodTicks);
-            },
-            TaskSchedule.tick((int) delayTicks)
+                () -> {
+                    task.run();
+                    return TaskSchedule.tick((int) periodTicks);
+                },
+                TaskSchedule.tick((int) delayTicks)
         );
         scheduledTasks.add(scheduledTask);
         return scheduledTask;
@@ -288,11 +289,11 @@ public abstract class Plugin {
      */
     public Task scheduleDelayedTask(Runnable task, long delayTicks) {
         Task scheduledTask = MinecraftServer.getSchedulerManager().scheduleTask(
-            () -> {
-                task.run();
-                return TaskSchedule.stop();
-            },
-            TaskSchedule.tick((int) delayTicks)
+                () -> {
+                    task.run();
+                    return TaskSchedule.stop();
+                },
+                TaskSchedule.tick((int) delayTicks)
         );
         scheduledTasks.add(scheduledTask);
         return scheduledTask;
@@ -317,11 +318,11 @@ public abstract class Plugin {
      */
     public Player getPlayer(String name) {
         return MinecraftServer.getConnectionManager()
-            .getOnlinePlayers()
-            .stream()
-            .filter(p -> p.getUsername().equalsIgnoreCase(name))
-            .findFirst()
-            .orElse(null);
+                .getOnlinePlayers()
+                .stream()
+                .filter(p -> p.getUsername().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -329,11 +330,11 @@ public abstract class Plugin {
      */
     public Player getPlayer(UUID uuid) {
         return MinecraftServer.getConnectionManager()
-            .getOnlinePlayers()
-            .stream()
-            .filter(p -> p.getUuid().equals(uuid))
-            .findFirst()
-            .orElse(null);
+                .getOnlinePlayers()
+                .stream()
+                .filter(p -> p.getUuid().equals(uuid))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -341,8 +342,8 @@ public abstract class Plugin {
      */
     public void broadcastMessage(net.kyori.adventure.text.Component message) {
         MinecraftServer.getConnectionManager()
-            .getOnlinePlayers()
-            .forEach(p -> p.sendMessage(message));
+                .getOnlinePlayers()
+                .forEach(p -> p.sendMessage(message));
     }
 
     /**
@@ -383,7 +384,7 @@ public abstract class Plugin {
 
         // Unregister commands
         registeredCommands.forEach(cmd ->
-            MinecraftServer.getCommandManager().unregister(cmd)
+                MinecraftServer.getCommandManager().unregister(cmd)
         );
         registeredCommands.clear();
 

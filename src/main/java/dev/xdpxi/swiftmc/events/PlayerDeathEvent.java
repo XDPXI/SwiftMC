@@ -9,33 +9,33 @@ public class PlayerDeathEvent {
 
     public static void addListener(GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(
-            net.minestom.server.event.player.PlayerDeathEvent.class,
-            event -> {
-                Player player = event.getPlayer();
+                net.minestom.server.event.player.PlayerDeathEvent.class,
+                event -> {
+                    Player player = event.getPlayer();
 
-                Log.info(player.getUsername() + " died");
+                    Log.info(player.getUsername() + " died");
 
-                try {
-                    // Heal the player
-                    player.setHealth(20);
-                    player.setFood(20);
-                    player.clearEffects();
+                    try {
+                        // Heal the player
+                        player.setHealth(20);
+                        player.setFood(20);
+                        player.clearEffects();
 
-                    // Teleport to spawn
-                    Pos respawnPoint = player.getRespawnPoint();
-                    player.teleport(respawnPoint);
+                        // Teleport to spawn
+                        Pos respawnPoint = player.getRespawnPoint();
+                        player.teleport(respawnPoint);
 
-                    Log.debug(player.getUsername() + " respawned successfully");
-                } catch (Exception e) {
-                    Log.error(
-                        "Error respawning player " +
-                            player.getUsername() +
-                            ": " +
-                            e.getMessage()
-                    );
-                    e.printStackTrace();
+                        Log.debug(player.getUsername() + " respawned successfully");
+                    } catch (Exception e) {
+                        Log.error(
+                                "Error respawning player " +
+                                        player.getUsername() +
+                                        ": " +
+                                        e.getMessage()
+                        );
+                        e.printStackTrace();
+                    }
                 }
-            }
         );
     }
 }

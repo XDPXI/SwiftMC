@@ -1,19 +1,19 @@
 package dev.xdpxi.swiftmc.utils;
 
 import dev.xdpxi.swiftmc.Main;
-import java.util.ArrayList;
-import java.util.List;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.generator.GenerationUnit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TerrainGenerator
-    implements net.minestom.server.instance.generator.Generator
-{
+        implements net.minestom.server.instance.generator.Generator {
 
     private static final int BASE_HEIGHT = 64;
     private static final int WATER_LEVEL = 52;
-    private static final double[] NOISE_FREQUENCIES = { 0.02, 0.05, 0.1 };
-    private static final double[] NOISE_AMPLITUDES = { 20, 10, 5 };
+    private static final double[] NOISE_FREQUENCIES = {0.02, 0.05, 0.1};
+    private static final double[] NOISE_AMPLITUDES = {20, 10, 5};
     private static final double TREE_PROBABILITY = 0.001;
     private final FastNoise noise = new FastNoise(Main.config.seed);
 
@@ -34,11 +34,11 @@ public class TerrainGenerator
                 int worldZ = baseZ + z;
                 for (int i = 0; i < NOISE_FREQUENCIES.length; i++) {
                     height +=
-                        noise.get(
-                            worldX * NOISE_FREQUENCIES[i],
-                            worldZ * NOISE_FREQUENCIES[i]
-                        ) *
-                        NOISE_AMPLITUDES[i];
+                            noise.get(
+                                    worldX * NOISE_FREQUENCIES[i],
+                                    worldZ * NOISE_FREQUENCIES[i]
+                            ) *
+                                    NOISE_AMPLITUDES[i];
                 }
                 height = Math.max(startY, Math.min(endY - 1, height));
                 heightMap[x + 1][z + 1] = (int) height;
@@ -76,25 +76,25 @@ public class TerrainGenerator
                 // Fill column
                 for (int y = startY; y < endY; y++) {
                     Block block = getBlockAt(
-                        y,
-                        height,
-                        x,
-                        z,
-                        smoothedHeightMap
+                            y,
+                            height,
+                            x,
+                            z,
+                            smoothedHeightMap
                     );
                     if (block != null) unit
-                        .modifier()
-                        .setBlock(worldX, y, worldZ, block);
+                            .modifier()
+                            .setBlock(worldX, y, worldZ, block);
                 }
 
                 // Record trees - keep trunks 2 blocks away from chunk borders
                 if (
-                    height > WATER_LEVEL &&
-                    Math.random() < TREE_PROBABILITY &&
-                    x >= 2 &&
-                    x <= 13 &&
-                    z >= 2 &&
-                    z <= 13
+                        height > WATER_LEVEL &&
+                                Math.random() < TREE_PROBABILITY &&
+                                x >= 2 &&
+                                x <= 13 &&
+                                z >= 2 &&
+                                z <= 13
                 ) {
                     trees.add(new TreePos(worldX, height, worldZ));
                 }
@@ -108,10 +108,10 @@ public class TerrainGenerator
     }
 
     private void placeTree(
-        GenerationUnit unit,
-        int worldX,
-        int worldY,
-        int worldZ
+            GenerationUnit unit,
+            int worldX,
+            int worldY,
+            int worldZ
     ) {
         int trunkHeight = 4;
         int baseY = worldY + trunkHeight;
@@ -132,12 +132,12 @@ public class TerrainGenerator
     }
 
     private void placeLeafLayer(
-        GenerationUnit unit,
-        int centerX,
-        int y,
-        int centerZ,
-        int radius,
-        boolean removeCorners
+            GenerationUnit unit,
+            int centerX,
+            int y,
+            int centerZ,
+            int radius,
+            boolean removeCorners
     ) {
         // Place leaves in a square pattern with given radius
         // radius=1 gives 3x3, radius=2 gives 5x5
@@ -145,9 +145,9 @@ public class TerrainGenerator
             for (int dz = -radius; dz <= radius; dz++) {
                 // Skip corners if requested
                 if (
-                    removeCorners &&
-                    Math.abs(dx) == radius &&
-                    Math.abs(dz) == radius
+                        removeCorners &&
+                                Math.abs(dx) == radius &&
+                                Math.abs(dz) == radius
                 ) {
                     continue;
                 }
@@ -165,11 +165,11 @@ public class TerrainGenerator
     }
 
     private Block getBlockAt(
-        int y,
-        int height,
-        int x,
-        int z,
-        int[][] heightMap
+            int y,
+            int height,
+            int x,
+            int z,
+            int[][] heightMap
     ) {
         if (y < height - 3) return Block.STONE;
         if (y < height - 1) return Block.DIRT;
@@ -200,5 +200,6 @@ public class TerrainGenerator
         return null;
     }
 
-    private record TreePos(int x, int y, int z) {}
+    private record TreePos(int x, int y, int z) {
+    }
 }

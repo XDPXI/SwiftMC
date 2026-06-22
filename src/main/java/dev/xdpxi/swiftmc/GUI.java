@@ -2,6 +2,10 @@ package dev.xdpxi.swiftmc;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import dev.xdpxi.swiftmc.utils.Log;
+import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.File;
 import java.io.OutputStream;
@@ -9,9 +13,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import org.jetbrains.annotations.NotNull;
 
 public class GUI extends JFrame {
 
@@ -48,22 +49,22 @@ public class GUI extends JFrame {
 
         // Handle window closing
         addWindowListener(
-            new java.awt.event.WindowAdapter() {
-                @Override
-                public void windowClosing(
-                    java.awt.event.WindowEvent windowEvent
-                ) {
-                    if (serverRunning) {
-                        stopServer();
-                        try {
-                            Thread.sleep(1000); // Give server time to shut down
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(
+                            java.awt.event.WindowEvent windowEvent
+                    ) {
+                        if (serverRunning) {
+                            stopServer();
+                            try {
+                                Thread.sleep(1000); // Give server time to shut down
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
+                        System.exit(0);
                     }
-                    System.exit(0);
                 }
-            }
         );
     }
 
@@ -73,7 +74,7 @@ public class GUI extends JFrame {
             UIManager.setLookAndFeel(new FlatDarkLaf());
         } catch (Exception e) {
             System.err.println(
-                "Failed to initialize FlatLaf Dark theme: " + e.getMessage()
+                    "Failed to initialize FlatLaf Dark theme: " + e.getMessage()
             );
         }
 
@@ -93,7 +94,7 @@ public class GUI extends JFrame {
         logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         JScrollPane scrollPane = new JScrollPane(logArea);
         scrollPane.setVerticalScrollBarPolicy(
-            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
         );
 
         // Bottom panel with buttons
@@ -129,10 +130,10 @@ public class GUI extends JFrame {
 
         JScrollPane scrollPane = new JScrollPane(pluginsPanel);
         scrollPane.setVerticalScrollBarPolicy(
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
         );
         scrollPane.setHorizontalScrollBarPolicy(
-            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         );
 
         // Refresh button
@@ -161,7 +162,7 @@ public class GUI extends JFrame {
         }
 
         File[] pluginFiles = pluginsFolder.listFiles((_, name) ->
-            name.endsWith(".jar")
+                name.endsWith(".jar")
         );
 
         List<File> validPlugins = new ArrayList<>();
@@ -173,10 +174,10 @@ public class GUI extends JFrame {
                     }
                 } catch (Exception e) {
                     System.err.println(
-                        "Error reading plugin jar " +
-                            file.getName() +
-                            ": " +
-                            e.getMessage()
+                            "Error reading plugin jar " +
+                                    file.getName() +
+                                    ": " +
+                                    e.getMessage()
                     );
                 }
             }
@@ -184,7 +185,7 @@ public class GUI extends JFrame {
 
         if (validPlugins.isEmpty()) {
             JLabel noPluginsLabel = new JLabel(
-                "No valid plugins found in the plugins folder"
+                    "No valid plugins found in the plugins folder"
             );
             noPluginsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             noPluginsLabel.setForeground(Color.GRAY);
@@ -193,7 +194,7 @@ public class GUI extends JFrame {
         } else {
             // Sort alphabetically
             validPlugins.sort((a, b) ->
-                a.getName().compareToIgnoreCase(b.getName())
+                    a.getName().compareToIgnoreCase(b.getName())
             );
 
             for (File file : validPlugins) {
@@ -218,7 +219,7 @@ public class GUI extends JFrame {
             }
 
             @Override
-            public void write(byte@NotNull [] b, int off, int len) {
+            public void write(byte @NotNull [] b, int off, int len) {
                 SwingUtilities.invokeLater(() -> {
                     logArea.append(new String(b, off, len));
                     logArea.setCaretPosition(logArea.getDocument().getLength());
@@ -238,11 +239,11 @@ public class GUI extends JFrame {
             restartButton.setEnabled(true);
 
             ProcessBuilder pb = new ProcessBuilder(
-                "java",
-                "-cp",
-                System.getProperty("java.class.path"),
-                "dev.xdpxi.swiftmc.Main",
-                "--nogui"
+                    "java",
+                    "-cp",
+                    System.getProperty("java.class.path"),
+                    "dev.xdpxi.swiftmc.Main",
+                    "--nogui"
             );
             pb.redirectErrorStream(true);
             serverProcess = pb.start();
@@ -251,31 +252,31 @@ public class GUI extends JFrame {
 
             // Read server output in background thread
             new Thread(
-                () -> {
-                    try (
-                        var reader = new java.io.BufferedReader(
-                            new java.io.InputStreamReader(
-                                serverProcess.getInputStream()
-                            )
-                        )
-                    ) {
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            final String logLine = line;
-                            SwingUtilities.invokeLater(() -> {
-                                logArea.append(logLine + "\n");
-                                logArea.setCaretPosition(
-                                    logArea.getDocument().getLength()
-                                );
-                            });
+                    () -> {
+                        try (
+                                var reader = new java.io.BufferedReader(
+                                        new java.io.InputStreamReader(
+                                                serverProcess.getInputStream()
+                                        )
+                                )
+                        ) {
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                final String logLine = line;
+                                SwingUtilities.invokeLater(() -> {
+                                    logArea.append(logLine + "\n");
+                                    logArea.setCaretPosition(
+                                            logArea.getDocument().getLength()
+                                    );
+                                });
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                },
-                "Server-Output-Reader"
+                    },
+                    "Server-Output-Reader"
             )
-                .start();
+                    .start();
 
             Log.info("Server process started.");
         } catch (Exception e) {
@@ -299,13 +300,13 @@ public class GUI extends JFrame {
 
                 // Wait up to 5 seconds for graceful shutdown
                 if (
-                    !serverProcess.waitFor(
-                        5,
-                        java.util.concurrent.TimeUnit.SECONDS
-                    )
+                        !serverProcess.waitFor(
+                                5,
+                                java.util.concurrent.TimeUnit.SECONDS
+                        )
                 ) {
                     Log.warn(
-                        "Server did not exit in time; forcing termination..."
+                            "Server did not exit in time; forcing termination..."
                     );
                     serverProcess.destroyForcibly();
                 }
@@ -335,7 +336,7 @@ public class GUI extends JFrame {
                 e.printStackTrace();
             }
         })
-            .start();
+                .start();
     }
 
     private static class PluginRow {
@@ -345,10 +346,10 @@ public class GUI extends JFrame {
         public PluginRow(File pluginFile) {
             panel = new JPanel(new BorderLayout());
             panel.setBorder(
-                BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(Color.GRAY, 1),
-                    new EmptyBorder(5, 20, 5, 20)
-                )
+                    BorderFactory.createCompoundBorder(
+                            BorderFactory.createLineBorder(Color.GRAY, 1),
+                            new EmptyBorder(5, 20, 5, 20)
+                    )
             );
             panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 

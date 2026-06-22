@@ -13,12 +13,12 @@ public class PluginClassLoader extends URLClassLoader {
     private final PluginDescriptor descriptor;
 
     public PluginClassLoader(
-        PluginManager pluginManager,
-        PluginDescriptor descriptor,
-        File file,
-        ClassLoader parent
+            PluginManager pluginManager,
+            PluginDescriptor descriptor,
+            File file,
+            ClassLoader parent
     ) throws Exception {
-        super(new URL[] { file.toURI().toURL() }, parent);
+        super(new URL[]{file.toURI().toURL()}, parent);
         this.pluginManager = pluginManager;
         this.descriptor = descriptor;
     }

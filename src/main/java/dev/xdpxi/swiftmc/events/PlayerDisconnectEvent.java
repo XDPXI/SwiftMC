@@ -9,16 +9,16 @@ public class PlayerDisconnectEvent {
 
     public static void addListener(GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(
-            net.minestom.server.event.player.PlayerDisconnectEvent.class,
-            event -> {
-                final Player player = event.getPlayer();
+                net.minestom.server.event.player.PlayerDisconnectEvent.class,
+                event -> {
+                    final Player player = event.getPlayer();
 
-                // Save player data
-                PlayerDataManager.savePlayer(player);
+                    // Save player data
+                    PlayerDataManager.savePlayer(player);
 
-                // Log player leave
-                Log.info(player.getUsername() + " left the game");
-            }
+                    // Log player leave
+                    Log.info(player.getUsername() + " left the game");
+                }
         );
     }
 }

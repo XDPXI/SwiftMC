@@ -1,14 +1,15 @@
 package dev.xdpxi.swiftmc.utils;
 
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
 
 public class Config {
 
@@ -40,7 +41,7 @@ public class Config {
 
                 Object maxPlayersObj = map.get("maxPlayers");
                 if (maxPlayersObj != null) config.maxPlayers =
-                    (Integer) maxPlayersObj;
+                        (Integer) maxPlayersObj;
 
                 Object onlineObj = map.get("online");
                 if (onlineObj != null) config.online =
@@ -48,19 +49,19 @@ public class Config {
 
                 Object debugObj = map.get("debug");
                 if (debugObj != null) config.debug =
-                    (Boolean) debugObj;
+                        (Boolean) debugObj;
 
                 Object velocityObj = map.get("velocity");
                 if (velocityObj != null) config.velocity =
-                    (Boolean) velocityObj;
+                        (Boolean) velocityObj;
 
                 Object velocitySecretObj = map.get("velocitySecret");
                 if (velocitySecretObj != null) config.velocitySecret =
-                    (String) velocitySecretObj;
+                        (String) velocitySecretObj;
 
                 Object simpleVoiceChatObj = map.get("simpleVoiceChat");
                 if (simpleVoiceChatObj != null) config.simpleVoiceChat =
-                    (Boolean) simpleVoiceChatObj;
+                        (Boolean) simpleVoiceChatObj;
             }
         } else {
             Log.warn("Config not found! Generating with default values.");

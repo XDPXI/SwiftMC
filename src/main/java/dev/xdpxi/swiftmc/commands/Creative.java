@@ -14,17 +14,17 @@ public class Creative extends Command {
         setDefaultExecutor((sender, context) -> {
             if (!(sender instanceof Player player)) {
                 sender.sendMessage(
-                    Component.text(
-                        "Only players can use this command!",
-                        NamedTextColor.RED
-                    )
+                        Component.text(
+                                "Only players can use this command!",
+                                NamedTextColor.RED
+                        )
                 );
                 return;
             }
 
             player.setGameMode(GameMode.CREATIVE);
             player.sendMessage(
-                Component.text("Gamemode set to Creative", NamedTextColor.GREEN)
+                    Component.text("Gamemode set to Creative", NamedTextColor.GREEN)
             );
             Log.info(player.getUsername() + " changed gamemode to Creative");
         });

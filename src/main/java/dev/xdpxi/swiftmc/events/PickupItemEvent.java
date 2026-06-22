@@ -10,31 +10,31 @@ public class PickupItemEvent {
 
     public static void addListener(GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(
-            net.minestom.server.event.item.PickupItemEvent.class,
-            event -> {
-                Player player = (Player) event.getLivingEntity();
-                ItemEntity itemEntity = event.getItemEntity();
+                net.minestom.server.event.item.PickupItemEvent.class,
+                event -> {
+                    Player player = (Player) event.getLivingEntity();
+                    ItemEntity itemEntity = event.getItemEntity();
 
-                // Add the item to player's inventory
-                boolean added = player
-                    .getInventory()
-                    .addItemStack(itemEntity.getItemStack());
+                    // Add the item to player's inventory
+                    boolean added = player
+                            .getInventory()
+                            .addItemStack(itemEntity.getItemStack());
 
-                if (added) {
-                    // Play pickup sound
-                    player.playSound(
-                        Sound.sound(
-                            Key.key("entity.item.pickup"),
-                            Sound.Source.PLAYER,
-                            0.2f,
-                            1.0f
-                        )
-                    );
-                } else {
-                    // Inventory full, cancel the pickup
-                    event.setCancelled(true);
+                    if (added) {
+                        // Play pickup sound
+                        player.playSound(
+                                Sound.sound(
+                                        Key.key("entity.item.pickup"),
+                                        Sound.Source.PLAYER,
+                                        0.2f,
+                                        1.0f
+                                )
+                        );
+                    } else {
+                        // Inventory full, cancel the pickup
+                        event.setCancelled(true);
+                    }
                 }
-            }
         );
     }
 }

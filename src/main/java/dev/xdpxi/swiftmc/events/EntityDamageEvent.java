@@ -10,29 +10,29 @@ public class EntityDamageEvent {
 
     public static void addListener(GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(
-            net.minestom.server.event.entity.EntityDamageEvent.class,
-            event -> {
-                if (!(event.getEntity() instanceof Player player)) return;
+                net.minestom.server.event.entity.EntityDamageEvent.class,
+                event -> {
+                    if (!(event.getEntity() instanceof Player player)) return;
 
-                if (event.getDamage().getType() == DamageType.FALL) {
-                    Pos pos = player.getPosition();
+                    if (event.getDamage().getType() == DamageType.FALL) {
+                        Pos pos = player.getPosition();
 
-                    // Cancel fall damage if in water
-                    if (
-                        isWater(
-                            player
-                                .getInstance()
-                                .getBlock(
-                                    pos.blockX(),
-                                    pos.blockY(),
-                                    pos.blockZ()
+                        // Cancel fall damage if in water
+                        if (
+                                isWater(
+                                        player
+                                                .getInstance()
+                                                .getBlock(
+                                                        pos.blockX(),
+                                                        pos.blockY(),
+                                                        pos.blockZ()
+                                                )
                                 )
-                        )
-                    ) {
-                        event.setCancelled(true);
+                        ) {
+                            event.setCancelled(true);
+                        }
                     }
                 }
-            }
         );
     }
 

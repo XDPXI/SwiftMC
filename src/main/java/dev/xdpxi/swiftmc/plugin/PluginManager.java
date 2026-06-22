@@ -1,6 +1,7 @@
 package dev.xdpxi.swiftmc.plugin;
 
 import dev.xdpxi.swiftmc.utils.Log;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.*;
@@ -30,7 +31,7 @@ public class PluginManager {
         Log.info("Loading plugins from " + pluginsFolder.getAbsolutePath());
 
         File[] files = pluginsFolder.listFiles((dir, name) ->
-            name.endsWith(".jar")
+                name.endsWith(".jar")
         );
         if (files == null || files.length == 0) {
             Log.info("No plugins found.");
@@ -44,17 +45,17 @@ public class PluginManager {
                 PluginDescriptor descriptor = loadDescriptor(file);
                 descriptors.put(file, descriptor);
                 Log.info(
-                    "Found plugin: " +
-                        descriptor.name() +
-                        " v" +
-                        descriptor.version()
+                        "Found plugin: " +
+                                descriptor.name() +
+                                " v" +
+                                descriptor.version()
                 );
             } catch (Exception e) {
                 Log.error(
-                    "Failed to load plugin descriptor from " +
-                        file.getName() +
-                        ": " +
-                        e.getMessage()
+                        "Failed to load plugin descriptor from " +
+                                file.getName() +
+                                ": " +
+                                e.getMessage()
                 );
                 e.printStackTrace();
             }
@@ -66,9 +67,9 @@ public class PluginManager {
             boolean progress = false;
 
             for (Map.Entry<
-                File,
-                PluginDescriptor
-            > entry : descriptors.entrySet()) {
+                    File,
+                    PluginDescriptor
+                    > entry : descriptors.entrySet()) {
                 File file = entry.getKey();
                 PluginDescriptor descriptor = entry.getValue();
 
@@ -92,19 +93,19 @@ public class PluginManager {
                         loaded.add(descriptor.name());
                         progress = true;
                         Log.info(
-                            "Loaded plugin: " +
-                                descriptor.name() +
-                                " v" +
-                                descriptor.version() +
-                                " by " +
-                                descriptor.author()
+                                "Loaded plugin: " +
+                                        descriptor.name() +
+                                        " v" +
+                                        descriptor.version() +
+                                        " by " +
+                                        descriptor.author()
                         );
                     } catch (Exception e) {
                         Log.error(
-                            "Failed to load plugin " +
-                                descriptor.name() +
-                                ": " +
-                                e.getMessage()
+                                "Failed to load plugin " +
+                                        descriptor.name() +
+                                        ": " +
+                                        e.getMessage()
                         );
                         e.printStackTrace();
                     }
@@ -114,16 +115,16 @@ public class PluginManager {
             // If no progress was made, we have circular dependencies or missing dependencies
             if (!progress) {
                 for (Map.Entry<
-                    File,
-                    PluginDescriptor
-                > entry : descriptors.entrySet()) {
+                        File,
+                        PluginDescriptor
+                        > entry : descriptors.entrySet()) {
                     PluginDescriptor descriptor = entry.getValue();
                     if (!loaded.contains(descriptor.name())) {
                         Log.error(
-                            "Could not load plugin " +
-                                descriptor.name() +
-                                " due to missing dependencies: " +
-                                descriptor.depend()
+                                "Could not load plugin " +
+                                        descriptor.name() +
+                                        " due to missing dependencies: " +
+                                        descriptor.depend()
                         );
                     }
                 }
@@ -185,7 +186,7 @@ public class PluginManager {
             JarEntry entry = jar.getJarEntry("plugin.yml");
             if (entry == null) {
                 throw new IllegalArgumentException(
-                    "Plugin JAR must contain plugin.yml"
+                        "Plugin JAR must contain plugin.yml"
                 );
             }
 
@@ -196,13 +197,13 @@ public class PluginManager {
     }
 
     private Plugin loadPlugin(File file, PluginDescriptor descriptor)
-        throws Exception {
+            throws Exception {
         // Create class loader
         PluginClassLoader classLoader = new PluginClassLoader(
-            this,
-            descriptor,
-            file,
-            getClass().getClassLoader()
+                this,
+                descriptor,
+                file,
+                getClass().getClassLoader()
         );
         classLoaders.put(descriptor.name(), classLoader);
 
@@ -214,8 +215,8 @@ public class PluginManager {
 
         // Create plugin instance
         Plugin plugin = (Plugin) mainClass
-            .getDeclaredConstructor()
-            .newInstance();
+                .getDeclaredConstructor()
+                .newInstance();
         plugin.setDescriptor(descriptor);
         plugin.setDataFolder(new File(pluginsFolder, descriptor.name()));
         plugin.setClassLoader(classLoader);
@@ -225,10 +226,10 @@ public class PluginManager {
             plugin.onLoad();
         } catch (Exception e) {
             Log.error(
-                "Error during onLoad for " +
-                    descriptor.name() +
-                    ": " +
-                    e.getMessage()
+                    "Error during onLoad for " +
+                            descriptor.name() +
+                            ": " +
+                            e.getMessage()
             );
             e.printStackTrace();
         }
@@ -247,10 +248,10 @@ public class PluginManager {
             Log.info("Enabled plugin: " + plugin.getName());
         } catch (Exception e) {
             Log.error(
-                "Error enabling plugin " +
-                    plugin.getName() +
-                    ": " +
-                    e.getMessage()
+                    "Error enabling plugin " +
+                            plugin.getName() +
+                            ": " +
+                            e.getMessage()
             );
             e.printStackTrace();
         }
@@ -267,10 +268,10 @@ public class PluginManager {
             Log.info("Disabled plugin: " + plugin.getName());
         } catch (Exception e) {
             Log.error(
-                "Error disabling plugin " +
-                    plugin.getName() +
-                    ": " +
-                    e.getMessage()
+                    "Error disabling plugin " +
+                            plugin.getName() +
+                            ": " +
+                            e.getMessage()
             );
             e.printStackTrace();
         }
@@ -281,8 +282,8 @@ public class PluginManager {
      * Used for inter-plugin dependencies.
      */
     Class<?> getClassFromPlugins(
-        String name,
-        PluginClassLoader requestingLoader
+            String name,
+            PluginClassLoader requestingLoader
     ) {
         for (PluginClassLoader loader : classLoaders.values()) {
             if (loader == requestingLoader) {
@@ -291,7 +292,8 @@ public class PluginManager {
 
             try {
                 return loader.findClass(name);
-            } catch (ClassNotFoundException ignored) {}
+            } catch (ClassNotFoundException ignored) {
+            }
         }
         return null;
     }

@@ -2,19 +2,20 @@ package dev.xdpxi.swiftmc.player;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.minestom.server.entity.Player;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
-import net.minestom.server.entity.Player;
 
 public class PlayerDataManager {
 
     private static final Path PLAYER_FOLDER = Paths.get("players");
     private static final Gson GSON = new GsonBuilder()
-        .setPrettyPrinting()
-        .create();
+            .setPrettyPrinting()
+            .create();
 
     static {
         try {

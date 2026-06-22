@@ -1,7 +1,5 @@
 package dev.xdpxi.swiftmc.utils;
 
-import static dev.xdpxi.swiftmc.Main.config;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +11,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.zip.GZIPOutputStream;
 
+import static dev.xdpxi.swiftmc.Main.config;
+
 public class Log {
 
     private static final String RESET = "\u001B[0m";
@@ -22,9 +22,9 @@ public class Log {
     private static final String GRAY = "\u001B[90m";
 
     private static final DateTimeFormatter TIME_FORMAT =
-        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter FILE_TIME_FORMAT =
-        DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
 
     private static BufferedWriter fileWriter;
     private static Path logFilePath;
@@ -33,37 +33,37 @@ public class Log {
         try {
             Files.createDirectories(Path.of("logs"));
             String logFileName =
-                "logs/log_" +
-                LocalDateTime.now().format(FILE_TIME_FORMAT) +
-                ".log";
+                    "logs/log_" +
+                            LocalDateTime.now().format(FILE_TIME_FORMAT) +
+                            ".log";
             logFilePath = Path.of(logFileName);
             fileWriter = Files.newBufferedWriter(
-                logFilePath,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.APPEND
+                    logFilePath,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND
             );
         } catch (IOException e) {
             System.err.println(
-                RED + "Failed to initialize log file: " + e.getMessage() + RESET
+                    RED + "Failed to initialize log file: " + e.getMessage() + RESET
             );
             e.printStackTrace();
         }
     }
 
     private static String formatMessage(
-        String color,
-        String message,
-        Object... args
+            String color,
+            String message,
+            Object... args
     ) {
         String timestamp = LocalDateTime.now().format(TIME_FORMAT);
         String thread = Thread.currentThread().getName();
         return String.format(
-            "%s[%s] [%s] %s%s%n",
-            color,
-            timestamp,
-            thread,
-            String.format(message, args),
-            RESET
+                "%s[%s] [%s] %s%s%n",
+                color,
+                timestamp,
+                thread,
+                String.format(message, args),
+                RESET
         );
     }
 
@@ -72,14 +72,14 @@ public class Log {
         try {
             if (fileWriter != null) {
                 fileWriter.write(
-                    formattedMessage.replaceAll("\u001B\\[[;\\d]*m", "")
+                        formattedMessage.replaceAll("\u001B\\[[;\\d]*m", "")
                 ); // Remove ANSI colors
                 fileWriter.flush();
             }
         } catch (IOException e) {
             if (Objects.equals(e.getMessage(), "Stream closed")) return;
             System.err.println(
-                RED + "Failed to write to log file: " + e.getMessage() + RESET
+                    RED + "Failed to write to log file: " + e.getMessage() + RESET
             );
             e.printStackTrace();
         }
@@ -102,9 +102,9 @@ public class Log {
     }
 
     public static void error(
-        Throwable throwable,
-        String message,
-        Object... args
+            Throwable throwable,
+            String message,
+            Object... args
     ) {
         write(formatMessage(RED, message, args));
         throwable.printStackTrace(System.err);
@@ -115,10 +115,10 @@ public class Log {
             }
         } catch (IOException e) {
             System.err.println(
-                RED +
-                    "Failed to write throwable to log file: " +
-                    e.getMessage() +
-                    RESET
+                    RED +
+                            "Failed to write throwable to log file: " +
+                            e.getMessage() +
+                            RESET
             );
         }
     }
@@ -130,10 +130,10 @@ public class Log {
 
             Path gzPath = Path.of(logFilePath.toString() + ".gz");
             try (
-                GZIPOutputStream gos = new GZIPOutputStream(
-                    Files.newOutputStream(gzPath)
-                );
-                InputStream fis = Files.newInputStream(logFilePath)
+                    GZIPOutputStream gos = new GZIPOutputStream(
+                            Files.newOutputStream(gzPath)
+                    );
+                    InputStream fis = Files.newInputStream(logFilePath)
             ) {
                 byte[] buffer = new byte[1024];
                 int len;
@@ -145,10 +145,10 @@ public class Log {
             Files.deleteIfExists(logFilePath);
         } catch (IOException e) {
             System.err.println(
-                RED +
-                    "Failed to close/compress log file: " +
-                    e.getMessage() +
-                    RESET
+                    RED +
+                            "Failed to close/compress log file: " +
+                            e.getMessage() +
+                            RESET
             );
             e.printStackTrace();
         }

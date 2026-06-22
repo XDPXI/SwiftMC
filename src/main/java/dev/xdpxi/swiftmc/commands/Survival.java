@@ -14,17 +14,17 @@ public class Survival extends Command {
         setDefaultExecutor((sender, context) -> {
             if (!(sender instanceof Player player)) {
                 sender.sendMessage(
-                    Component.text(
-                        "Only players can use this command!",
-                        NamedTextColor.RED
-                    )
+                        Component.text(
+                                "Only players can use this command!",
+                                NamedTextColor.RED
+                        )
                 );
                 return;
             }
 
             player.setGameMode(GameMode.SURVIVAL);
             player.sendMessage(
-                Component.text("Gamemode set to Survival", NamedTextColor.GREEN)
+                    Component.text("Gamemode set to Survival", NamedTextColor.GREEN)
             );
             Log.info(player.getUsername() + " changed gamemode to Survival");
         });
