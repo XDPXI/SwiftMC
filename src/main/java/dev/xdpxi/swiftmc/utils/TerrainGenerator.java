@@ -133,7 +133,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         double roll = Math.random();
         if (roll < 0.25) {
             unit.modifier().setBlock(worldX, height, worldZ, Block.SEAGRASS);
-        } else if (roll < 0.5) {
+        } else if (roll < 0.35) {
             int available = (WATER_LEVEL - 1) - height;
             if (available <= 0) return;
             int gap = Math.min((int) (Math.random() * 6), available - 1);
