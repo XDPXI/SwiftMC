@@ -39,6 +39,10 @@ public class FastNoise {
         return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
     }
 
+    public double getRidge(double x, double y) {
+        return 1.0 - Math.abs(get(x, y));
+    }
+
     public double get(double x, double y) {
         int X = ((int) Math.floor(x)) & 255;
         int Y = ((int) Math.floor(y)) & 255;
