@@ -309,7 +309,7 @@ public class Main {
         }
         isShuttingDown = true;
 
-        Log.info("=== Server shutdown initiated ===");
+        Log.info("Server is shutting down!");
 
         // Save all player data
         MinecraftServer.getConnectionManager()
