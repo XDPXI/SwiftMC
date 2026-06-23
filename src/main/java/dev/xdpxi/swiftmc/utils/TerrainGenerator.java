@@ -135,7 +135,6 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         }
 
         if (y < WATER_LEVEL) {
-            if (height > WATER_LEVEL - 1) return Block.SAND;
             return Block.WATER;
         }
 

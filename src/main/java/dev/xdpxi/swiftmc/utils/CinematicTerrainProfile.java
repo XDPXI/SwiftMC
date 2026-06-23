@@ -30,7 +30,7 @@ public class CinematicTerrainProfile implements TerrainProfile {
         double sx = cx + wx2;
         double sz = cz + wz2;
 
-        double cont = continental.get(sx * 0.0006, sz * 0.0006);
+        double cont = continental.get(sx * 0.002 + 47.3, sz * 0.002 + 47.3);
 
         double ero = Math.max(0, Math.min(1,
                 (erosion.get(sx * 0.005, sz * 0.005) + 0.7) / 1.4));
@@ -45,13 +45,13 @@ public class CinematicTerrainProfile implements TerrainProfile {
             height = 28 + t * 14;
         } else if (c < -0.1) {
             double t = (c + 0.6) / 0.5;
-            height = 42 + t * 11;
+            height = 42 + t * 8;
         } else if (c < 0.1) {
             double t = (c + 0.1) / 0.2;
-            height = 53 + t * 17;
+            height = 50 + t * 18;
         } else {
             double t = Math.min((c - 0.1) / 0.9, 1.0);
-            double base = 70 + t * 35;
+            double base = 68 + t * 35;
 
             double mf = Math.pow(Math.max(0.0, 1.0 - ero), 1.5);
 
