@@ -90,6 +90,10 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                         && !tooCloseToTree(trees, worldX, worldZ, 5)) {
                     trees.add(new TreePos(worldX, height, worldZ));
                 }
+
+                if (cinematic && height < WATER_LEVEL) {
+                    placeOceanFloorVegetation(unit, worldX, worldZ, height);
+                }
             }
         }
 
@@ -122,6 +126,22 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                 if (dx == 0 && dz == 0 && radius > 1) continue;
                 unit.modifier().setBlock(centerX + dx, y, centerZ + dz, Block.OAK_LEAVES);
             }
+        }
+    }
+
+    private void placeOceanFloorVegetation(GenerationUnit unit, int worldX, int worldZ, int height) {
+        double roll = Math.random();
+        if (roll < 0.25) {
+            unit.modifier().setBlock(worldX, height, worldZ, Block.SEAGRASS);
+        } else if (roll < 0.5) {
+            int available = (WATER_LEVEL - 1) - height;
+            if (available <= 0) return;
+            int gap = Math.min((int) (Math.random() * 6), available - 1);
+            int kelpHeight = available - gap;
+            for (int y = height; y < height + kelpHeight - 1; y++) {
+                unit.modifier().setBlock(worldX, y, worldZ, Block.KELP_PLANT);
+            }
+            unit.modifier().setBlock(worldX, height + kelpHeight - 1, worldZ, Block.KELP);
         }
     }
 
