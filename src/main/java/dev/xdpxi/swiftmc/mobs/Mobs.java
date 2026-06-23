@@ -166,12 +166,12 @@ public class Mobs {
     public static boolean isFlyingMob(EntityType type) {
         return (
                 type == EntityType.BAT ||
-                type == EntityType.GHAST ||
-                type == EntityType.BLAZE ||
-                type == EntityType.BEE ||
-                type == EntityType.PHANTOM ||
-                type == EntityType.PARROT ||
-                type == EntityType.VEX
+                        type == EntityType.GHAST ||
+                        type == EntityType.BLAZE ||
+                        type == EntityType.BEE ||
+                        type == EntityType.PHANTOM ||
+                        type == EntityType.PARROT ||
+                        type == EntityType.VEX
         );
     }
 

@@ -39,7 +39,7 @@ class PluginDescriptorTest {
         String content = "version: \"1.0\"\nmain: dev.test.Main\n"; // missing name
 
         assertThrows(IllegalArgumentException.class,
-            () -> PluginDescriptor.load(yaml(content)));
+                () -> PluginDescriptor.load(yaml(content)));
     }
 
     @Test

@@ -1,7 +1,9 @@
 package dev.xdpxi.swiftmc.utils;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TerrainProfileTest {
 
@@ -14,7 +16,7 @@ class TerrainProfileTest {
             for (int z = -2000; z <= 2000; z += 100) {
                 int h = profile.getHeight(x, z);
                 assertTrue(h >= 25 && h <= 245,
-                    "Height out of range at (" + x + "," + z + "): " + h);
+                        "Height out of range at (" + x + "," + z + "): " + h);
                 if (h > 150) foundHigh = true;
                 if (h < 55) foundLow = true;
             }

@@ -40,6 +40,10 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         return false;
     }
 
+    private static long veinKey(int x, int y, int z) {
+        return ((long) x << 48) ^ ((long) z << 32) ^ (y & 0xFFFFFFFFL);
+    }
+
     @Override
     public void generate(@NonNull GenerationUnit unit) {
         int baseX = unit.absoluteStart().blockX();
@@ -262,8 +266,8 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
     }
 
     private void growOreVein(GenerationUnit unit, int baseX, int baseZ, int startY, int endY,
-                              int[][] smoothedHeightMap, int startX, int startVeinY, int startZ,
-                              int goal, Ore ore) {
+                             int[][] smoothedHeightMap, int startX, int startVeinY, int startZ,
+                             int goal, Ore ore) {
         int[][] dirs = {{1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {0, 0, 1}, {0, 0, -1}};
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -304,10 +308,6 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
     private void placeOreBlock(@NonNull GenerationUnit unit, int baseX, int baseZ, int x, int y, int z, Ore ore) {
         Block block = y < 0 ? ore.deepslateBlock : ore.stoneBlock;
         unit.modifier().setBlock(baseX + x, y, baseZ + z, block);
-    }
-
-    private static long veinKey(int x, int y, int z) {
-        return ((long) x << 48) ^ ((long) z << 32) ^ (y & 0xFFFFFFFFL);
     }
 
     private enum Ore {

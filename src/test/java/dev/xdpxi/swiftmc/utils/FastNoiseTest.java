@@ -1,7 +1,9 @@
 package dev.xdpxi.swiftmc.utils;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FastNoiseTest {
 
@@ -12,7 +14,7 @@ class FastNoiseTest {
             for (int z = -50; z <= 50; z++) {
                 double ridge = noise.getRidge(x * 0.05, z * 0.05);
                 assertTrue(ridge >= 0.0 && ridge <= 1.0,
-                    "getRidge out of range at (" + x + "," + z + "): " + ridge);
+                        "getRidge out of range at (" + x + "," + z + "): " + ridge);
             }
         }
     }

@@ -22,6 +22,14 @@ class PluginManagerTest {
 
     private String originalUserDir;
 
+    private static void writeJarWithPluginYml(File jar, @NonNull String yamlContent) throws Exception {
+        try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(jar))) {
+            jos.putNextEntry(new JarEntry("plugin.yml"));
+            jos.write(yamlContent.getBytes(StandardCharsets.UTF_8));
+            jos.closeEntry();
+        }
+    }
+
     @BeforeEach
     void redirectWorkingDir() {
         originalUserDir = System.getProperty("user.dir");
@@ -70,13 +78,5 @@ class PluginManagerTest {
     void isPluginLoaded_returnsFalse_whenNotLoaded() {
         PluginManager manager = new PluginManager();
         assertFalse(manager.isPluginLoaded("NonExistentPlugin"));
-    }
-
-    private static void writeJarWithPluginYml(File jar, @NonNull String yamlContent) throws Exception {
-        try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(jar))) {
-            jos.putNextEntry(new JarEntry("plugin.yml"));
-            jos.write(yamlContent.getBytes(StandardCharsets.UTF_8));
-            jos.closeEntry();
-        }
     }
 }

@@ -1,7 +1,6 @@
 package dev.xdpxi.swiftmc.player;
 
 import net.minestom.server.coordinate.Pos;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

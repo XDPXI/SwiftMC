@@ -14,11 +14,6 @@ import java.util.Random;
 
 public class Config {
 
-    private static @NonNull File getConfigFile() {
-        String userDir = System.getProperty("user.dir");
-        return new File(userDir, "config.yml");
-    }
-
     public int seed;
     public int port = 25565;
     public int maxPlayers = 500;
@@ -27,6 +22,11 @@ public class Config {
     public boolean velocity = false;
     public String velocitySecret = "ENTER-YOUR-SECRET-HERE";
     public boolean simpleVoiceChat = true;
+
+    private static @NonNull File getConfigFile() {
+        String userDir = System.getProperty("user.dir");
+        return new File(userDir, "config.yml");
+    }
 
     public static Config loadOrCreate() throws Exception {
         LoaderOptions loaderOptions = new LoaderOptions();
