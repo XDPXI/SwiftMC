@@ -10,7 +10,6 @@ import java.util.List;
 public class TerrainGenerator implements net.minestom.server.instance.generator.Generator {
 
     private static final int WATER_LEVEL = 52;
-    private static final double TREE_PROBABILITY = 0.001;
 
     private final TerrainProfile profile;
 
@@ -25,6 +24,13 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
             }
             this.profile = new MinecraftTerrainProfile(seed);
         }
+    }
+
+    private static boolean tooCloseToTree(List<TreePos> trees, int x, int z, int minDist) {
+        for (TreePos t : trees) {
+            if (Math.abs(t.x - x) <= minDist && Math.abs(t.z - z) <= minDist) return true;
+        }
+        return false;
     }
 
     @Override
@@ -68,8 +74,9 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                     if (block != null) unit.modifier().setBlock(worldX, y, worldZ, block);
                 }
 
-                if (height > WATER_LEVEL && Math.random() < TREE_PROBABILITY
-                        && x >= 2 && x <= 13 && z >= 2 && z <= 13) {
+                if (height > WATER_LEVEL && Math.random() < profile.getTreeProbability(worldX, worldZ)
+                        && x >= 2 && x <= 13 && z >= 2 && z <= 13
+                        && !tooCloseToTree(trees, worldX, worldZ, 5)) {
                     trees.add(new TreePos(worldX, height, worldZ));
                 }
             }
