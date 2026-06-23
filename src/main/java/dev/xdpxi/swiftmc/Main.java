@@ -189,6 +189,7 @@ public class Main {
         );
         EntityDamageEvent.addListener(globalEventHandler);
         EntityDeathEvent.addListener(globalEventHandler);
+        MobFallDamageEvent.addListener(globalEventHandler);
         ItemDropEvent.addListener(globalEventHandler);
         PickupItemEvent.addListener(globalEventHandler);
         PlayerBlockBreakEvent.addListener(globalEventHandler);
