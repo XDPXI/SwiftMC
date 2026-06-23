@@ -10,10 +10,11 @@ import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.block.BlockHandler;
 import net.minestom.server.item.Material;
+import org.jspecify.annotations.NonNull;
 
 public class PlayerUseItemOnBlockEvent {
 
-    public static void addListener(GlobalEventHandler globalEventHandler) {
+    public static void addListener(@NonNull GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(
                 net.minestom.server.event.player.PlayerUseItemOnBlockEvent.class,
                 event -> {

@@ -4,11 +4,12 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.instance.InstanceContainer;
+import org.jspecify.annotations.NonNull;
 
 public class AsyncPlayerConfigurationEvent {
 
     public static void addListener(
-            GlobalEventHandler globalEventHandler,
+            @NonNull GlobalEventHandler globalEventHandler,
             InstanceContainer instanceContainer
     ) {
         globalEventHandler.addListener(

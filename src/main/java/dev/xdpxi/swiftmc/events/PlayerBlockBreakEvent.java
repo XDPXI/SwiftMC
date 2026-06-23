@@ -9,13 +9,15 @@ import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class PlayerBlockBreakEvent {
 
-    public static void addListener(GlobalEventHandler globalEventHandler) {
+    public static void addListener(@NonNull GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(
                 net.minestom.server.event.player.PlayerBlockBreakEvent.class,
                 event -> {
@@ -56,7 +58,7 @@ public class PlayerBlockBreakEvent {
         );
     }
 
-    private static Material getBlockDrop(Block block) {
+    private static @Nullable Material getBlockDrop(@NonNull Block block) {
         // Map blocks to their drops
         String name = block.name();
         switch (name) {

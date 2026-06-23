@@ -1,5 +1,7 @@
 package dev.xdpxi.swiftmc.utils;
 
+import org.jspecify.annotations.NonNull;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,7 +52,7 @@ public class Log {
         }
     }
 
-    private static String formatMessage(
+    private static @NonNull String formatMessage(
             String color,
             String message,
             Object... args
@@ -102,7 +104,7 @@ public class Log {
     }
 
     public static void error(
-            Throwable throwable,
+            @NonNull Throwable throwable,
             String message,
             Object... args
     ) {

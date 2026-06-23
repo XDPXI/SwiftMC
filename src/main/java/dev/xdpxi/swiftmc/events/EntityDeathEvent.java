@@ -7,13 +7,14 @@ import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import org.jspecify.annotations.NonNull;
 
 import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EntityDeathEvent {
 
-    public static void addListener(GlobalEventHandler globalEventHandler) {
+    public static void addListener(@NonNull GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(
                 net.minestom.server.event.entity.EntityDeathEvent.class,
                 event -> {

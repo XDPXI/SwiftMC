@@ -1,5 +1,7 @@
 package dev.xdpxi.swiftmc.plugin;
 
+import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.NonNull;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -41,7 +43,8 @@ public record PluginDescriptor(
     /**
      * Loads a plugin descriptor from plugin.yml
      */
-    public static PluginDescriptor load(InputStream stream) {
+    @Contract("_ -> new")
+    public static @NonNull PluginDescriptor load(InputStream stream) {
         LoaderOptions loaderOptions = new LoaderOptions();
         Yaml yaml = new Yaml(loaderOptions);
         Map<String, Object> data = yaml.load(stream);

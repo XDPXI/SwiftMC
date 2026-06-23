@@ -3,6 +3,8 @@ package dev.xdpxi.swiftmc.utils;
 import dev.xdpxi.swiftmc.Main;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.generator.GenerationUnit;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,7 +33,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         this.deepslateNoise = new FastNoise(seed + 7);
     }
 
-    private static boolean tooCloseToTree(List<TreePos> trees, int x, int z, int minDist) {
+    private static boolean tooCloseToTree(@NonNull List<TreePos> trees, int x, int z, int minDist) {
         for (TreePos t : trees) {
             if (Math.abs(t.x - x) <= minDist && Math.abs(t.z - z) <= minDist) return true;
         }
@@ -39,7 +41,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
     }
 
     @Override
-    public void generate(GenerationUnit unit) {
+    public void generate(@NonNull GenerationUnit unit) {
         int baseX = unit.absoluteStart().blockX();
         int baseZ = unit.absoluteStart().blockZ();
         int startY = unit.absoluteStart().blockY();
@@ -144,7 +146,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         }
     }
 
-    private Block getBedrockOverride(int y, int worldX, int worldZ) {
+    private @Nullable Block getBedrockOverride(int y, int worldX, int worldZ) {
         if (y == BEDROCK_Y) return Block.BEDROCK;
         if (y > BEDROCK_Y && y <= BEDROCK_Y + BEDROCK_TRANSITION_HEIGHT) {
             double t = (double) (y - BEDROCK_Y) / (BEDROCK_TRANSITION_HEIGHT + 1);
@@ -171,8 +173,8 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         return 2 + (int) (Math.abs(h) % 4);
     }
 
-    private void generateColumn(GenerationUnit unit, int x, int z, int worldX, int worldZ, int height,
-                                 int dirtDepth, int startY, int endY, int[][] heightMap) {
+    private void generateColumn(@NonNull GenerationUnit unit, int x, int z, int worldX, int worldZ, int height,
+                                int dirtDepth, int startY, int endY, int[][] heightMap) {
         var modifier = unit.modifier();
 
         int bedrockTop = BEDROCK_Y + BEDROCK_TRANSITION_HEIGHT;
@@ -299,7 +301,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         }
     }
 
-    private void placeOreBlock(GenerationUnit unit, int baseX, int baseZ, int x, int y, int z, Ore ore) {
+    private void placeOreBlock(@NonNull GenerationUnit unit, int baseX, int baseZ, int x, int y, int z, Ore ore) {
         Block block = y < 0 ? ore.deepslateBlock : ore.stoneBlock;
         unit.modifier().setBlock(baseX + x, y, baseZ + z, block);
     }

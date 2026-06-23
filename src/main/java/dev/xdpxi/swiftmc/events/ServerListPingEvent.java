@@ -5,12 +5,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.ping.Status;
+import org.jspecify.annotations.NonNull;
 
 import static dev.xdpxi.swiftmc.Main.config;
 
 public class ServerListPingEvent {
 
-    public static void addListener(GlobalEventHandler globalEventHandler) {
+    public static void addListener(@NonNull GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(
                 net.minestom.server.event.server.ServerListPingEvent.class,
                 event -> {

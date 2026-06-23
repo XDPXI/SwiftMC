@@ -10,6 +10,7 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.timer.TaskSchedule;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Set;
 import java.util.UUID;
@@ -19,7 +20,7 @@ public class EntityDamageEvent {
 
     private static final Set<UUID> panicBoostedMobs = ConcurrentHashMap.newKeySet();
 
-    public static void addListener(GlobalEventHandler globalEventHandler) {
+    public static void addListener(@NonNull GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(
                 net.minestom.server.event.entity.EntityDamageEvent.class,
                 event -> {
@@ -72,7 +73,7 @@ public class EntityDamageEvent {
         );
     }
 
-    private static boolean isWater(Block block) {
+    private static boolean isWater(@NonNull Block block) {
         return block.compare(Block.WATER);
     }
 }

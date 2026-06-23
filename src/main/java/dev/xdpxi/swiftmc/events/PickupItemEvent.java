@@ -5,10 +5,11 @@ import net.kyori.adventure.sound.Sound;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
+import org.jspecify.annotations.NonNull;
 
 public class PickupItemEvent {
 
-    public static void addListener(GlobalEventHandler globalEventHandler) {
+    public static void addListener(@NonNull GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(
                 net.minestom.server.event.item.PickupItemEvent.class,
                 event -> {

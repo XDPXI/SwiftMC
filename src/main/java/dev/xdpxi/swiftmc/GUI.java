@@ -3,6 +3,7 @@ package dev.xdpxi.swiftmc;
 import com.formdev.flatlaf.FlatDarkLaf;
 import dev.xdpxi.swiftmc.utils.Log;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -84,7 +85,7 @@ public class GUI extends JFrame {
         });
     }
 
-    private JPanel createConsolePanel() {
+    private @NonNull JPanel createConsolePanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -120,7 +121,7 @@ public class GUI extends JFrame {
         return panel;
     }
 
-    private JPanel createPluginsPanel() {
+    private @NonNull JPanel createPluginsPanel() {
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -343,7 +344,7 @@ public class GUI extends JFrame {
 
         private final JPanel panel;
 
-        public PluginRow(File pluginFile) {
+        public PluginRow(@NonNull File pluginFile) {
             panel = new JPanel(new BorderLayout());
             panel.setBorder(
                     BorderFactory.createCompoundBorder(

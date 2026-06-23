@@ -5,12 +5,13 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
+import org.jspecify.annotations.NonNull;
 
 import java.time.Duration;
 
 public class ItemDropEvent {
 
-    public static void addListener(GlobalEventHandler globalEventHandler) {
+    public static void addListener(@NonNull GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(
                 net.minestom.server.event.item.ItemDropEvent.class,
                 event -> {

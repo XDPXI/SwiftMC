@@ -3,6 +3,7 @@ package dev.xdpxi.swiftmc.player;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minestom.server.entity.Player;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,7 +39,7 @@ public class PlayerDataManager {
         }
     }
 
-    public static void loadPlayer(Player player) {
+    public static void loadPlayer(@NonNull Player player) {
         try {
             UUID uuid = player.getUuid();
             Path file = PLAYER_FOLDER.resolve(uuid + ".json");

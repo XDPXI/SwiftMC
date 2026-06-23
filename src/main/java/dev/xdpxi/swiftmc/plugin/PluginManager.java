@@ -1,6 +1,7 @@
 package dev.xdpxi.swiftmc.plugin;
 
 import dev.xdpxi.swiftmc.utils.Log;
+import org.jspecify.annotations.NonNull;
 
 import java.io.File;
 import java.io.InputStream;
@@ -181,7 +182,7 @@ public class PluginManager {
 
     // Internal methods
 
-    private PluginDescriptor loadDescriptor(File file) throws Exception {
+    private @NonNull PluginDescriptor loadDescriptor(File file) throws Exception {
         try (JarFile jar = new JarFile(file)) {
             JarEntry entry = jar.getJarEntry("plugin.yml");
             if (entry == null) {
@@ -196,7 +197,7 @@ public class PluginManager {
         }
     }
 
-    private Plugin loadPlugin(File file, PluginDescriptor descriptor)
+    private @NonNull Plugin loadPlugin(File file, PluginDescriptor descriptor)
             throws Exception {
         // Create class loader
         PluginClassLoader classLoader = new PluginClassLoader(
@@ -237,7 +238,7 @@ public class PluginManager {
         return plugin;
     }
 
-    private void enablePlugin(Plugin plugin) {
+    private void enablePlugin(@NonNull Plugin plugin) {
         if (plugin.isEnabled()) {
             return;
         }
@@ -257,7 +258,7 @@ public class PluginManager {
         }
     }
 
-    private void disablePlugin(Plugin plugin) {
+    private void disablePlugin(@NonNull Plugin plugin) {
         if (!plugin.isEnabled()) {
             return;
         }

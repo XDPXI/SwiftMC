@@ -2,6 +2,7 @@ package dev.xdpxi.swiftmc.player;
 
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
@@ -10,7 +11,7 @@ public class ItemSerialization {
     public final int materialId;
     public final int amount;
 
-    public ItemSerialization(ItemStack stack) {
+    public ItemSerialization(@NonNull ItemStack stack) {
         this.materialId = stack.material().id();
         this.amount = stack.amount();
     }

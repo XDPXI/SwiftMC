@@ -5,6 +5,7 @@ import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ public class PlayerData {
     public PlayerData() {
     }
 
-    public PlayerData(Player player) {
+    public PlayerData(@NonNull Player player) {
         Pos pos = player.getPosition();
         this.x = pos.x();
         this.y = pos.y();
@@ -44,7 +45,7 @@ public class PlayerData {
         return new Pos(x, y, z, yaw, pitch);
     }
 
-    public void applyInventory(Player player) {
+    public void applyInventory(@NonNull Player player) {
         PlayerInventory inv = player.getInventory();
         for (int i = 0; i < inventory.size(); i++) {
             ItemSerialization itemSerialization = inventory.get(i);

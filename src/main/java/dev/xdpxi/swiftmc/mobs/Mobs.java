@@ -3,6 +3,9 @@ package dev.xdpxi.swiftmc.mobs;
 import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.item.Material;
+import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -116,11 +119,13 @@ public class Mobs {
             Map.entry(EntityType.WITHER, 300)
     );
 
-    public static List<EntityCreature> getSpawnedMobs() {
+    @Contract(value = " -> new", pure = true)
+    public static @NonNull List<EntityCreature> getSpawnedMobs() {
         return MobSpawner.getSpawnedMobs();
     }
 
-    public static EntityType getEntityTypeFromSpawnEgg(Material material) {
+    @Contract(pure = true)
+    public static @Nullable EntityType getEntityTypeFromSpawnEgg(@NonNull Material material) {
         return switch (material.name()) {
             case "minecraft:chicken_spawn_egg" -> EntityType.CHICKEN;
             case "minecraft:cow_spawn_egg" -> EntityType.COW;

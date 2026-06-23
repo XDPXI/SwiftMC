@@ -4,6 +4,7 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.ai.GoalSelector;
 import net.minestom.server.instance.Instance;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class RandomStrollGoal extends GoalSelector {
         this.closePositions = getNearbyBlocks(radius);
     }
 
-    private static List<Vec> getNearbyBlocks(int radius) {
+    private static @NonNull List<Vec> getNearbyBlocks(int radius) {
         List<Vec> blocks = new ArrayList<>();
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y <= radius; y++) {

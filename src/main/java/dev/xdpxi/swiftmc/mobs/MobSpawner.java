@@ -12,6 +12,9 @@ import net.minestom.server.entity.attribute.AttributeInstance;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.timer.TaskSchedule;
+import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +31,8 @@ public record MobSpawner(Instance instance) {
     private static final int MAX_SPAWN_DISTANCE = 64; // blocks away from player
     private static final List<EntityCreature> spawnedMobs = new ArrayList<>();
 
-    static List<EntityCreature> getSpawnedMobs() {
+    @Contract(value = " -> new", pure = true)
+    static @NonNull List<EntityCreature> getSpawnedMobs() {
         return new ArrayList<>(spawnedMobs);
     }
 
@@ -147,7 +151,7 @@ public record MobSpawner(Instance instance) {
         };
     }
 
-    private Pos getRandomSpawnLocationNearPlayer(Player player) {
+    private @Nullable Pos getRandomSpawnLocationNearPlayer(@NonNull Player player) {
         if (player.getChunk() == null) return null;
 
         int playerChunkX = player.getChunk().getChunkX();
@@ -191,7 +195,7 @@ public record MobSpawner(Instance instance) {
         return null;
     }
 
-    private boolean isValidSpawnLocation(Pos pos) {
+    private boolean isValidSpawnLocation(@NonNull Pos pos) {
         Block below = instance.getBlock(pos.sub(0, 1, 0));
         if (below.isAir() || below.compare(Block.WATER)) {
             return false;

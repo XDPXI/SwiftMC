@@ -24,6 +24,7 @@ import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.LightingChunk;
+import org.jspecify.annotations.NonNull;
 
 import java.awt.*;
 import java.io.File;
@@ -41,7 +42,7 @@ public class Main {
     private static MobSpawner mobSpawner;
     private static volatile boolean isShuttingDown = false;
 
-    static void main(String[] args) {
+    static void main(String @NonNull [] args) {
         boolean fromGui = args.length > 0 && args[0].equals("--nogui");
 
         if (

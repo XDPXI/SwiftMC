@@ -1,5 +1,6 @@
 package dev.xdpxi.swiftmc.utils;
 
+import org.jspecify.annotations.NonNull;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -13,7 +14,7 @@ import java.util.Random;
 
 public class Config {
 
-    private static File getConfigFile() {
+    private static @NonNull File getConfigFile() {
         String userDir = System.getProperty("user.dir");
         return new File(userDir, "config.yml");
     }

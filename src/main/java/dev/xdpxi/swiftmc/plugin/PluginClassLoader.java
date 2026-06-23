@@ -1,5 +1,7 @@
 package dev.xdpxi.swiftmc.plugin;
 
+import org.jspecify.annotations.NonNull;
+
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -15,7 +17,7 @@ public class PluginClassLoader extends URLClassLoader {
     public PluginClassLoader(
             PluginManager pluginManager,
             PluginDescriptor descriptor,
-            File file,
+            @NonNull File file,
             ClassLoader parent
     ) throws Exception {
         super(new URL[]{file.toURI().toURL()}, parent);

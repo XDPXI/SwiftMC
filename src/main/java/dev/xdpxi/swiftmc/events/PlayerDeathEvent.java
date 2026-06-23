@@ -4,10 +4,11 @@ import dev.xdpxi.swiftmc.utils.Log;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
+import org.jspecify.annotations.NonNull;
 
 public class PlayerDeathEvent {
 
-    public static void addListener(GlobalEventHandler globalEventHandler) {
+    public static void addListener(@NonNull GlobalEventHandler globalEventHandler) {
         globalEventHandler.addListener(
                 net.minestom.server.event.player.PlayerDeathEvent.class,
                 event -> {
