@@ -39,9 +39,7 @@ java {
 
 tasks {
     jar {
-        manifest {
-            attributes["Main-Class"] = "dev.xdpxi.swiftmc.Main"
-        }
+        enabled = false
     }
 
     build {
@@ -49,6 +47,11 @@ tasks {
     }
 
     shadowJar {
+        dependsOn gradle.includedBuild('MinestomFluids').task(':jar')
+        dependsOn gradle.includedBuild('simple-voice-chat-minestom').task(':jar')
+        manifest {
+            attributes["Main-Class"] = "dev.xdpxi.swiftmc.Main"
+        }
         mergeServiceFiles()
         archiveClassifier.set("")
     }
