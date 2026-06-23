@@ -5,7 +5,9 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.generator.GenerationUnit;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class TerrainGenerator implements net.minestom.server.instance.generator.Generator {
 
@@ -103,6 +105,10 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
 
         for (TreePos tree : trees) {
             placeTree(unit, tree.x, tree.y, tree.z);
+        }
+
+        if (cinematic) {
+            placeOreVeins(unit, baseX, baseZ, startY, endY, smoothedHeightMap);
         }
     }
 
@@ -205,6 +211,99 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         }
 
         return null;
+    }
+
+    private void placeOreVeins(GenerationUnit unit, int baseX, int baseZ, int startY, int endY, int[][] smoothedHeightMap) {
+        for (Ore ore : Ore.values()) {
+            for (int i = 0; i < ore.attemptsPerChunk; i++) {
+                if (Math.random() >= ore.chancePerAttempt) continue;
+
+                int x = (int) (Math.random() * 16);
+                int z = (int) (Math.random() * 16);
+                int worldX = baseX + x;
+                int worldZ = baseZ + z;
+                int dirtDepth = cinematic ? dirtDepth(worldX, worldZ) : 2;
+                int maxStoneY = Math.min(endY - 1, smoothedHeightMap[x][z] - 2 - dirtDepth);
+                if (maxStoneY < startY) continue;
+
+                int y = startY + (int) (Math.random() * (maxStoneY - startY + 1));
+                int goal = 1 + (int) (Math.random() * ore.maxVeinSize);
+                growOreVein(unit, baseX, baseZ, startY, endY, smoothedHeightMap, x, y, z, goal, ore);
+            }
+        }
+    }
+
+    private void growOreVein(GenerationUnit unit, int baseX, int baseZ, int startY, int endY,
+                              int[][] smoothedHeightMap, int startX, int startVeinY, int startZ,
+                              int goal, Ore ore) {
+        int[][] dirs = {{1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {0, 0, 1}, {0, 0, -1}};
+
+        Set<Long> visited = new HashSet<>();
+        List<int[]> frontier = new ArrayList<>();
+        int[] seed = {startX, startVeinY, startZ};
+        visited.add(veinKey(seed[0], seed[1], seed[2]));
+        frontier.add(seed);
+        placeOreBlock(unit, baseX, baseZ, seed[0], seed[1], seed[2], ore);
+        int placed = 1;
+
+        int maxAttempts = goal * 20;
+        while (placed < goal && !frontier.isEmpty() && maxAttempts-- > 0) {
+            int[] cur = frontier.get((int) (Math.random() * frontier.size()));
+            int[] dir = dirs[(int) (Math.random() * dirs.length)];
+            int nx = cur[0] + dir[0];
+            int ny = cur[1] + dir[1];
+            int nz = cur[2] + dir[2];
+
+            if (nx < 0 || nx > 15 || nz < 0 || nz > 15 || ny < startY || ny >= endY) continue;
+
+            long key = veinKey(nx, ny, nz);
+            if (visited.contains(key)) continue;
+            visited.add(key);
+
+            int worldX = baseX + nx;
+            int worldZ = baseZ + nz;
+            int dirtDepth = cinematic ? dirtDepth(worldX, worldZ) : 2;
+            int maxStoneY = smoothedHeightMap[nx][nz] - 2 - dirtDepth;
+            if (ny > maxStoneY) continue;
+
+            placeOreBlock(unit, baseX, baseZ, nx, ny, nz, ore);
+            frontier.add(new int[]{nx, ny, nz});
+            placed++;
+        }
+    }
+
+    private void placeOreBlock(GenerationUnit unit, int baseX, int baseZ, int x, int y, int z, Ore ore) {
+        Block block = y < 0 ? ore.deepslateBlock : ore.stoneBlock;
+        unit.modifier().setBlock(baseX + x, y, baseZ + z, block);
+    }
+
+    private static long veinKey(int x, int y, int z) {
+        return ((long) x << 48) ^ ((long) z << 32) ^ (y & 0xFFFFFFFFL);
+    }
+
+    private enum Ore {
+        COAL(17, 14, 1.0, Block.COAL_ORE, Block.DEEPSLATE_COAL_ORE),
+        COPPER(15, 12, 1.0, Block.COPPER_ORE, Block.DEEPSLATE_COPPER_ORE),
+        IRON(4, 12, 1.0, Block.IRON_ORE, Block.DEEPSLATE_IRON_ORE),
+        REDSTONE(8, 8, 1.0, Block.REDSTONE_ORE, Block.DEEPSLATE_REDSTONE_ORE),
+        LAPIS(7, 6, 0.85, Block.LAPIS_ORE, Block.DEEPSLATE_LAPIS_ORE),
+        GOLD(9, 5, 0.65, Block.GOLD_ORE, Block.DEEPSLATE_GOLD_ORE),
+        DIAMOND(12, 3, 0.5, Block.DIAMOND_ORE, Block.DEEPSLATE_DIAMOND_ORE),
+        EMERALD(3, 2, 0.3, Block.EMERALD_ORE, Block.DEEPSLATE_EMERALD_ORE);
+
+        final int maxVeinSize;
+        final int attemptsPerChunk;
+        final double chancePerAttempt;
+        final Block stoneBlock;
+        final Block deepslateBlock;
+
+        Ore(int maxVeinSize, int attemptsPerChunk, double chancePerAttempt, Block stoneBlock, Block deepslateBlock) {
+            this.maxVeinSize = maxVeinSize;
+            this.attemptsPerChunk = attemptsPerChunk;
+            this.chancePerAttempt = chancePerAttempt;
+            this.stoneBlock = stoneBlock;
+            this.deepslateBlock = deepslateBlock;
+        }
     }
 
     private record TreePos(int x, int y, int z) {
