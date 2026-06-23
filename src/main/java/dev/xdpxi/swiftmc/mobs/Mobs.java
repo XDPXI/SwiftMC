@@ -158,6 +158,18 @@ public class Mobs {
         return MOB_HEALTH.getOrDefault(type, 0);
     }
 
+    public static boolean isFlyingMob(EntityType type) {
+        return (
+                type == EntityType.BAT ||
+                type == EntityType.GHAST ||
+                type == EntityType.BLAZE ||
+                type == EntityType.BEE ||
+                type == EntityType.PHANTOM ||
+                type == EntityType.PARROT ||
+                type == EntityType.VEX
+        );
+    }
+
     public static boolean isPassiveMob(EntityType type) {
         return (
                 type == EntityType.CHICKEN ||
