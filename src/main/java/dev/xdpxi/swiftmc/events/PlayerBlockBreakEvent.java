@@ -4,6 +4,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.GameMode;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
@@ -20,6 +21,10 @@ public class PlayerBlockBreakEvent {
                 event -> {
                     Block block = event.getBlock();
                     Player player = event.getPlayer();
+
+                    if (player.getGameMode() == GameMode.CREATIVE) {
+                        return;
+                    }
 
                     // Get block drop
                     Material dropMaterial = getBlockDrop(block);
