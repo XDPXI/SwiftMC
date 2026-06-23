@@ -1,5 +1,6 @@
 package dev.xdpxi.swiftmc.plugin;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,7 +72,7 @@ class PluginManagerTest {
         assertFalse(manager.isPluginLoaded("NonExistentPlugin"));
     }
 
-    private static void writeJarWithPluginYml(File jar, String yamlContent) throws Exception {
+    private static void writeJarWithPluginYml(File jar, @NonNull String yamlContent) throws Exception {
         try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(jar))) {
             jos.putNextEntry(new JarEntry("plugin.yml"));
             jos.write(yamlContent.getBytes(StandardCharsets.UTF_8));

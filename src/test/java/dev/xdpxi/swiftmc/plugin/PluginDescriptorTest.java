@@ -1,5 +1,7 @@
 package dev.xdpxi.swiftmc.plugin;
 
+import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -10,7 +12,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PluginDescriptorTest {
 
-    private static InputStream yaml(String content) {
+    @Contract("_ -> new")
+    private static @NonNull InputStream yaml(@NonNull String content) {
         return new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
     }
 
