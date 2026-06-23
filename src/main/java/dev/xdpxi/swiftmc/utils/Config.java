@@ -13,7 +13,11 @@ import java.util.Random;
 
 public class Config {
 
-    private static final File CONFIG_FILE = new File("config.yml");
+    private static File getConfigFile() {
+        String userDir = System.getProperty("user.dir");
+        return new File(userDir, "config.yml");
+    }
+
     public int seed;
     public int port = 25565;
     public int maxPlayers = 500;
@@ -29,8 +33,8 @@ public class Config {
         Yaml yaml = new Yaml(loaderOptions);
 
         Config config;
-        if (CONFIG_FILE.exists()) {
-            try (FileInputStream fis = new FileInputStream(CONFIG_FILE)) {
+        if (getConfigFile().exists()) {
+            try (FileInputStream fis = new FileInputStream(getConfigFile())) {
                 Map<String, Object> map = yaml.load(fis);
                 config = new Config();
 
@@ -89,7 +93,7 @@ public class Config {
             dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 
             Yaml yamlWriter = new Yaml(dumperOptions);
-            try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
+            try (FileWriter writer = new FileWriter(getConfigFile())) {
                 yamlWriter.dump(data, writer);
             }
 
