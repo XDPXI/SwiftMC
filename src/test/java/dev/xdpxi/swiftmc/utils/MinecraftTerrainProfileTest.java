@@ -13,7 +13,7 @@ class MinecraftTerrainProfileTest {
         for (int x = -200; x <= 200; x += 10) {
             for (int z = -200; z <= 200; z += 10) {
                 int h = profile.getHeight(x, z);
-                assertTrue(h >= 55 && h <= 145,
+                assertTrue(h >= 44 && h <= 145,
                     "Height out of range at (" + x + "," + z + "): " + h);
                 if (h > 75) foundHigh = true;
                 if (h < 68) foundLow = true;

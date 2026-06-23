@@ -29,6 +29,6 @@ public class MinecraftTerrainProfile implements TerrainProfile {
             height += noise.get(px * FREQS[i], pz * FREQS[i]) * AMPS[i];
         }
 
-        return (int) Math.max(55, Math.min(145, height));
+        return (int) Math.max(44, Math.min(145, height));
     }
 }
