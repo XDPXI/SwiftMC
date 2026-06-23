@@ -10,10 +10,13 @@ import java.util.List;
 public class TerrainGenerator implements net.minestom.server.instance.generator.Generator {
 
     private static final int WATER_LEVEL = 52;
+    private static final int BEDROCK_Y = -64;
+    private static final int BEDROCK_TRANSITION_HEIGHT = 5;
 
     private final TerrainProfile profile;
     private final long seed;
     private final boolean cinematic;
+    private final FastNoise bedrockNoise;
 
     public TerrainGenerator() {
         this.seed = Main.config.seed;
@@ -29,6 +32,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
             }
             this.profile = new MinecraftTerrainProfile(seed);
         }
+        this.bedrockNoise = cinematic ? new FastNoise(seed + 6) : null;
     }
 
     private static boolean tooCloseToTree(List<TreePos> trees, int x, int z, int minDist) {
@@ -76,7 +80,8 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                 int dirtDepth = cinematic ? dirtDepth(worldX, worldZ) : 2;
 
                 for (int y = startY; y < endY; y++) {
-                    Block block = getBlockAt(y, height, x, z, smoothedHeightMap, dirtDepth);
+                    Block block = getBedrockOverride(y, worldX, worldZ);
+                    if (block == null) block = getBlockAt(y, height, x, z, smoothedHeightMap, dirtDepth);
                     if (block != null) unit.modifier().setBlock(worldX, y, worldZ, block);
                 }
 
@@ -118,6 +123,17 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                 unit.modifier().setBlock(centerX + dx, y, centerZ + dz, Block.OAK_LEAVES);
             }
         }
+    }
+
+    private Block getBedrockOverride(int y, int worldX, int worldZ) {
+        if (!cinematic) return null;
+        if (y == BEDROCK_Y) return Block.BEDROCK;
+        if (y > BEDROCK_Y && y <= BEDROCK_Y + BEDROCK_TRANSITION_HEIGHT) {
+            double t = (double) (y - BEDROCK_Y) / (BEDROCK_TRANSITION_HEIGHT + 1);
+            double n = (bedrockNoise.get(worldX * 0.4, worldZ * 0.4) + 1.0) / 2.0;
+            if (n > t) return Block.BEDROCK;
+        }
+        return null;
     }
 
     private int dirtDepth(int worldX, int worldZ) {
