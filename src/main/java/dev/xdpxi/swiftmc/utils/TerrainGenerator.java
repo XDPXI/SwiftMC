@@ -12,11 +12,14 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
     private static final int WATER_LEVEL = 52;
     private static final int BEDROCK_Y = -64;
     private static final int BEDROCK_TRANSITION_HEIGHT = 5;
+    private static final int DEEPSLATE_Y = -5;
+    private static final int DEEPSLATE_TRANSITION_HEIGHT = 5;
 
     private final TerrainProfile profile;
     private final long seed;
     private final boolean cinematic;
     private final FastNoise bedrockNoise;
+    private final FastNoise deepslateNoise;
 
     public TerrainGenerator() {
         this.seed = Main.config.seed;
@@ -33,6 +36,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
             this.profile = new MinecraftTerrainProfile(seed);
         }
         this.bedrockNoise = cinematic ? new FastNoise(seed + 6) : null;
+        this.deepslateNoise = new FastNoise(seed + 7);
     }
 
     private static boolean tooCloseToTree(List<TreePos> trees, int x, int z, int minDist) {
@@ -81,7 +85,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
 
                 for (int y = startY; y < endY; y++) {
                     Block block = getBedrockOverride(y, worldX, worldZ);
-                    if (block == null) block = getBlockAt(y, height, x, z, smoothedHeightMap, dirtDepth);
+                    if (block == null) block = getBlockAt(y, height, x, z, worldX, worldZ, smoothedHeightMap, dirtDepth);
                     if (block != null) unit.modifier().setBlock(worldX, y, worldZ, block);
                 }
 
@@ -159,6 +163,16 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         return null;
     }
 
+    private Block getStoneOrDeepslate(int y, int worldX, int worldZ) {
+        if (y <= DEEPSLATE_Y) return Block.DEEPSLATE;
+        if (y <= DEEPSLATE_Y + DEEPSLATE_TRANSITION_HEIGHT) {
+            double t = (double) (y - DEEPSLATE_Y) / (DEEPSLATE_TRANSITION_HEIGHT + 1);
+            double n = (deepslateNoise.get(worldX * 0.4, worldZ * 0.4) + 1.0) / 2.0;
+            if (n > t) return Block.DEEPSLATE;
+        }
+        return Block.STONE;
+    }
+
     private int dirtDepth(int worldX, int worldZ) {
         long h = seed ^ (worldX * 374761393L) ^ (worldZ * 668265263L);
         h = (h ^ (h >>> 13)) * 1274126177L;
@@ -166,8 +180,8 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         return 2 + (int) (Math.abs(h) % 4);
     }
 
-    private Block getBlockAt(int y, int height, int x, int z, int[][] heightMap, int dirtDepth) {
-        if (y < height - 1 - dirtDepth) return Block.STONE;
+    private Block getBlockAt(int y, int height, int x, int z, int worldX, int worldZ, int[][] heightMap, int dirtDepth) {
+        if (y < height - 1 - dirtDepth) return getStoneOrDeepslate(y, worldX, worldZ);
         if (y < height - 1) return Block.DIRT;
 
         if (y == height - 1) {
