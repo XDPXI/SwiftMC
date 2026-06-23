@@ -131,8 +131,11 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
 
     private void placeOceanFloorVegetation(GenerationUnit unit, int worldX, int worldZ, int height) {
         double roll = Math.random();
-        if (roll < 0.25) {
+        if (roll < 0.2) {
             unit.modifier().setBlock(worldX, height, worldZ, Block.SEAGRASS);
+        } else if (roll < 0.25 && (WATER_LEVEL - 1) - height >= 1) {
+            unit.modifier().setBlock(worldX, height, worldZ, Block.TALL_SEAGRASS.withProperty("half", "lower"));
+            unit.modifier().setBlock(worldX, height + 1, worldZ, Block.TALL_SEAGRASS.withProperty("half", "upper"));
         } else if (roll < 0.35) {
             int available = (WATER_LEVEL - 1) - height;
             if (available <= 0) return;
