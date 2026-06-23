@@ -65,8 +65,7 @@ public class Config {
                         (Boolean) simpleVoiceChatObj;
 
                 Object terrainStyleObj = map.get("terrainStyle");
-                if (terrainStyleObj != null) config.terrainStyle =
-                        (String) terrainStyleObj;
+                if (terrainStyleObj != null) config.terrainStyle = (String) terrainStyleObj;
             }
         } else {
             Log.warn("Config not found! Generating with default values.");
