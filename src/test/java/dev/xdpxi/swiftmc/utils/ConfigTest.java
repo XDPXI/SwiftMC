@@ -30,7 +30,7 @@ class ConfigTest {
 
     @Test
     void loadsExistingConfig() throws Exception {
-        String yaml = "seed: 999\nport: 19132\nmaxPlayers: 100\nonline: false\ndebug: true\nvelocity: true\nvelocitySecret: mysecret\nsimpleVoiceChat: false\nterrainStyle: cinematic\n";
+        String yaml = "seed: 999\nport: 19132\nmaxPlayers: 100\nonline: false\ndebug: true\nvelocity: true\nvelocitySecret: mysecret\nsimpleVoiceChat: false\n";
         try (FileWriter fw = new FileWriter(tempDir.resolve("config.yml").toFile())) {
             fw.write(yaml);
         }
@@ -45,7 +45,6 @@ class ConfigTest {
         assertTrue(config.velocity);
         assertEquals("mysecret", config.velocitySecret);
         assertFalse(config.simpleVoiceChat);
-        assertEquals("cinematic", config.terrainStyle);
     }
 
     @Test
@@ -60,7 +59,6 @@ class ConfigTest {
         assertFalse(config.velocity);
         assertEquals("ENTER-YOUR-SECRET-HERE", config.velocitySecret);
         assertTrue(config.simpleVoiceChat);
-        assertEquals("minecraft", config.terrainStyle);
     }
 
     @Test
@@ -75,7 +73,6 @@ class ConfigTest {
         assertEquals(12345, config.port);
         assertEquals(500, config.maxPlayers);
         assertTrue(config.online);
-        assertEquals("minecraft", config.terrainStyle);
     }
 
     @Test

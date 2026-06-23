@@ -26,7 +26,6 @@ public class Config {
     public boolean velocity = false;
     public String velocitySecret = "ENTER-YOUR-SECRET-HERE";
     public boolean simpleVoiceChat = true;
-    public String terrainStyle = "minecraft";
 
     public static Config loadOrCreate() throws Exception {
         LoaderOptions loaderOptions = new LoaderOptions();
@@ -67,10 +66,6 @@ public class Config {
                 Object simpleVoiceChatObj = map.get("simpleVoiceChat");
                 if (simpleVoiceChatObj != null) config.simpleVoiceChat =
                         (Boolean) simpleVoiceChatObj;
-
-                Object terrainStyleObj = map.get("terrainStyle");
-                if (terrainStyleObj != null) config.terrainStyle =
-                        (String) terrainStyleObj;
             }
         } else {
             Log.warn("Config not found! Generating with default values.");
@@ -86,7 +81,6 @@ public class Config {
             data.put("velocity", config.velocity);
             data.put("velocitySecret", config.velocitySecret);
             data.put("simpleVoiceChat", config.simpleVoiceChat);
-            data.put("terrainStyle", config.terrainStyle);
 
             DumperOptions dumperOptions = new DumperOptions();
             dumperOptions.setPrettyFlow(true);

@@ -19,25 +19,14 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
 
     private final TerrainProfile profile;
     private final long seed;
-    private final boolean cinematic;
     private final FastNoise bedrockNoise;
     private final FastNoise deepslateNoise;
 
     public TerrainGenerator() {
         this.seed = Main.config.seed;
         long seed = this.seed;
-        String style = Main.config.terrainStyle;
-        if ("cinematic".equalsIgnoreCase(style)) {
-            this.profile = new CinematicTerrainProfile(seed);
-            this.cinematic = true;
-        } else {
-            this.cinematic = false;
-            if (!"minecraft".equalsIgnoreCase(style)) {
-                Log.warn("Unknown terrainStyle '" + style + "', falling back to 'minecraft'");
-            }
-            this.profile = new MinecraftTerrainProfile(seed);
-        }
-        this.bedrockNoise = cinematic ? new FastNoise(seed + 6) : null;
+        this.profile = new TerrainProfile(seed);
+        this.bedrockNoise = new FastNoise(seed + 6);
         this.deepslateNoise = new FastNoise(seed + 7);
     }
 
@@ -83,7 +72,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                 int worldX = baseX + x;
                 int worldZ = baseZ + z;
                 int height = smoothedHeightMap[x][z];
-                int dirtDepth = cinematic ? dirtDepth(worldX, worldZ) : 2;
+                int dirtDepth = dirtDepth(worldX, worldZ);
 
                 for (int y = startY; y < endY; y++) {
                     Block block = getBedrockOverride(y, worldX, worldZ);
@@ -97,7 +86,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                     trees.add(new TreePos(worldX, height, worldZ));
                 }
 
-                if (cinematic && height < WATER_LEVEL) {
+                if (height < WATER_LEVEL) {
                     placeOceanFloorVegetation(unit, worldX, worldZ, height);
                 }
             }
@@ -107,9 +96,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
             placeTree(unit, tree.x, tree.y, tree.z);
         }
 
-        if (cinematic) {
-            placeOreVeins(unit, baseX, baseZ, startY, endY, smoothedHeightMap);
-        }
+        placeOreVeins(unit, baseX, baseZ, startY, endY, smoothedHeightMap);
     }
 
     private void placeTree(GenerationUnit unit, int worldX, int worldY, int worldZ) {
@@ -159,7 +146,6 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
     }
 
     private Block getBedrockOverride(int y, int worldX, int worldZ) {
-        if (!cinematic) return null;
         if (y == BEDROCK_Y) return Block.BEDROCK;
         if (y > BEDROCK_Y && y <= BEDROCK_Y + BEDROCK_TRANSITION_HEIGHT) {
             double t = (double) (y - BEDROCK_Y) / (BEDROCK_TRANSITION_HEIGHT + 1);
@@ -222,7 +208,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                 int z = (int) (Math.random() * 16);
                 int worldX = baseX + x;
                 int worldZ = baseZ + z;
-                int dirtDepth = cinematic ? dirtDepth(worldX, worldZ) : 2;
+                int dirtDepth = dirtDepth(worldX, worldZ);
                 int maxStoneY = Math.min(endY - 1, smoothedHeightMap[x][z] - 2 - dirtDepth);
                 if (maxStoneY < startY) continue;
 
@@ -262,7 +248,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
 
             int worldX = baseX + nx;
             int worldZ = baseZ + nz;
-            int dirtDepth = cinematic ? dirtDepth(worldX, worldZ) : 2;
+            int dirtDepth = dirtDepth(worldX, worldZ);
             int maxStoneY = smoothedHeightMap[nx][nz] - 2 - dirtDepth;
             if (ny > maxStoneY) continue;
 

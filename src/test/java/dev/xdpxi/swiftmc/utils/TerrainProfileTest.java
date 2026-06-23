@@ -3,11 +3,11 @@ package dev.xdpxi.swiftmc.utils;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-class CinematicTerrainProfileTest {
+class TerrainProfileTest {
 
     @Test
     void getHeight_outputsInExpectedRange() {
-        CinematicTerrainProfile profile = new CinematicTerrainProfile(12345L);
+        TerrainProfile profile = new TerrainProfile(12345L);
         boolean foundHigh = false;
         boolean foundLow = false;
         for (int x = -2000; x <= 2000; x += 100) {
@@ -25,8 +25,8 @@ class CinematicTerrainProfileTest {
 
     @Test
     void getHeight_isDeterministic() {
-        CinematicTerrainProfile a = new CinematicTerrainProfile(77L);
-        CinematicTerrainProfile b = new CinematicTerrainProfile(77L);
+        TerrainProfile a = new TerrainProfile(77L);
+        TerrainProfile b = new TerrainProfile(77L);
         assertEquals(a.getHeight(500, -300), b.getHeight(500, -300));
     }
 }
