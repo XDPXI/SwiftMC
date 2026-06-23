@@ -9,6 +9,7 @@ import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.ai.goal.RandomStrollGoal;
 import net.minestom.server.entity.attribute.Attribute;
+import net.minestom.server.entity.attribute.AttributeInstance;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.timer.TaskSchedule;
@@ -39,12 +40,12 @@ public record MobSpawner(Instance instance) {
         mob.addAIGroup(List.of(new RandomStrollGoal(mob, 20)), List.of());
 
         // Set attributes
-        mob
-                .getAttribute(Attribute.MOVEMENT_SPEED)
-                .setBaseValue((double) Mobs.getMobSpeed(type) / 100);
-        mob
-                .getAttribute(Attribute.MAX_HEALTH)
-                .setBaseValue(Mobs.getMobHealth(type));
+        AttributeInstance speedAttr = mob.getAttribute(Attribute.MOVEMENT_SPEED);
+        speedAttr.setBaseValue((double) Mobs.getMobSpeed(type) / 100);
+
+        AttributeInstance healthAttr = mob.getAttribute(Attribute.MAX_HEALTH);
+        healthAttr.setBaseValue(Mobs.getMobHealth(type));
+        mob.setHealth((float) healthAttr.getBaseValue());
 
         // Spawn in instance
         mob
