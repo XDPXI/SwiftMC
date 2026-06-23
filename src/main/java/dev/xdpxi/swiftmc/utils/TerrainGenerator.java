@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TerrainGenerator implements net.minestom.server.instance.generator.Generator {
 
@@ -66,6 +67,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         }
 
         List<TreePos> trees = new ArrayList<>();
+        ThreadLocalRandom random = ThreadLocalRandom.current();
 
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
@@ -74,13 +76,9 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                 int height = smoothedHeightMap[x][z];
                 int dirtDepth = dirtDepth(worldX, worldZ);
 
-                for (int y = startY; y < endY; y++) {
-                    Block block = getBedrockOverride(y, worldX, worldZ);
-                    if (block == null) block = getBlockAt(y, height, x, z, worldX, worldZ, smoothedHeightMap, dirtDepth);
-                    if (block != null) unit.modifier().setBlock(worldX, y, worldZ, block);
-                }
+                generateColumn(unit, x, z, worldX, worldZ, height, dirtDepth, startY, endY, smoothedHeightMap);
 
-                if (height > WATER_LEVEL && Math.random() < profile.getTreeProbability(worldX, worldZ)
+                if (height > WATER_LEVEL && random.nextDouble() < profile.getTreeProbability(worldX, worldZ)
                         && x >= 2 && x <= 13 && z >= 2 && z <= 13
                         && !tooCloseToTree(trees, worldX, worldZ, 5)) {
                     trees.add(new TreePos(worldX, height, worldZ));
@@ -127,7 +125,8 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
     }
 
     private void placeOceanFloorVegetation(GenerationUnit unit, int worldX, int worldZ, int height) {
-        double roll = Math.random();
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        double roll = random.nextDouble();
         if (roll < 0.2) {
             unit.modifier().setBlock(worldX, height, worldZ, Block.SEAGRASS);
         } else if (roll < 0.25 && (WATER_LEVEL - 1) - height >= 1) {
@@ -136,7 +135,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         } else if (roll < 0.35) {
             int available = (WATER_LEVEL - 1) - height;
             if (available <= 0) return;
-            int gap = Math.min((int) (Math.random() * 6), available - 1);
+            int gap = Math.min(random.nextInt(6), available - 1);
             int kelpHeight = available - gap;
             for (int y = height; y < height + kelpHeight - 1; y++) {
                 unit.modifier().setBlock(worldX, y, worldZ, Block.KELP_PLANT);
@@ -172,48 +171,89 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         return 2 + (int) (Math.abs(h) % 4);
     }
 
-    private Block getBlockAt(int y, int height, int x, int z, int worldX, int worldZ, int[][] heightMap, int dirtDepth) {
-        if (y < height - 1 - dirtDepth) return getStoneOrDeepslate(y, worldX, worldZ);
-        if (y < height - 1) return Block.DIRT;
+    private void generateColumn(GenerationUnit unit, int x, int z, int worldX, int worldZ, int height,
+                                 int dirtDepth, int startY, int endY, int[][] heightMap) {
+        var modifier = unit.modifier();
 
-        if (y == height - 1) {
-            boolean nearWater = false;
-            for (int dx = -1; dx <= 1 && !nearWater; dx++) {
-                for (int dz = -1; dz <= 1; dz++) {
-                    int nx = x + dx;
-                    int nz = z + dz;
-                    if (nx < 0 || nx >= 16 || nz < 0 || nz >= 16) continue;
-                    if (heightMap[nx][nz] < WATER_LEVEL) {
-                        nearWater = true;
-                        break;
-                    }
-                }
+        int bedrockTop = BEDROCK_Y + BEDROCK_TRANSITION_HEIGHT;
+        int bedrockLoopEnd = Math.min(endY, bedrockTop + 1);
+        for (int y = Math.max(startY, BEDROCK_Y); y < bedrockLoopEnd; y++) {
+            Block block = getBedrockOverride(y, worldX, worldZ);
+            modifier.setBlock(worldX, y, worldZ, block != null ? block : Block.DEEPSLATE);
+        }
+
+        int dirtStart = height - 1 - dirtDepth;
+        int stoneStart = Math.max(startY, bedrockTop + 1);
+        int stoneEnd = Math.min(endY, dirtStart);
+
+        if (stoneStart < stoneEnd) {
+            int deepslateTransitionStart = DEEPSLATE_Y + 1;
+            int deepslateTransitionEnd = DEEPSLATE_Y + DEEPSLATE_TRANSITION_HEIGHT + 1;
+
+            int pureDeepslateEnd = Math.min(stoneEnd, deepslateTransitionStart);
+            for (int y = stoneStart; y < pureDeepslateEnd; y++) {
+                modifier.setBlock(worldX, y, worldZ, Block.DEEPSLATE);
             }
-            return nearWater ? Block.SAND : Block.GRASS_BLOCK;
+
+            int transitionStart = Math.max(stoneStart, deepslateTransitionStart);
+            int transitionEnd = Math.min(stoneEnd, deepslateTransitionEnd);
+            for (int y = transitionStart; y < transitionEnd; y++) {
+                modifier.setBlock(worldX, y, worldZ, getStoneOrDeepslate(y, worldX, worldZ));
+            }
+
+            int pureStoneStart = Math.max(stoneStart, deepslateTransitionEnd);
+            for (int y = pureStoneStart; y < stoneEnd; y++) {
+                modifier.setBlock(worldX, y, worldZ, Block.STONE);
+            }
         }
 
-        if (y < WATER_LEVEL) {
-            return Block.WATER;
+        int dirtFillStart = Math.max(startY, dirtStart);
+        int dirtFillEnd = Math.min(endY, height - 1);
+        for (int y = dirtFillStart; y < dirtFillEnd; y++) {
+            modifier.setBlock(worldX, y, worldZ, Block.DIRT);
         }
 
-        return null;
+        int topY = height - 1;
+        if (topY >= startY && topY < endY) {
+            Block top = isNearWater(x, z, heightMap) ? Block.SAND : Block.GRASS_BLOCK;
+            modifier.setBlock(worldX, topY, worldZ, top);
+        }
+
+        int waterStart = Math.max(startY, height);
+        int waterEnd = Math.min(endY, WATER_LEVEL);
+        for (int y = waterStart; y < waterEnd; y++) {
+            modifier.setBlock(worldX, y, worldZ, Block.WATER);
+        }
+    }
+
+    private boolean isNearWater(int x, int z, int[][] heightMap) {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                int nx = x + dx;
+                int nz = z + dz;
+                if (nx < 0 || nx >= 16 || nz < 0 || nz >= 16) continue;
+                if (heightMap[nx][nz] < WATER_LEVEL) return true;
+            }
+        }
+        return false;
     }
 
     private void placeOreVeins(GenerationUnit unit, int baseX, int baseZ, int startY, int endY, int[][] smoothedHeightMap) {
+        ThreadLocalRandom random = ThreadLocalRandom.current();
         for (Ore ore : Ore.values()) {
             for (int i = 0; i < ore.attemptsPerChunk; i++) {
-                if (Math.random() >= ore.chancePerAttempt) continue;
+                if (random.nextDouble() >= ore.chancePerAttempt) continue;
 
-                int x = (int) (Math.random() * 16);
-                int z = (int) (Math.random() * 16);
+                int x = random.nextInt(16);
+                int z = random.nextInt(16);
                 int worldX = baseX + x;
                 int worldZ = baseZ + z;
                 int dirtDepth = dirtDepth(worldX, worldZ);
                 int maxStoneY = Math.min(endY - 1, smoothedHeightMap[x][z] - 2 - dirtDepth);
                 if (maxStoneY < startY) continue;
 
-                int y = startY + (int) (Math.random() * (maxStoneY - startY + 1));
-                int goal = 1 + (int) (Math.random() * ore.maxVeinSize);
+                int y = startY + random.nextInt(maxStoneY - startY + 1);
+                int goal = 1 + random.nextInt(ore.maxVeinSize);
                 growOreVein(unit, baseX, baseZ, startY, endY, smoothedHeightMap, x, y, z, goal, ore);
             }
         }
@@ -224,6 +264,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                               int goal, Ore ore) {
         int[][] dirs = {{1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {0, 0, 1}, {0, 0, -1}};
 
+        ThreadLocalRandom random = ThreadLocalRandom.current();
         Set<Long> visited = new HashSet<>();
         List<int[]> frontier = new ArrayList<>();
         int[] seed = {startX, startVeinY, startZ};
@@ -234,8 +275,8 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
 
         int maxAttempts = goal * 20;
         while (placed < goal && !frontier.isEmpty() && maxAttempts-- > 0) {
-            int[] cur = frontier.get((int) (Math.random() * frontier.size()));
-            int[] dir = dirs[(int) (Math.random() * dirs.length)];
+            int[] cur = frontier.get(random.nextInt(frontier.size()));
+            int[] dir = dirs[random.nextInt(dirs.length)];
             int nx = cur[0] + dir[0];
             int ny = cur[1] + dir[1];
             int nz = cur[2] + dir[2];
