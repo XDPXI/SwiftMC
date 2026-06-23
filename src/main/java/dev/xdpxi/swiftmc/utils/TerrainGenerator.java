@@ -12,13 +12,18 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
     private static final int WATER_LEVEL = 52;
 
     private final TerrainProfile profile;
+    private final long seed;
+    private final boolean cinematic;
 
     public TerrainGenerator() {
-        long seed = Main.config.seed;
+        this.seed = Main.config.seed;
+        long seed = this.seed;
         String style = Main.config.terrainStyle;
         if ("cinematic".equalsIgnoreCase(style)) {
             this.profile = new CinematicTerrainProfile(seed);
+            this.cinematic = true;
         } else {
+            this.cinematic = false;
             if (!"minecraft".equalsIgnoreCase(style)) {
                 Log.warn("Unknown terrainStyle '" + style + "', falling back to 'minecraft'");
             }
@@ -68,9 +73,10 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                 int worldX = baseX + x;
                 int worldZ = baseZ + z;
                 int height = smoothedHeightMap[x][z];
+                int dirtDepth = cinematic ? dirtDepth(worldX, worldZ) : 2;
 
                 for (int y = startY; y < endY; y++) {
-                    Block block = getBlockAt(y, height, x, z, smoothedHeightMap);
+                    Block block = getBlockAt(y, height, x, z, smoothedHeightMap, dirtDepth);
                     if (block != null) unit.modifier().setBlock(worldX, y, worldZ, block);
                 }
 
@@ -114,8 +120,15 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         }
     }
 
-    private Block getBlockAt(int y, int height, int x, int z, int[][] heightMap) {
-        if (y < height - 3) return Block.STONE;
+    private int dirtDepth(int worldX, int worldZ) {
+        long h = seed ^ (worldX * 374761393L) ^ (worldZ * 668265263L);
+        h = (h ^ (h >>> 13)) * 1274126177L;
+        h = h ^ (h >>> 16);
+        return 2 + (int) (Math.abs(h) % 4);
+    }
+
+    private Block getBlockAt(int y, int height, int x, int z, int[][] heightMap, int dirtDepth) {
+        if (y < height - 1 - dirtDepth) return Block.STONE;
         if (y < height - 1) return Block.DIRT;
 
         if (y == height - 1) {
