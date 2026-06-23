@@ -51,6 +51,7 @@ tasks {
         dependsOn gradle.includedBuild('simple-voice-chat-minestom').task(':jar')
         manifest {
             attributes["Main-Class"] = "dev.xdpxi.swiftmc.Main"
+            attributes["Enable-Native-Access"] = "ALL-UNNAMED"
         }
         mergeServiceFiles()
         archiveClassifier.set("")
@@ -58,6 +59,7 @@ tasks {
 
     test {
         useJUnitPlatform()
+        jvmArgs '--enable-native-access=ALL-UNNAMED'
     }
 
     build {
