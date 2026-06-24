@@ -11,7 +11,7 @@ import dev.xdpxi.swiftmc.player.PlayerDataManager;
 import dev.xdpxi.swiftmc.plugin.PluginManager;
 import dev.xdpxi.swiftmc.utils.Config;
 import dev.xdpxi.swiftmc.utils.Log;
-import dev.xdpxi.swiftmc.utils.TerrainGenerator;
+import dev.xdpxi.swiftmc.terrain.TerrainGenerator;
 import io.github.togar2.fluids.MinestomFluids;
 import io.github.togar2.pvp.MinestomPvP;
 import io.github.togar2.pvp.feature.CombatFeatureSet;
@@ -26,7 +26,6 @@ import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.LightingChunk;
 import org.jspecify.annotations.NonNull;
 
-import java.awt.*;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;

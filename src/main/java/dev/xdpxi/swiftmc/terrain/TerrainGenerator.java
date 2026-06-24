@@ -1,6 +1,7 @@
-package dev.xdpxi.swiftmc.utils;
+package dev.xdpxi.swiftmc.terrain;
 
 import dev.xdpxi.swiftmc.Main;
+import dev.xdpxi.swiftmc.utils.FastNoise;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.generator.GenerationUnit;
 import org.jspecify.annotations.NonNull;

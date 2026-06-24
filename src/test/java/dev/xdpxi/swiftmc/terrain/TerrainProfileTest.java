@@ -1,4 +1,4 @@
-package dev.xdpxi.swiftmc.utils;
+package dev.xdpxi.swiftmc.terrain;
 
 import org.junit.jupiter.api.Test;
 

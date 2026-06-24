@@ -1,4 +1,6 @@
-package dev.xdpxi.swiftmc.utils;
+package dev.xdpxi.swiftmc.terrain;
+
+import dev.xdpxi.swiftmc.utils.FastNoise;
 
 public class TerrainProfile {
 

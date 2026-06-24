@@ -58,7 +58,6 @@
 
 Credits to the following projects, without them this wouldn't be possible:
 
-- [MobMind by Kanelucky](https://github.com/Kanelucky/MobMind)
 - [MinestomPVP by TogAr2](https://github.com/TogAr2/MinestomPvP)
 - [MinestomFluids by TogAr2](https://github.com/TogAr2/MinestomFluids)
 - [Polar by Hollow Cube](https://github.com/hollow-cube/polar) 
