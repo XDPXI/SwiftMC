@@ -43,3 +43,4 @@ bin/
 /.idea
 RELEASE.md
 *.java~
+/logs
