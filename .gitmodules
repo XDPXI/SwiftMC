@@ -5,3 +5,6 @@
 	path = libs/simple-voice-chat-minestom
 	url = https://github.com/fractalmicrosystems/simple-voice-chat-minestom.git
 	branch = feature/update-minestom-2026.06.05-26.1.2
+[submodule "libs/ParticleEmitter"]
+	path = libs/ParticleEmitter
+	url = https://github.com/XDPXI/ParticleEmitter-26.1.2.git

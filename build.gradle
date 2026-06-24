@@ -21,6 +21,7 @@ dependencies {
 
     implementation 'io.github.togar2:MinestomFluids'
     implementation 'dev.lu15:simple-voice-chat-minestom:0.2.0-SNAPSHOT'
+    implementation 'net.worldseed.particleemitter:ParticleEmitter:1.4.1'
 
     testImplementation platform('org.junit:junit-bom:6.1.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -48,6 +49,7 @@ tasks {
     shadowJar {
         dependsOn gradle.includedBuild('MinestomFluids').task(':jar')
         dependsOn gradle.includedBuild('simple-voice-chat-minestom').task(':jar')
+        dependsOn gradle.includedBuild('ParticleEmitter').task(':jar')
         manifest {
             attributes["Main-Class"] = "dev.xdpxi.swiftmc.Main"
             attributes["Enable-Native-Access"] = "ALL-UNNAMED"

@@ -12,4 +12,11 @@ includeBuild('libs/simple-voice-chat-minestom') {
     }
 }
 
+includeBuild('libs/ParticleEmitter') {
+    dependencySubstitution {
+        substitute(module('net.worldseed.particleemitter:ParticleEmitter'))
+                .using(project(':'))
+    }
+}
+
 rootProject.name = 'SwiftMC'
