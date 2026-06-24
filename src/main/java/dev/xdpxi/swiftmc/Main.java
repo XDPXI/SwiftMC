@@ -43,22 +43,12 @@ public class Main {
     private static volatile boolean isShuttingDown = false;
 
     static void main(String @NonNull [] args) {
-        boolean fromGui = args.length > 0 && args[0].equals("--nogui");
-
-        if (
-                !fromGui &&
-                        System.console() == null &&
-                        !GraphicsEnvironment.isHeadless()
-        ) {
-            GUI.launch();
-        } else {
-            try {
-                server();
-            } catch (Exception e) {
-                Log.error("Failed to start server: " + e.getMessage());
-                e.printStackTrace();
-                System.exit(1);
-            }
+        try {
+            server();
+        } catch (Exception e) {
+            Log.error("Failed to start server: " + e.getMessage());
+            e.printStackTrace();
+            System.exit(1);
         }
     }
 
