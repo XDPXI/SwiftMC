@@ -7,7 +7,7 @@
 
 ---
 
-## 🧱 Features
+## Features
 
 - ⚡ **Fast:** Powered by Minestom and optimized for performance, SwiftMC delivers exceptional tick rates, low latency,
   and smooth gameplay even under heavy player loads.
@@ -18,7 +18,7 @@
 
 ---
 
-## 🚀 Building from Source
+## Building from Source
 
 ### Requirements
 
@@ -40,7 +40,7 @@
 
 ---
 
-## ⚙️ Usage
+## Usage
 
 ### Requirements
 
@@ -51,5 +51,18 @@
 
 1. Download the latest release from [Releases](https://github.com/XDPXI/SwiftMC/releases) or build from source
 2. Run the JAR file (the server starts on port `25565` by default)
+
+---
+
+## Credits
+
+Credits to the following projects, without them this wouldn't be possible:
+
+- [MobMind by Kanelucky](https://github.com/Kanelucky/MobMind)
+- [MinestomPVP by TogAr2](https://github.com/TogAr2/MinestomPvP)
+- [MinestomFluids by TogAr2](https://github.com/TogAr2/MinestomFluids)
+- [Polar by Hollow Cube](https://github.com/hollow-cube/polar) 
+- [Simple Voice Chat Minestom by LooFifteen](https://github.com/LooFifteen/simple-voice-chat-minestom)
+- [ParticleEmitter by Atlas Engine](https://github.com/AtlasEngineCa/ParticleEmitter)
 
 ---
