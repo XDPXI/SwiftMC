@@ -11,6 +11,9 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
 import static dev.xdpxi.swiftmc.Main.config;
@@ -27,6 +30,12 @@ public class Log {
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter FILE_TIME_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+
+    private static final ExecutorService WRITER = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "Log-Writer");
+        t.setDaemon(true);
+        return t;
+    });
 
     private static BufferedWriter fileWriter;
     private static Path logFilePath;
@@ -69,7 +78,7 @@ public class Log {
         );
     }
 
-    private static void write(String formattedMessage) {
+    private static void writeNow(String formattedMessage) {
         System.out.print(formattedMessage);
         try {
             if (fileWriter != null) {
@@ -85,6 +94,10 @@ public class Log {
             );
             e.printStackTrace();
         }
+    }
+
+    private static void write(String formattedMessage) {
+        WRITER.submit(() -> writeNow(formattedMessage));
     }
 
     public static void debug(String message, Object... args) {
@@ -108,25 +121,50 @@ public class Log {
             String message,
             Object... args
     ) {
-        write(formatMessage(RED, message, args));
-        throwable.printStackTrace(System.err);
-        try {
-            if (fileWriter != null) {
-                throwable.printStackTrace();
-                fileWriter.flush();
+        String formatted = formatMessage(RED, message, args);
+        WRITER.submit(() -> {
+            writeNow(formatted);
+            throwable.printStackTrace(System.err);
+            try {
+                if (fileWriter != null) {
+                    throwable.printStackTrace();
+                    fileWriter.flush();
+                }
+            } catch (IOException e) {
+                System.err.println(
+                        RED +
+                                "Failed to write throwable to log file: " +
+                                e.getMessage() +
+                                RESET
+                );
             }
-        } catch (IOException e) {
-            System.err.println(
-                    RED +
-                            "Failed to write throwable to log file: " +
-                            e.getMessage() +
-                            RESET
-            );
+        });
+    }
+
+    /**
+     * Blocks until all previously submitted log writes have been processed.
+     */
+    private static void awaitDrain() {
+        try {
+            WRITER.submit(() -> {}).get();
+        } catch (Exception ignored) {
+            // best-effort drain
         }
     }
 
     public static void close() {
         if (fileWriter == null) return;
+
+        awaitDrain();
+        WRITER.shutdown();
+        try {
+            if (!WRITER.awaitTermination(5, TimeUnit.SECONDS)) {
+                WRITER.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         try {
             fileWriter.close();
 
