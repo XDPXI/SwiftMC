@@ -25,6 +25,7 @@ import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.LightingChunk;
 import org.jspecify.annotations.NonNull;
+import rocks.minestom.placement.Registrations;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -138,15 +139,25 @@ public class Main {
             e.printStackTrace();
         }
 
+        // Init Simple Voice Chat Minestom
         try {
             if (config.simpleVoiceChat) {
-                VoiceChat voiceChat = VoiceChat.builder("0.0.0.0", config.port).enable();
+                VoiceChat.builder("0.0.0.0", config.port).enable();
                 Log.info("Simple Voice Chat initialized successfully.");
             }
         } catch (Exception e) {
             Log.error(
                     "Simple Voice Chat initialization failed: " + e.getMessage()
             );
+            e.printStackTrace();
+        }
+
+        // Init Block Placement Rules
+        try {
+            Registrations.registerAllVanilla(MinecraftServer.getBlockManager());
+            Log.info("Block Placement Rules initialized successfully.");
+        } catch (Exception e) {
+            Log.error("Block Placement Rules initialization failed: " + e.getMessage());
             e.printStackTrace();
         }
 

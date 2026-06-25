@@ -63,5 +63,6 @@ Credits to the following projects, without them this wouldn't be possible:
 - [Polar by Hollow Cube](https://github.com/hollow-cube/polar) 
 - [Simple Voice Chat Minestom by LooFifteen](https://github.com/LooFifteen/simple-voice-chat-minestom)
 - [ParticleEmitter by Atlas Engine](https://github.com/AtlasEngineCa/ParticleEmitter)
+- [Placement by Vibenilla](https://github.com/vibenilla/placement)
 
 ---
