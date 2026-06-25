@@ -1,10 +1,14 @@
 plugins {
     id 'java'
+    id 'maven-publish'
     id 'com.gradleup.shadow' version '9.4.2'
+    id 'co.uzzu.dotenv.gradle' version '4.0.0'
 }
 
 group = 'dev.xdpxi'
-version = '1.0.0-SNAPSHOT'
+version = System.getenv("VERSION") ?: '1.0.0-SNAPSHOT'
+
+def isSnapshot = (System.getenv("SNAPSHOT") ?: "false").toBoolean()
 
 repositories {
     mavenCentral()
@@ -47,10 +51,6 @@ tasks {
         enabled = false
     }
 
-    build {
-        dependsOn(shadowJar)
-    }
-
     shadowJar {
         dependsOn gradle.includedBuild('MinestomFluids').task(':jar')
         dependsOn gradle.includedBuild('simple-voice-chat-minestom').task(':jar')
@@ -70,5 +70,36 @@ tasks {
 
     build {
         dependsOn(javadocJar, sourcesJar)
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact tasks.shadowJar
+            artifact tasks.sourcesJar
+            artifact tasks.javadocJar
+
+            groupId = 'dev.xdpxi' as Publication
+            artifactId = 'swiftmc' as Publication
+            version = project.version
+        }
+    }
+
+    repositories {
+        maven {
+            name = isSnapshot ? "xdpxi-snapshots" : "xdpxi-releases"
+
+            url = uri(
+                    isSnapshot
+                            ? "https://maven.xdpxi.net/snapshots"
+                            : "https://maven.xdpxi.net/releases"
+            )
+
+            credentials {
+                username = env.REPOSILITE_USER ?: ''
+                password = env.REPOSILITE_TOKEN ?: ''
+            }
+        }
     }
 }
