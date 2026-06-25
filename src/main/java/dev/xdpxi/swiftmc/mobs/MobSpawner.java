@@ -30,6 +30,7 @@ public record MobSpawner(Instance instance) {
     private static final int GROUP_MAX = 4;
     private static final int MIN_SPAWN_DISTANCE = 24; // blocks away from player
     private static final int MAX_SPAWN_DISTANCE = 64; // blocks away from player
+    private static final int DESPAWN_DELAY_SECONDS = 60 * 3; // naturally spawned mobs despawn after 3 minutes
     private static final List<EntityCreature> spawnedMobs = Collections.synchronizedList(new ArrayList<>());
 
     @Contract(value = " -> new", pure = true)
@@ -40,6 +41,10 @@ public record MobSpawner(Instance instance) {
     }
 
     public static void spawnMob(EntityType type, Pos pos) {
+        spawnMob(type, pos, false);
+    }
+
+    private static void spawnMob(EntityType type, Pos pos, boolean natural) {
         EntityCreature mob = new EntityCreature(type);
 
         // Add AI
@@ -68,6 +73,22 @@ public record MobSpawner(Instance instance) {
                                     ", " +
                                     pos.blockZ()
                     );
+
+                    if (natural) {
+                        MinecraftServer.getSchedulerManager().buildTask(() -> {
+                            if (!mob.isRemoved()) {
+                                mob.remove();
+                                spawnedMobs.remove(mob);
+                                Log.debug(
+                                        "Despawned " +
+                                                type.name() +
+                                                " after " +
+                                                DESPAWN_DELAY_SECONDS +
+                                                " seconds"
+                                );
+                            }
+                        }).delay(TaskSchedule.seconds(DESPAWN_DELAY_SECONDS)).schedule();
+                    }
                 });
     }
 
@@ -144,7 +165,7 @@ public record MobSpawner(Instance instance) {
                 double offsetZ = ThreadLocalRandom.current().nextDouble(-3, 3);
                 Pos spawnPos = groupCenter.add(offsetX, 0, offsetZ);
                 if (isValidSpawnLocation(spawnPos)) {
-                    spawnMob(mobType, spawnPos);
+                    spawnMob(mobType, spawnPos, true);
                 }
             }
         }
