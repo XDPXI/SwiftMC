@@ -29,6 +29,11 @@ import org.jspecify.annotations.NonNull;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class Main {
 
@@ -303,21 +308,27 @@ public class Main {
         Log.info("Server is shutting down!");
 
         // Save all player data
-        MinecraftServer.getConnectionManager()
-                .getOnlinePlayers()
-                .forEach(player -> {
-                    try {
-                        PlayerDataManager.savePlayer(player);
-                        Log.info("Saved data for " + player.getUsername());
-                    } catch (Exception e) {
-                        Log.error(
-                                "Failed to save data for " +
-                                        player.getUsername() +
-                                        ": " +
-                                        e.getMessage()
-                        );
-                    }
-                });
+        List<CompletableFuture<Void>> saveFutures = new ArrayList<>();
+        for (var player : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
+            String username = player.getUsername();
+            saveFutures.add(
+                    PlayerDataManager.savePlayer(player)
+                            .thenRun(() -> Log.info("Saved data for " + username))
+                            .exceptionally(e -> {
+                                Log.error("Failed to save data for " + username + ": " + e.getMessage());
+                                return null;
+                            })
+            );
+        }
+        try {
+            CompletableFuture.allOf(saveFutures.toArray(new CompletableFuture[0]))
+                    .get(30, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            Log.error("Timed out waiting for all player data to save after 30 seconds.");
+        } catch (Exception e) {
+            Log.error("Error while waiting for player data saves: " + e.getMessage());
+        }
+        PlayerDataManager.shutdownExecutor();
 
         // Disable plugins
         if (pluginManager != null) {
