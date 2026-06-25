@@ -79,8 +79,8 @@ publishing {
             artifact tasks.sourcesJar
             artifact tasks.javadocJar
 
-            groupId = 'dev.xdpxi' as Publication
-            artifactId = 'swiftmc' as Publication
+            groupId = 'dev.xdpxi'
+            artifactId = 'swiftmc'
             version = project.version
         }
     }
