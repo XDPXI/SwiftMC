@@ -34,13 +34,6 @@ jobs:
         env:
           GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true"
 
-      - name: Capture build artifacts
-        uses: actions/upload-artifact@v5
-        continue-on-error: true
-        with:
-          name: Artifacts
-          path: build/libs/
-
   publish:
     needs: build
     runs-on: ubuntu-latest
