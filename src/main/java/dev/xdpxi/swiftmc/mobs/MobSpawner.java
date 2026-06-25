@@ -17,6 +17,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -29,11 +30,13 @@ public record MobSpawner(Instance instance) {
     private static final int GROUP_MAX = 4;
     private static final int MIN_SPAWN_DISTANCE = 24; // blocks away from player
     private static final int MAX_SPAWN_DISTANCE = 64; // blocks away from player
-    private static final List<EntityCreature> spawnedMobs = new ArrayList<>();
+    private static final List<EntityCreature> spawnedMobs = Collections.synchronizedList(new ArrayList<>());
 
     @Contract(value = " -> new", pure = true)
     static @NonNull List<EntityCreature> getSpawnedMobs() {
-        return new ArrayList<>(spawnedMobs);
+        synchronized (spawnedMobs) {
+            return new ArrayList<>(spawnedMobs);
+        }
     }
 
     public static void spawnMob(EntityType type, Pos pos) {
@@ -77,22 +80,27 @@ public record MobSpawner(Instance instance) {
     }
 
     private void trySpawnMobs() {
-        // Clean up removed/inactive mobs
-        spawnedMobs.removeIf(mob -> mob.isRemoved() || !mob.isActive());
+        long chickenCount;
+        long cowCount;
+        long pigCount;
+        synchronized (spawnedMobs) {
+            // Clean up removed/inactive mobs
+            spawnedMobs.removeIf(mob -> mob.isRemoved() || !mob.isActive());
 
-        // Count mobs by type
-        long chickenCount = spawnedMobs
-                .stream()
-                .filter(mob -> mob.getEntityType() == EntityType.CHICKEN)
-                .count();
-        long cowCount = spawnedMobs
-                .stream()
-                .filter(mob -> mob.getEntityType() == EntityType.COW)
-                .count();
-        long pigCount = spawnedMobs
-                .stream()
-                .filter(mob -> mob.getEntityType() == EntityType.PIG)
-                .count();
+            // Count mobs by type
+            chickenCount = spawnedMobs
+                    .stream()
+                    .filter(mob -> mob.getEntityType() == EntityType.CHICKEN)
+                    .count();
+            cowCount = spawnedMobs
+                    .stream()
+                    .filter(mob -> mob.getEntityType() == EntityType.COW)
+                    .count();
+            pigCount = spawnedMobs
+                    .stream()
+                    .filter(mob -> mob.getEntityType() == EntityType.PIG)
+                    .count();
+        }
 
         for (int i = 0; i < SPAWN_ATTEMPTS_PER_TICK; i++) {
             EntityType mobType = getRandomMobType();
