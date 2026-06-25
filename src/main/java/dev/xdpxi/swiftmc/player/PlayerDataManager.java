@@ -10,6 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PlayerDataManager {
 
@@ -17,6 +20,7 @@ public class PlayerDataManager {
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
             .create();
+    private static final ExecutorService IO_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
 
     static {
         try {
@@ -28,25 +32,26 @@ public class PlayerDataManager {
         }
     }
 
-    public static void savePlayer(Player player) {
-        try {
-            PlayerData data = new PlayerData(player);
-            UUID uuid = player.getUuid();
-            Path file = PLAYER_FOLDER.resolve(uuid + ".json");
-            Files.writeString(file, GSON.toJson(data));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static CompletableFuture<Void> savePlayer(Player player) {
+        PlayerData data = new PlayerData(player);
+        return saveDataAsync(player.getUuid(), data);
+    }
+
+    static CompletableFuture<Void> saveDataAsync(UUID uuid, PlayerData data) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                Path file = PLAYER_FOLDER.resolve(uuid + ".json");
+                Files.writeString(file, GSON.toJson(data));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }, IO_EXECUTOR);
     }
 
     public static void loadPlayer(@NonNull Player player) {
-        try {
-            UUID uuid = player.getUuid();
-            Path file = PLAYER_FOLDER.resolve(uuid + ".json");
-            if (!Files.exists(file)) return;
-
-            String json = Files.readString(file);
-            PlayerData data = GSON.fromJson(json, PlayerData.class);
+        UUID uuid = player.getUuid();
+        loadDataAsync(uuid).thenAccept(data -> {
+            if (data == null) return;
 
             // Schedule next tick
             player.scheduleNextTick(_ -> {
@@ -56,8 +61,25 @@ public class PlayerDataManager {
                 }
                 data.applyInventory(player);
             });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        });
+    }
+
+    static CompletableFuture<PlayerData> loadDataAsync(UUID uuid) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Path file = PLAYER_FOLDER.resolve(uuid + ".json");
+                if (!Files.exists(file)) return null;
+
+                String json = Files.readString(file);
+                return GSON.fromJson(json, PlayerData.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }, IO_EXECUTOR);
+    }
+
+    public static void shutdownExecutor() {
+        IO_EXECUTOR.shutdown();
     }
 }
