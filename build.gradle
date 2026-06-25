@@ -97,8 +97,8 @@ publishing {
             )
 
             credentials {
-                username = env.REPOSILITE_USER ?: ''
-                password = env.REPOSILITE_TOKEN ?: ''
+                username = env.fetch("REPOSILITE_USER") ?: ""
+                password = env.fetch("REPOSILITE_TOKEN") ?: ""
             }
         }
     }
