@@ -61,4 +61,9 @@ jobs:
           REPOSILITE_TOKEN: ${{ secrets.REPOSILITE_TOKEN }}
         run: |
           export VERSION=$(echo "$VERSION" | cut -c1-8)
-          ./gradlew publish --no-daemon
+          for i in 1 2 3; do
+            ./gradlew publish --no-daemon --no-configuration-cache \
+              -Dorg.gradle.internal.http.socketTimeout=120000 \
+              -Dorg.gradle.internal.http.connectionTimeout=120000 \
+              && break || { echo "Attempt $i failed, retrying..."; sleep 10; }
+          done
