@@ -7,6 +7,7 @@ import net.minestom.server.command.ConsoleSender;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.command.builder.arguments.ArgumentType;
+import net.minestom.server.command.builder.suggestion.SuggestionEntry;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 
@@ -16,7 +17,12 @@ public class Gamemode extends Command {
         super("gamemode", "gm");
 
         var modeArg = ArgumentType.Enum("mode", GameModeArg.class)
-                .setFormat(ArgumentEnum.Format.LOWER_CASED);
+                .setFormat(ArgumentEnum.Format.LOWER_CASED)
+                .setSuggestionCallback((sender, context, suggestion) -> {
+                    for (GameModeArg value : GameModeArg.values()) {
+                        suggestion.addEntry(new SuggestionEntry(value.name().toLowerCase()));
+                    }
+                });
 
         setCondition((sender, cmd) ->
                 sender instanceof ConsoleSender || (sender instanceof Player p && p.getPermissionLevel() >= 2)

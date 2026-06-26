@@ -4,9 +4,11 @@ import dev.xdpxi.swiftmc.player.PlayerDataManager;
 import dev.xdpxi.swiftmc.utils.Log;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.ConsoleSender;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentType;
+import net.minestom.server.command.builder.suggestion.SuggestionEntry;
 import net.minestom.server.entity.Player;
 
 public class Deop extends Command {
@@ -14,7 +16,14 @@ public class Deop extends Command {
     public Deop() {
         super("deop");
 
-        var nameArg = ArgumentType.Word("player");
+        var nameArg = ArgumentType.Word("player")
+                .setSuggestionCallback((sender, context, suggestion) -> {
+                    for (Player online : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
+                        if (online.getPermissionLevel() >= 4) {
+                            suggestion.addEntry(new SuggestionEntry(online.getUsername()));
+                        }
+                    }
+                });
 
         setCondition((sender, cmd) ->
                 sender instanceof ConsoleSender || (sender instanceof Player p && p.getPermissionLevel() >= 4)
