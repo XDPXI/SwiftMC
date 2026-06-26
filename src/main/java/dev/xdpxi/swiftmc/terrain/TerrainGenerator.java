@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TerrainGenerator implements net.minestom.server.instance.generator.Generator {
@@ -19,18 +20,21 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
     private static final int BEDROCK_TRANSITION_HEIGHT = 5;
     private static final int DEEPSLATE_Y = -5;
     private static final int DEEPSLATE_TRANSITION_HEIGHT = 5;
-
+    private static Semaphore GENERATION_SEMAPHORE = new Semaphore(Math.max(1, Runtime.getRuntime().availableProcessors() - 1));
     private final TerrainProfile profile;
     private final long seed;
     private final FastNoise bedrockNoise;
     private final FastNoise deepslateNoise;
-
     public TerrainGenerator() {
         this.seed = Main.config.seed;
         long seed = this.seed;
         this.profile = new TerrainProfile(seed);
         this.bedrockNoise = new FastNoise(seed + 6);
         this.deepslateNoise = new FastNoise(seed + 7);
+    }
+
+    public static void init(int threads) {
+        GENERATION_SEMAPHORE = new Semaphore(Math.max(1, threads));
     }
 
     private static boolean tooCloseToTree(@NonNull List<TreePos> trees, int x, int z, int minDist) {
@@ -46,75 +50,80 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
 
     @Override
     public void generate(@NonNull GenerationUnit unit) {
-        int baseX = unit.absoluteStart().blockX();
-        int baseZ = unit.absoluteStart().blockZ();
-        int startY = unit.absoluteStart().blockY();
-        int endY = unit.absoluteEnd().blockY();
+        GENERATION_SEMAPHORE.acquireUninterruptibly();
+        try {
+            int baseX = unit.absoluteStart().blockX();
+            int baseZ = unit.absoluteStart().blockZ();
+            int startY = unit.absoluteStart().blockY();
+            int endY = unit.absoluteEnd().blockY();
 
-        int[][] heightMap = new int[18][18];
-        for (int x = -1; x < 17; x++) {
-            for (int z = -1; z < 17; z++) {
-                int h = profile.getHeight(baseX + x, baseZ + z);
-                heightMap[x + 1][z + 1] = Math.max(startY, Math.min(endY - 1, h));
+            int[][] heightMap = new int[18][18];
+            for (int x = -1; x < 17; x++) {
+                for (int z = -1; z < 17; z++) {
+                    int h = profile.getHeight(baseX + x, baseZ + z);
+                    heightMap[x + 1][z + 1] = Math.max(startY, Math.min(endY - 1, h));
+                }
             }
-        }
 
-        int[][] smoothedHeightMap = new int[16][16];
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                int sum = 0;
-                for (int dx = -1; dx <= 1; dx++) {
-                    for (int dz = -1; dz <= 1; dz++) {
-                        sum += heightMap[x + dx + 1][z + dz + 1];
+            int[][] smoothedHeightMap = new int[16][16];
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    int sum = 0;
+                    for (int dx = -1; dx <= 1; dx++) {
+                        for (int dz = -1; dz <= 1; dz++) {
+                            sum += heightMap[x + dx + 1][z + dz + 1];
+                        }
+                    }
+                    smoothedHeightMap[x][z] = sum / 9;
+                }
+            }
+
+            // Precompute per-column values to avoid redundant noise/hash calls inside loops
+            int[][] dirtDepths = new int[16][16];
+            double[][] bedrockNCache = new double[16][16];
+            double[][] deepslateNCache = new double[16][16];
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    int wx = baseX + x;
+                    int wz = baseZ + z;
+                    dirtDepths[x][z] = dirtDepth(wx, wz);
+                    bedrockNCache[x][z] = (bedrockNoise.get(wx * 0.4, wz * 0.4) + 1.0) / 2.0;
+                    deepslateNCache[x][z] = (deepslateNoise.get(wx * 0.4, wz * 0.4) + 1.0) / 2.0;
+                }
+            }
+
+            List<TreePos> trees = new ArrayList<>();
+            ThreadLocalRandom random = ThreadLocalRandom.current();
+
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    int worldX = baseX + x;
+                    int worldZ = baseZ + z;
+                    int height = smoothedHeightMap[x][z];
+
+                    generateColumn(unit, x, z, worldX, worldZ, height, dirtDepths[x][z], startY, endY,
+                            smoothedHeightMap, bedrockNCache[x][z], deepslateNCache[x][z]);
+
+                    if (height > WATER_LEVEL && random.nextDouble() < profile.getTreeProbability(worldX, worldZ)
+                            && x >= 2 && x <= 13 && z >= 2 && z <= 13
+                            && !tooCloseToTree(trees, worldX, worldZ, 5)) {
+                        trees.add(new TreePos(worldX, height, worldZ));
+                    }
+
+                    if (height < WATER_LEVEL) {
+                        placeOceanFloorVegetation(unit, worldX, worldZ, height);
                     }
                 }
-                smoothedHeightMap[x][z] = sum / 9;
             }
-        }
 
-        // Precompute per-column values to avoid redundant noise/hash calls inside loops
-        int[][] dirtDepths = new int[16][16];
-        double[][] bedrockNCache = new double[16][16];
-        double[][] deepslateNCache = new double[16][16];
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                int wx = baseX + x;
-                int wz = baseZ + z;
-                dirtDepths[x][z] = dirtDepth(wx, wz);
-                bedrockNCache[x][z] = (bedrockNoise.get(wx * 0.4, wz * 0.4) + 1.0) / 2.0;
-                deepslateNCache[x][z] = (deepslateNoise.get(wx * 0.4, wz * 0.4) + 1.0) / 2.0;
+            for (TreePos tree : trees) {
+                placeTree(unit, tree.x, tree.y, tree.z);
             }
+
+            placeOreVeins(unit, baseX, baseZ, startY, endY, smoothedHeightMap, dirtDepths);
+        } finally {
+            GENERATION_SEMAPHORE.release();
         }
-
-        List<TreePos> trees = new ArrayList<>();
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                int worldX = baseX + x;
-                int worldZ = baseZ + z;
-                int height = smoothedHeightMap[x][z];
-
-                generateColumn(unit, x, z, worldX, worldZ, height, dirtDepths[x][z], startY, endY,
-                        smoothedHeightMap, bedrockNCache[x][z], deepslateNCache[x][z]);
-
-                if (height > WATER_LEVEL && random.nextDouble() < profile.getTreeProbability(worldX, worldZ)
-                        && x >= 2 && x <= 13 && z >= 2 && z <= 13
-                        && !tooCloseToTree(trees, worldX, worldZ, 5)) {
-                    trees.add(new TreePos(worldX, height, worldZ));
-                }
-
-                if (height < WATER_LEVEL) {
-                    placeOceanFloorVegetation(unit, worldX, worldZ, height);
-                }
-            }
-        }
-
-        for (TreePos tree : trees) {
-            placeTree(unit, tree.x, tree.y, tree.z);
-        }
-
-        placeOreVeins(unit, baseX, baseZ, startY, endY, smoothedHeightMap, dirtDepths);
     }
 
     private void placeTree(GenerationUnit unit, int worldX, int worldY, int worldZ) {

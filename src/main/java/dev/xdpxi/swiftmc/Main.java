@@ -9,9 +9,9 @@ import dev.xdpxi.swiftmc.events.*;
 import dev.xdpxi.swiftmc.mobs.MobSpawner;
 import dev.xdpxi.swiftmc.player.PlayerDataManager;
 import dev.xdpxi.swiftmc.plugin.PluginManager;
+import dev.xdpxi.swiftmc.terrain.TerrainGenerator;
 import dev.xdpxi.swiftmc.utils.Config;
 import dev.xdpxi.swiftmc.utils.Log;
-import dev.xdpxi.swiftmc.terrain.TerrainGenerator;
 import io.github.togar2.fluids.MinestomFluids;
 import io.github.togar2.pvp.MinestomPvP;
 import io.github.togar2.pvp.feature.CombatFeatureSet;
@@ -172,10 +172,12 @@ public class Main {
         polarFile = worldFolder.resolve("overworld.polar");
 
         polarLoader = new PolarLoader(polarFile);
+        polarLoader.setParallel(true);
         instanceContainer.setChunkLoader(polarLoader);
         Log.info("Polar world loader set for instance.");
 
         // Terrain Generator
+        TerrainGenerator.init(config.chunkGenerationThreads);
         instanceContainer.setGenerator(new TerrainGenerator());
         Log.info("Custom terrain generator applied.");
 
