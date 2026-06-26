@@ -1,11 +1,7 @@
 package dev.xdpxi.swiftmc;
 
 import dev.lu15.voicechat.VoiceChat;
-import dev.xdpxi.swiftmc.commands.Deop;
-import dev.xdpxi.swiftmc.commands.Gamemode;
-import dev.xdpxi.swiftmc.commands.Op;
-import dev.xdpxi.swiftmc.commands.Stop;
-import dev.xdpxi.swiftmc.commands.Teleport;
+import dev.xdpxi.swiftmc.commands.*;
 import dev.xdpxi.swiftmc.events.*;
 import dev.xdpxi.swiftmc.mobs.MobSpawner;
 import dev.xdpxi.swiftmc.player.PlayerDataManager;

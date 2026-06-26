@@ -25,6 +25,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
     private final long seed;
     private final FastNoise bedrockNoise;
     private final FastNoise deepslateNoise;
+
     public TerrainGenerator() {
         this.seed = Main.config.seed;
         long seed = this.seed;
