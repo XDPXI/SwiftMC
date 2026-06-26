@@ -64,6 +64,7 @@ public class PlayerDataManager {
                 }
                 data.applyInventory(player);
                 player.setPermissionLevel(data.op ? 4 : 0);
+                player.refreshCommands();
             });
         });
     }
@@ -99,6 +100,7 @@ public class PlayerDataManager {
                         for (Player online : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
                             if (online.getUsername().equalsIgnoreCase(username)) {
                                 online.setPermissionLevel(op ? 4 : 0);
+                                online.refreshCommands();
                                 break;
                             }
                         }
