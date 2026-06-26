@@ -12,7 +12,6 @@ def isSnapshot = (System.getenv("SNAPSHOT") ?: "false").toBoolean()
 repositories {
     mavenCentral()
     maven { url = "https://jitpack.io" }
-    maven { url = "https://central.sonatype.com/repository/maven-snapshots" }
 }
 
 dependencies {
@@ -21,7 +20,7 @@ dependencies {
     implementation 'org.yaml:snakeyaml:2.6'
     implementation 'it.unimi.dsi:fastutil:8.5.18'
 
-    implementation 'net.minestom:minestom:26_2-SNAPSHOT'
+    implementation 'net.minestom:minestom:2026.06.20-26.1.2'
 
     implementation 'io.github.togar2:MinestomPvP:2026.05.30-26.1.1'
     implementation 'dev.hollowcube:polar:1.16.0'
