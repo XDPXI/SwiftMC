@@ -2,9 +2,11 @@ name: Build and Test
 
 on:
   push:
+  pull_request:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   build:
@@ -67,3 +69,23 @@ jobs:
               -Dorg.gradle.internal.http.connectionTimeout=120000 \
               && break || { echo "Attempt $i failed, retrying..."; sleep 10; }
           done
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(echo "${{ github.sha }}" | cut -c1-8)
+          gh pr comment ${{ github.event.pull_request.number }} --body "### Snapshot Published :rocket:
+
+          **Add the Maven repository:**
+          \`\`\`gradle
+          maven { url = \"https://maven.xdpxi.net/snapshots\" }
+          \`\`\`
+
+          **Add the dependency:**
+          \`\`\`gradle
+          compileOnly \"dev.xdpxi:swiftmc:${VERSION}\"
+          \`\`\`
+
+          **Download server JAR:** [swiftmc-${VERSION}.jar](https://maven.xdpxi.net/snapshots/dev/xdpxi/swiftmc/${VERSION}/swiftmc-${VERSION}.jar)"
