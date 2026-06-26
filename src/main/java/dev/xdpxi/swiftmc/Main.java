@@ -43,7 +43,6 @@ public class Main {
     private static Path lockFile;
     private static InstanceContainer instanceContainer;
     private static PolarLoader polarLoader;
-    private static Path polarFile;
     private static PluginManager pluginManager;
     private static MobSpawner mobSpawner;
     private static volatile boolean isShuttingDown = false;
@@ -170,7 +169,7 @@ public class Main {
         // Polar world loader
         Path worldFolder = Path.of("worlds");
         Files.createDirectories(worldFolder);
-        polarFile = worldFolder.resolve("overworld.polar");
+        Path polarFile = worldFolder.resolve("overworld.polar");
 
         polarLoader = new PolarLoader(polarFile);
         polarLoader.setParallel(true);

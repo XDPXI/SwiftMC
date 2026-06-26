@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
@@ -33,12 +34,13 @@ public class PlayerDataManager {
         }
     }
 
-    public static CompletableFuture<Void> savePlayer(Player player) {
+    public static @NonNull CompletableFuture<Void> savePlayer(Player player) {
         PlayerData data = new PlayerData(player);
         return saveDataAsync(player.getUuid(), data);
     }
 
-    static CompletableFuture<Void> saveDataAsync(UUID uuid, PlayerData data) {
+    @Contract("_, _ -> new")
+    static @NonNull CompletableFuture<Void> saveDataAsync(UUID uuid, PlayerData data) {
         return CompletableFuture.runAsync(() -> {
             try {
                 Path file = PLAYER_FOLDER.resolve(uuid + ".json");
@@ -66,7 +68,8 @@ public class PlayerDataManager {
         });
     }
 
-    static CompletableFuture<PlayerData> loadDataAsync(UUID uuid) {
+    @Contract("_ -> new")
+    static @NonNull CompletableFuture<PlayerData> loadDataAsync(UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Path file = PLAYER_FOLDER.resolve(uuid + ".json");
@@ -81,7 +84,8 @@ public class PlayerDataManager {
         }, IO_EXECUTOR);
     }
 
-    public static CompletableFuture<Boolean> setOp(String username, boolean op) {
+    @Contract("_, _ -> new")
+    public static @NonNull CompletableFuture<Boolean> setOp(String username, boolean op) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 if (!Files.exists(PLAYER_FOLDER)) return false;
