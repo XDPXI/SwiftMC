@@ -5,7 +5,6 @@ import dev.xdpxi.swiftmc.utils.FastNoise;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.generator.GenerationUnit;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -73,6 +72,20 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
             }
         }
 
+        // Precompute per-column values to avoid redundant noise/hash calls inside loops
+        int[][] dirtDepths = new int[16][16];
+        double[][] bedrockNCache = new double[16][16];
+        double[][] deepslateNCache = new double[16][16];
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                int wx = baseX + x;
+                int wz = baseZ + z;
+                dirtDepths[x][z] = dirtDepth(wx, wz);
+                bedrockNCache[x][z] = (bedrockNoise.get(wx * 0.4, wz * 0.4) + 1.0) / 2.0;
+                deepslateNCache[x][z] = (deepslateNoise.get(wx * 0.4, wz * 0.4) + 1.0) / 2.0;
+            }
+        }
+
         List<TreePos> trees = new ArrayList<>();
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
@@ -81,9 +94,9 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
                 int worldX = baseX + x;
                 int worldZ = baseZ + z;
                 int height = smoothedHeightMap[x][z];
-                int dirtDepth = dirtDepth(worldX, worldZ);
 
-                generateColumn(unit, x, z, worldX, worldZ, height, dirtDepth, startY, endY, smoothedHeightMap);
+                generateColumn(unit, x, z, worldX, worldZ, height, dirtDepths[x][z], startY, endY,
+                        smoothedHeightMap, bedrockNCache[x][z], deepslateNCache[x][z]);
 
                 if (height > WATER_LEVEL && random.nextDouble() < profile.getTreeProbability(worldX, worldZ)
                         && x >= 2 && x <= 13 && z >= 2 && z <= 13
@@ -101,7 +114,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
             placeTree(unit, tree.x, tree.y, tree.z);
         }
 
-        placeOreVeins(unit, baseX, baseZ, startY, endY, smoothedHeightMap);
+        placeOreVeins(unit, baseX, baseZ, startY, endY, smoothedHeightMap, dirtDepths);
     }
 
     private void placeTree(GenerationUnit unit, int worldX, int worldY, int worldZ) {
@@ -151,26 +164,6 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         }
     }
 
-    private @Nullable Block getBedrockOverride(int y, int worldX, int worldZ) {
-        if (y == BEDROCK_Y) return Block.BEDROCK;
-        if (y > BEDROCK_Y && y <= BEDROCK_Y + BEDROCK_TRANSITION_HEIGHT) {
-            double t = (double) (y - BEDROCK_Y) / (BEDROCK_TRANSITION_HEIGHT + 1);
-            double n = (bedrockNoise.get(worldX * 0.4, worldZ * 0.4) + 1.0) / 2.0;
-            if (n > t) return Block.BEDROCK;
-        }
-        return null;
-    }
-
-    private Block getStoneOrDeepslate(int y, int worldX, int worldZ) {
-        if (y <= DEEPSLATE_Y) return Block.DEEPSLATE;
-        if (y <= DEEPSLATE_Y + DEEPSLATE_TRANSITION_HEIGHT) {
-            double t = (double) (y - DEEPSLATE_Y) / (DEEPSLATE_TRANSITION_HEIGHT + 1);
-            double n = (deepslateNoise.get(worldX * 0.4, worldZ * 0.4) + 1.0) / 2.0;
-            if (n > t) return Block.DEEPSLATE;
-        }
-        return Block.STONE;
-    }
-
     private int dirtDepth(int worldX, int worldZ) {
         long h = seed ^ (worldX * 374761393L) ^ (worldZ * 668265263L);
         h = (h ^ (h >>> 13)) * 1274126177L;
@@ -179,14 +172,21 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
     }
 
     private void generateColumn(@NonNull GenerationUnit unit, int x, int z, int worldX, int worldZ, int height,
-                                int dirtDepth, int startY, int endY, int[][] heightMap) {
+                                int dirtDepth, int startY, int endY, int[][] heightMap,
+                                double bedrockN, double deepslateN) {
         var modifier = unit.modifier();
 
         int bedrockTop = BEDROCK_Y + BEDROCK_TRANSITION_HEIGHT;
         int bedrockLoopEnd = Math.min(endY, bedrockTop + 1);
         for (int y = Math.max(startY, BEDROCK_Y); y < bedrockLoopEnd; y++) {
-            Block block = getBedrockOverride(y, worldX, worldZ);
-            modifier.setBlock(worldX, y, worldZ, block != null ? block : Block.DEEPSLATE);
+            Block block;
+            if (y == BEDROCK_Y) {
+                block = Block.BEDROCK;
+            } else {
+                double t = (double) (y - BEDROCK_Y) / (BEDROCK_TRANSITION_HEIGHT + 1);
+                block = bedrockN > t ? Block.BEDROCK : Block.DEEPSLATE;
+            }
+            modifier.setBlock(worldX, y, worldZ, block);
         }
 
         int dirtStart = height - 1 - dirtDepth;
@@ -205,7 +205,8 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
             int transitionStart = Math.max(stoneStart, deepslateTransitionStart);
             int transitionEnd = Math.min(stoneEnd, deepslateTransitionEnd);
             for (int y = transitionStart; y < transitionEnd; y++) {
-                modifier.setBlock(worldX, y, worldZ, getStoneOrDeepslate(y, worldX, worldZ));
+                double t = (double) (y - DEEPSLATE_Y) / (DEEPSLATE_TRANSITION_HEIGHT + 1);
+                modifier.setBlock(worldX, y, worldZ, deepslateN > t ? Block.DEEPSLATE : Block.STONE);
             }
 
             int pureStoneStart = Math.max(stoneStart, deepslateTransitionEnd);
@@ -245,7 +246,8 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
         return false;
     }
 
-    private void placeOreVeins(GenerationUnit unit, int baseX, int baseZ, int startY, int endY, int[][] smoothedHeightMap) {
+    private void placeOreVeins(GenerationUnit unit, int baseX, int baseZ, int startY, int endY,
+                               int[][] smoothedHeightMap, int[][] dirtDepths) {
         ThreadLocalRandom random = ThreadLocalRandom.current();
         for (Ore ore : Ore.values()) {
             for (int i = 0; i < ore.attemptsPerChunk; i++) {
@@ -253,21 +255,18 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
 
                 int x = random.nextInt(16);
                 int z = random.nextInt(16);
-                int worldX = baseX + x;
-                int worldZ = baseZ + z;
-                int dirtDepth = dirtDepth(worldX, worldZ);
-                int maxStoneY = Math.min(endY - 1, smoothedHeightMap[x][z] - 2 - dirtDepth);
+                int maxStoneY = Math.min(endY - 1, smoothedHeightMap[x][z] - 2 - dirtDepths[x][z]);
                 if (maxStoneY < startY) continue;
 
                 int y = startY + random.nextInt(maxStoneY - startY + 1);
                 int goal = 1 + random.nextInt(ore.maxVeinSize);
-                growOreVein(unit, baseX, baseZ, startY, endY, smoothedHeightMap, x, y, z, goal, ore);
+                growOreVein(unit, baseX, baseZ, startY, endY, smoothedHeightMap, dirtDepths, x, y, z, goal, ore);
             }
         }
     }
 
     private void growOreVein(GenerationUnit unit, int baseX, int baseZ, int startY, int endY,
-                             int[][] smoothedHeightMap, int startX, int startVeinY, int startZ,
+                             int[][] smoothedHeightMap, int[][] dirtDepths, int startX, int startVeinY, int startZ,
                              int goal, Ore ore) {
         int[][] dirs = {{1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {0, 0, 1}, {0, 0, -1}};
 
@@ -294,10 +293,7 @@ public class TerrainGenerator implements net.minestom.server.instance.generator.
             if (visited.contains(key)) continue;
             visited.add(key);
 
-            int worldX = baseX + nx;
-            int worldZ = baseZ + nz;
-            int dirtDepth = dirtDepth(worldX, worldZ);
-            int maxStoneY = smoothedHeightMap[nx][nz] - 2 - dirtDepth;
+            int maxStoneY = smoothedHeightMap[nx][nz] - 2 - dirtDepths[nx][nz];
             if (ny > maxStoneY) continue;
 
             placeOreBlock(unit, baseX, baseZ, nx, ny, nz, ore);
