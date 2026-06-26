@@ -85,6 +85,43 @@ public class PlayerDataManager {
         }, IO_EXECUTOR);
     }
 
+    @Contract("_, _, _ -> new")
+    public static @NonNull CompletableFuture<Boolean> setBan(String username, boolean banned, String reason) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                if (!Files.exists(PLAYER_FOLDER)) return false;
+                for (Path file : Files.newDirectoryStream(PLAYER_FOLDER, "*.json")) {
+                    String json = Files.readString(file);
+                    PlayerData data = GSON.fromJson(json, PlayerData.class);
+                    if (data != null && username.equalsIgnoreCase(data.username)) {
+                        data.banned = banned;
+                        data.banReason = reason == null ? "" : reason;
+                        Files.writeString(file, GSON.toJson(data));
+                        if (banned) {
+                            for (Player online : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
+                                if (online.getUsername().equalsIgnoreCase(username)) {
+                                    String msg = reason != null && !reason.isBlank()
+                                            ? "You have been banned: " + reason
+                                            : "You have been banned from this server.";
+                                    online.kick(msg);
+                                    break;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }, IO_EXECUTOR);
+    }
+
+    public static @NonNull CompletableFuture<PlayerData> loadDataByUuid(@NonNull UUID uuid) {
+        return loadDataAsync(uuid);
+    }
+
     @Contract("_, _ -> new")
     public static @NonNull CompletableFuture<Boolean> setOp(String username, boolean op) {
         return CompletableFuture.supplyAsync(() -> {

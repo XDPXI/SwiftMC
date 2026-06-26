@@ -214,6 +214,9 @@ public class Main {
         MinecraftServer.getCommandManager().register(new Teleport());
         MinecraftServer.getCommandManager().register(new Op());
         MinecraftServer.getCommandManager().register(new Deop());
+        MinecraftServer.getCommandManager().register(new Kick());
+        MinecraftServer.getCommandManager().register(new Ban());
+        MinecraftServer.getCommandManager().register(new Unban());
         Log.info("Commands registered.");
 
         // Minestom PVP Events
