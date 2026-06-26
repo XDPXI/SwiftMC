@@ -2,6 +2,7 @@ package dev.xdpxi.swiftmc.player;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import org.jspecify.annotations.NonNull;
 
@@ -60,6 +61,7 @@ public class PlayerDataManager {
                     player.setGameMode(data.gameMode);
                 }
                 data.applyInventory(player);
+                player.setPermissionLevel(data.op ? 4 : 0);
             });
         });
     }
@@ -76,6 +78,33 @@ public class PlayerDataManager {
                 e.printStackTrace();
                 return null;
             }
+        }, IO_EXECUTOR);
+    }
+
+    public static CompletableFuture<Boolean> setOp(String username, boolean op) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                if (!Files.exists(PLAYER_FOLDER)) return false;
+                for (Path file : Files.newDirectoryStream(PLAYER_FOLDER, "*.json")) {
+                    String json = Files.readString(file);
+                    PlayerData data = GSON.fromJson(json, PlayerData.class);
+                    if (data != null && username.equalsIgnoreCase(data.username)) {
+                        data.op = op;
+                        Files.writeString(file, GSON.toJson(data));
+                        // Apply immediately if the player is online
+                        for (Player online : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
+                            if (online.getUsername().equalsIgnoreCase(username)) {
+                                online.setPermissionLevel(op ? 4 : 0);
+                                break;
+                            }
+                        }
+                        return true;
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return false;
         }, IO_EXECUTOR);
     }
 

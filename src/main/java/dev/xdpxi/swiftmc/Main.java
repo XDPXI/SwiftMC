@@ -1,7 +1,9 @@
 package dev.xdpxi.swiftmc;
 
 import dev.lu15.voicechat.VoiceChat;
+import dev.xdpxi.swiftmc.commands.Deop;
 import dev.xdpxi.swiftmc.commands.Gamemode;
+import dev.xdpxi.swiftmc.commands.Op;
 import dev.xdpxi.swiftmc.commands.Stop;
 import dev.xdpxi.swiftmc.commands.Teleport;
 import dev.xdpxi.swiftmc.events.*;
@@ -215,6 +217,8 @@ public class Main {
         MinecraftServer.getCommandManager().register(new Gamemode());
         MinecraftServer.getCommandManager().register(new Stop());
         MinecraftServer.getCommandManager().register(new Teleport());
+        MinecraftServer.getCommandManager().register(new Op());
+        MinecraftServer.getCommandManager().register(new Deop());
         Log.info("Commands registered.");
 
         // Minestom PVP Events
@@ -291,6 +295,22 @@ public class Main {
                                     Log.info("Received stop command.");
                                     shutdown();
                                     System.exit(0);
+                                } else if (line.toLowerCase().startsWith("op ")) {
+                                    String name = line.substring(3).trim();
+                                    if (!name.isEmpty()) {
+                                        PlayerDataManager.setOp(name, true).thenAccept(found -> {
+                                            if (found) Log.info("Opped " + name + ".");
+                                            else Log.warn("Player '" + name + "' has never joined the server.");
+                                        });
+                                    }
+                                } else if (line.toLowerCase().startsWith("deop ")) {
+                                    String name = line.substring(5).trim();
+                                    if (!name.isEmpty()) {
+                                        PlayerDataManager.setOp(name, false).thenAccept(found -> {
+                                            if (found) Log.info("Deopped " + name + ".");
+                                            else Log.warn("Player '" + name + "' has never joined the server.");
+                                        });
+                                    }
                                 }
                             }
                         } catch (Exception e) {

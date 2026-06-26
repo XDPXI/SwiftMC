@@ -13,14 +13,17 @@ import java.util.List;
 public class PlayerData {
 
     public final List<ItemSerialization> inventory = new ArrayList<>();
+    public String username;
     public double x, y, z;
     public float yaw, pitch;
     public GameMode gameMode;
+    public boolean op = false;
 
     public PlayerData() {
     }
 
     public PlayerData(@NonNull Player player) {
+        this.username = player.getUsername();
         Pos pos = player.getPosition();
         this.x = pos.x();
         this.y = pos.y();
@@ -28,6 +31,7 @@ public class PlayerData {
         this.yaw = pos.yaw();
         this.pitch = pos.pitch();
         this.gameMode = player.getGameMode();
+        this.op = player.getPermissionLevel() >= 2;
 
         // Save inventory
         PlayerInventory inv = player.getInventory();
