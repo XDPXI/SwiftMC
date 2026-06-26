@@ -2,7 +2,9 @@ package dev.xdpxi.swiftmc.player;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
@@ -32,12 +34,13 @@ public class PlayerDataManager {
         }
     }
 
-    public static CompletableFuture<Void> savePlayer(Player player) {
+    public static @NonNull CompletableFuture<Void> savePlayer(Player player) {
         PlayerData data = new PlayerData(player);
         return saveDataAsync(player.getUuid(), data);
     }
 
-    static CompletableFuture<Void> saveDataAsync(UUID uuid, PlayerData data) {
+    @Contract("_, _ -> new")
+    static @NonNull CompletableFuture<Void> saveDataAsync(UUID uuid, PlayerData data) {
         return CompletableFuture.runAsync(() -> {
             try {
                 Path file = PLAYER_FOLDER.resolve(uuid + ".json");
@@ -60,11 +63,14 @@ public class PlayerDataManager {
                     player.setGameMode(data.gameMode);
                 }
                 data.applyInventory(player);
+                player.setPermissionLevel(data.op ? 4 : 0);
+                player.refreshCommands();
             });
         });
     }
 
-    static CompletableFuture<PlayerData> loadDataAsync(UUID uuid) {
+    @Contract("_ -> new")
+    static @NonNull CompletableFuture<PlayerData> loadDataAsync(UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Path file = PLAYER_FOLDER.resolve(uuid + ".json");
@@ -76,6 +82,35 @@ public class PlayerDataManager {
                 e.printStackTrace();
                 return null;
             }
+        }, IO_EXECUTOR);
+    }
+
+    @Contract("_, _ -> new")
+    public static @NonNull CompletableFuture<Boolean> setOp(String username, boolean op) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                if (!Files.exists(PLAYER_FOLDER)) return false;
+                for (Path file : Files.newDirectoryStream(PLAYER_FOLDER, "*.json")) {
+                    String json = Files.readString(file);
+                    PlayerData data = GSON.fromJson(json, PlayerData.class);
+                    if (data != null && username.equalsIgnoreCase(data.username)) {
+                        data.op = op;
+                        Files.writeString(file, GSON.toJson(data));
+                        // Apply immediately if the player is online
+                        for (Player online : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
+                            if (online.getUsername().equalsIgnoreCase(username)) {
+                                online.setPermissionLevel(op ? 4 : 0);
+                                online.refreshCommands();
+                                break;
+                            }
+                        }
+                        return true;
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return false;
         }, IO_EXECUTOR);
     }
 

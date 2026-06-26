@@ -84,4 +84,35 @@ class ConfigTest {
 
         assertDoesNotThrow(() -> Config.loadOrCreate());
     }
+
+    @Test
+    void loadsChunkGenerationThreadsFromConfig() throws Exception {
+        String yaml = "seed: 1\nport: 25565\nchunkGenerationThreads: 4\n";
+        try (FileWriter fw = new FileWriter(tempDir.resolve("config.yml").toFile())) {
+            fw.write(yaml);
+        }
+
+        Config config = Config.loadOrCreate();
+
+        assertEquals(4, config.chunkGenerationThreads);
+    }
+
+    @Test
+    void defaultChunkGenerationThreadsIsAtLeastOne() throws Exception {
+        Config config = Config.loadOrCreate();
+
+        assertTrue(config.chunkGenerationThreads >= 1);
+    }
+
+    @Test
+    void missingChunkGenerationThreadsUsesDefault() throws Exception {
+        String yaml = "seed: 1\nport: 25565\n";
+        try (FileWriter fw = new FileWriter(tempDir.resolve("config.yml").toFile())) {
+            fw.write(yaml);
+        }
+
+        Config config = Config.loadOrCreate();
+
+        assertEquals(Math.max(1, Runtime.getRuntime().availableProcessors() - 1), config.chunkGenerationThreads);
+    }
 }

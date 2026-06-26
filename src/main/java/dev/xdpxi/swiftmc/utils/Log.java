@@ -146,7 +146,8 @@ public class Log {
      */
     private static void awaitDrain() {
         try {
-            WRITER.submit(() -> {}).get();
+            WRITER.submit(() -> {
+            }).get();
         } catch (Exception ignored) {
             // best-effort drain
         }

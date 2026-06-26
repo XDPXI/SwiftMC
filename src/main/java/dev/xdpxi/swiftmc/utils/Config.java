@@ -22,6 +22,7 @@ public class Config {
     public boolean velocity = false;
     public String velocitySecret = "ENTER-YOUR-SECRET-HERE";
     public boolean simpleVoiceChat = true;
+    public int chunkGenerationThreads = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
 
     private static @NonNull File getConfigFile() {
         String userDir = System.getProperty("user.dir");
@@ -67,6 +68,10 @@ public class Config {
                 Object simpleVoiceChatObj = map.get("simpleVoiceChat");
                 if (simpleVoiceChatObj != null) config.simpleVoiceChat =
                         (Boolean) simpleVoiceChatObj;
+
+                Object chunkGenerationThreadsObj = map.get("chunkGenerationThreads");
+                if (chunkGenerationThreadsObj != null)
+                    config.chunkGenerationThreads = (Integer) chunkGenerationThreadsObj;
             }
         } else {
             Log.warn("Config not found! Generating with default values.");
@@ -82,6 +87,7 @@ public class Config {
             data.put("velocity", config.velocity);
             data.put("velocitySecret", config.velocitySecret);
             data.put("simpleVoiceChat", config.simpleVoiceChat);
+            data.put("chunkGenerationThreads", config.chunkGenerationThreads);
 
             DumperOptions dumperOptions = new DumperOptions();
             dumperOptions.setPrettyFlow(true);

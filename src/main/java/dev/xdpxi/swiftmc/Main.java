@@ -1,17 +1,14 @@
 package dev.xdpxi.swiftmc;
 
 import dev.lu15.voicechat.VoiceChat;
-import dev.xdpxi.swiftmc.commands.Adventure;
-import dev.xdpxi.swiftmc.commands.Creative;
-import dev.xdpxi.swiftmc.commands.Spectator;
-import dev.xdpxi.swiftmc.commands.Survival;
+import dev.xdpxi.swiftmc.commands.*;
 import dev.xdpxi.swiftmc.events.*;
 import dev.xdpxi.swiftmc.mobs.MobSpawner;
 import dev.xdpxi.swiftmc.player.PlayerDataManager;
 import dev.xdpxi.swiftmc.plugin.PluginManager;
+import dev.xdpxi.swiftmc.terrain.TerrainGenerator;
 import dev.xdpxi.swiftmc.utils.Config;
 import dev.xdpxi.swiftmc.utils.Log;
-import dev.xdpxi.swiftmc.terrain.TerrainGenerator;
 import io.github.togar2.fluids.MinestomFluids;
 import io.github.togar2.pvp.MinestomPvP;
 import io.github.togar2.pvp.feature.CombatFeatureSet;
@@ -42,7 +39,6 @@ public class Main {
     private static Path lockFile;
     private static InstanceContainer instanceContainer;
     private static PolarLoader polarLoader;
-    private static Path polarFile;
     private static PluginManager pluginManager;
     private static MobSpawner mobSpawner;
     private static volatile boolean isShuttingDown = false;
@@ -169,13 +165,15 @@ public class Main {
         // Polar world loader
         Path worldFolder = Path.of("worlds");
         Files.createDirectories(worldFolder);
-        polarFile = worldFolder.resolve("overworld.polar");
+        Path polarFile = worldFolder.resolve("overworld.polar");
 
         polarLoader = new PolarLoader(polarFile);
+        polarLoader.setParallel(true);
         instanceContainer.setChunkLoader(polarLoader);
         Log.info("Polar world loader set for instance.");
 
         // Terrain Generator
+        TerrainGenerator.init(config.chunkGenerationThreads);
         instanceContainer.setGenerator(new TerrainGenerator());
         Log.info("Custom terrain generator applied.");
 
@@ -211,10 +209,11 @@ public class Main {
         Log.info("Mob spawner initialized.");
 
         // Commands
-        MinecraftServer.getCommandManager().register(new Spectator());
-        MinecraftServer.getCommandManager().register(new Creative());
-        MinecraftServer.getCommandManager().register(new Survival());
-        MinecraftServer.getCommandManager().register(new Adventure());
+        MinecraftServer.getCommandManager().register(new Gamemode());
+        MinecraftServer.getCommandManager().register(new Stop());
+        MinecraftServer.getCommandManager().register(new Teleport());
+        MinecraftServer.getCommandManager().register(new Op());
+        MinecraftServer.getCommandManager().register(new Deop());
         Log.info("Commands registered.");
 
         // Minestom PVP Events
@@ -291,6 +290,22 @@ public class Main {
                                     Log.info("Received stop command.");
                                     shutdown();
                                     System.exit(0);
+                                } else if (line.toLowerCase().startsWith("op ")) {
+                                    String name = line.substring(3).trim();
+                                    if (!name.isEmpty()) {
+                                        PlayerDataManager.setOp(name, true).thenAccept(found -> {
+                                            if (found) Log.info("Opped " + name + ".");
+                                            else Log.warn("Player '" + name + "' has never joined the server.");
+                                        });
+                                    }
+                                } else if (line.toLowerCase().startsWith("deop ")) {
+                                    String name = line.substring(5).trim();
+                                    if (!name.isEmpty()) {
+                                        PlayerDataManager.setOp(name, false).thenAccept(found -> {
+                                            if (found) Log.info("Deopped " + name + ".");
+                                            else Log.warn("Player '" + name + "' has never joined the server.");
+                                        });
+                                    }
                                 }
                             }
                         } catch (Exception e) {
