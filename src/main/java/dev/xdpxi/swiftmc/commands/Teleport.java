@@ -3,6 +3,7 @@ package dev.xdpxi.swiftmc.commands;
 import dev.xdpxi.swiftmc.utils.Log;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.command.ConsoleSender;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.relative.ArgumentRelativeVec3;
 import net.minestom.server.coordinate.Pos;
@@ -15,6 +16,10 @@ public class Teleport extends Command {
         super("tp", "teleport");
 
         var posArg = new ArgumentRelativeVec3("position");
+
+        setCondition((sender, cmd) ->
+                sender instanceof ConsoleSender || (sender instanceof Player p && p.getPermissionLevel() >= 2)
+        );
 
         setDefaultExecutor((sender, context) ->
                 sender.sendMessage(Component.text("Usage: /tp <x> <y> <z>", NamedTextColor.RED))

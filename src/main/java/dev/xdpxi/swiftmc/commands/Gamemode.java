@@ -3,6 +3,7 @@ package dev.xdpxi.swiftmc.commands;
 import dev.xdpxi.swiftmc.utils.Log;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.command.ConsoleSender;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.command.builder.arguments.ArgumentType;
@@ -16,6 +17,10 @@ public class Gamemode extends Command {
 
         var modeArg = ArgumentType.Enum("mode", GameModeArg.class)
                 .setFormat(ArgumentEnum.Format.LOWER_CASED);
+
+        setCondition((sender, cmd) ->
+                sender instanceof ConsoleSender || (sender instanceof Player p && p.getPermissionLevel() >= 2)
+        );
 
         setDefaultExecutor((sender, context) ->
                 sender.sendMessage(Component.text("Usage: /gamemode <adventure|survival|creative|spectator>", NamedTextColor.RED))
