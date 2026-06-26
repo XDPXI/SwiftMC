@@ -18,6 +18,8 @@ public class PlayerData {
     public float yaw, pitch;
     public GameMode gameMode;
     public boolean op = false;
+    public boolean banned = false;
+    public String banReason = "";
 
     public PlayerData() {
     }
