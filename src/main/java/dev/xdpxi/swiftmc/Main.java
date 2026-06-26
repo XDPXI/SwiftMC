@@ -1,10 +1,9 @@
 package dev.xdpxi.swiftmc;
 
 import dev.lu15.voicechat.VoiceChat;
-import dev.xdpxi.swiftmc.commands.Adventure;
-import dev.xdpxi.swiftmc.commands.Creative;
-import dev.xdpxi.swiftmc.commands.Spectator;
-import dev.xdpxi.swiftmc.commands.Survival;
+import dev.xdpxi.swiftmc.commands.Gamemode;
+import dev.xdpxi.swiftmc.commands.Stop;
+import dev.xdpxi.swiftmc.commands.Teleport;
 import dev.xdpxi.swiftmc.events.*;
 import dev.xdpxi.swiftmc.mobs.MobSpawner;
 import dev.xdpxi.swiftmc.player.PlayerDataManager;
@@ -213,10 +212,9 @@ public class Main {
         Log.info("Mob spawner initialized.");
 
         // Commands
-        MinecraftServer.getCommandManager().register(new Spectator());
-        MinecraftServer.getCommandManager().register(new Creative());
-        MinecraftServer.getCommandManager().register(new Survival());
-        MinecraftServer.getCommandManager().register(new Adventure());
+        MinecraftServer.getCommandManager().register(new Gamemode());
+        MinecraftServer.getCommandManager().register(new Stop());
+        MinecraftServer.getCommandManager().register(new Teleport());
         Log.info("Commands registered.");
 
         // Minestom PVP Events
